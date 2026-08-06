@@ -9,6 +9,7 @@ BLOCKSDS	?= /opt/blocksds/core
 NAME		:= sprites_animated
 GAME_TITLE	:= Animated sprites
 GAME_SUBTITLE	:= 2D graphics: Sprites
+COMPDB = 1
 
 # Source code paths
 # -----------------
