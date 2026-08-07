@@ -31,14 +31,16 @@ NITROFSDIR	?= nitrofiles
 SDROOT		:= sdroot
 # Name of the generated image it "DSi-1.sd" for no$gba in DSi mode
 SDIMAGE		:= image.bin
+AUDIODIRS	:= audio
 
 # Libraries
 # ---------
 
-LIBS		+= -lnflib -ldswifi9 -lnds9 -lc
+LIBS		+= -lnflib -ldswifi9 -lnds9 -lc -lmm9
 LIBDIRS		+= $(BLOCKSDSEXT)/nflib \
 		   $(BLOCKSDS)/libs/dswifi \
-		   $(BLOCKSDS)/libs/libnds
+		   $(BLOCKSDS)/libs/libnds \
+		   $(BLOCKSDS)/libs/maxmod
 
 # Build artifacts
 # ---------------
