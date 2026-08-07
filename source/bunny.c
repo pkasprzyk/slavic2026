@@ -5,7 +5,6 @@
 #include <nf_lib.h>
 
 #include "level.h"
-#include "nds/dma.h"
 #include "sprites.h"
 
 typedef struct
@@ -55,7 +54,9 @@ void bunnies_update(void)
     frame_cnt %= 60*2;
     for (u16 i = 0; i < bunnies_cnt; ++i)
     {
-        NF_MoveSprite(SCREEN_BOT, bunnies[i].oam_id, bunnies[i].x - level_cam_x(), bunnies[i].y - level_cam_y());
+        s16 phaseSin = sinLerp((frame_cnt-60)*(32767/60)); // 4.12 fixed
+        s16 offset = (5 * phaseSin) >>12;
+        NF_MoveSprite(SCREEN_BOT, bunnies[i].oam_id, bunnies[i].x - level_cam_x(), bunnies[i].y - level_cam_y() + offset);
         NF_SpriteFrame(SCREEN_BOT, bunnies[i].oam_id, frame_cnt / 30);
     }
 }
