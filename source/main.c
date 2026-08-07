@@ -5,6 +5,7 @@
 #include <nf_lib.h>
 
 #include "game.h"
+#include "ids.h"
 
 int main(void) {
 
@@ -13,7 +14,7 @@ int main(void) {
   while (1) {
     scanKeys();
     game_update();
-    NF_SpriteOamSet(1);
+    NF_SpriteOamSet(SCR_WORLD);
     swiWaitForVBlank();
     oamUpdate(&oamSub);
   }

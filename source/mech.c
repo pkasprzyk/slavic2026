@@ -4,32 +4,27 @@
 
 #include <nf_lib.h>
 
+#include "ids.h"
 #include "level.h"
 #include "mech.h"
+#include "sprites.h"
 
 #define MECH_SPEED 2
 
 #define MECH_W 32
 #define MECH_H 32
 
-#define COLMAP_SLOT 0
-#define TILE_SOLID 1
-
 static s16 mech_x;
 static s16 mech_y;
 
 void mech_init(void)
 {
-    NF_LoadSpriteGfx("spr/mech", 0, 32, 32);
-    NF_LoadSpritePal("spr/mech", 0);
-    NF_VramSpriteGfx(1, 0, 0, true);
-    NF_VramSpritePal(1, 0, 0);
-
     mech_x = 128;
     mech_y = 128;
 
-    NF_CreateSprite(1, 0, 0, 0, mech_x, mech_y);
-    NF_SpriteLayer(1, 0, 3);
+    if (!sprite_create(SCR_WORLD, &SPRITES[SPR_MECH], mech_x, mech_y))
+        while (1)
+            swiWaitForVBlank();
 }
 
 static int tile_solid(s32 x, s32 y)
@@ -81,5 +76,6 @@ void mech_update(void)
 
     level_update_camera(mech_x + MECH_W / 2, mech_y + MECH_H / 2);
 
-    NF_MoveSprite(1, 0, mech_x - level_cam_x(), mech_y - level_cam_y());
+    sprite_move(SCR_WORLD, &SPRITES[SPR_MECH], mech_x - level_cam_x(),
+                mech_y - level_cam_y());
 }

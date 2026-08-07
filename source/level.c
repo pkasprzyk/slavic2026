@@ -4,6 +4,7 @@
 
 #include <nf_lib.h>
 
+#include "ids.h"
 #include "level.h"
 
 #define CAM_EASE 4
@@ -14,15 +15,15 @@ static s32 cam_y;
 
 void level_init(void)
 {
-    NF_LoadTiledBg("bg/forest", "forest", LEVEL_W, LEVEL_H);
-    NF_CreateTiledBg(1, 3, "forest");
+    NF_LoadTiledBg(PATH_BG_FOREST, BG_FOREST, LEVEL_W, LEVEL_H);
+    NF_CreateTiledBg(SCR_WORLD, LAYER_WORLD_BG, BG_FOREST);
 
     NF_InitCmapBuffers();
-    NF_LoadCollisionMap("maps/colmap", 0, LEVEL_W, LEVEL_H);
+    NF_LoadCollisionMap(PATH_COLMAP, COLMAP_SLOT, LEVEL_W, LEVEL_H);
 
     cam_x = 0;
     cam_y = 0;
-    NF_ScrollBg(1, 3, 0, 0);
+    NF_ScrollBg(SCR_WORLD, LAYER_WORLD_BG, 0, 0);
 }
 
 void level_update_camera(s16 target_x, s16 target_y)
@@ -42,7 +43,7 @@ void level_update_camera(s16 target_x, s16 target_y)
     cam_x += ((tx << CAM_FP) - cam_x) / CAM_EASE;
     cam_y += ((ty << CAM_FP) - cam_y) / CAM_EASE;
 
-    NF_ScrollBg(1, 3, cam_x >> CAM_FP, cam_y >> CAM_FP);
+    NF_ScrollBg(SCR_WORLD, LAYER_WORLD_BG, cam_x >> CAM_FP, cam_y >> CAM_FP);
 }
 
 s16 level_cam_x(void)

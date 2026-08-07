@@ -7,6 +7,7 @@
 
 #include "audio.h"
 #include "game.h"
+#include "ids.h"
 #include "level.h"
 #include "mech.h"
 
@@ -33,10 +34,10 @@ void game_init(void) {
   level_init();
   mech_init();
 
-  NF_LoadTextFont("fnt/default", "normal", 256, 256, 0);
-  NF_CreateTextLayer(0, 2, 0, "normal");
-  NF_WriteText(0, 2, 2, 2, "CHILLING MECH");
-  NF_WriteText(0, 2, 2, 4, "D-Pad moves the mech");
+  NF_LoadTextFont(PATH_FONT, FONT_NORMAL, 256, 256, 0);
+  NF_CreateTextLayer(SCR_CHAMBER, LAYER_CHAMBER_TEXT, 0, FONT_NORMAL);
+  NF_WriteText(SCR_CHAMBER, LAYER_CHAMBER_TEXT, 2, 2, "CHILLING MECH");
+  NF_WriteText(SCR_CHAMBER, LAYER_CHAMBER_TEXT, 2, 4, "D-Pad moves the mech");
   NF_UpdateTextLayers();
 
   srand(time(NULL));
