@@ -15,11 +15,17 @@ void LoadPalette(const char* file, u16 palette_id){
 void LoadGraphicImage(SpriteInfo info){
   u16 imgId = info.img_id;
   NF_LoadSpriteGfx(info.path, imgId, info.width, info.height);
-  NF_VramSpriteGfx(SCR_WORLD, imgId, imgId,  true);
+  if (info.is_top_screen) {
+    NF_VramSpriteGfx(SCR_CHAMBER, imgId, imgId,  true);
+  } else {
+    NF_VramSpriteGfx(SCR_WORLD, imgId, imgId,  true);
+  }
 }
 
 void InitSprites(void) {
   LoadPalette("spr/default_sprite", DEFAULT_SPRITE_PALETTE);
+  NF_VramSpritePal(SCR_CHAMBER,DEFAULT_SPRITE_PALETTE, DEFAULT_SPRITE_PALETTE);
+
   // LoadPalette(SPRITE_INFOS[MECH].path, SPRITE_INFOS[MECH].pal_id);
 
   for (int i = 0; i < SPRITE_CNT; i++) {

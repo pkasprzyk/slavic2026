@@ -15,7 +15,11 @@ int main(void) {
     scanKeys();
     game_update();
     NF_SpriteOamSet(SCR_WORLD);
+    NF_SpriteOamSet(SCR_CHAMBER);
     swiWaitForVBlank();
+    oamUpdate(&oamMain);
     oamUpdate(&oamSub);
   }
+
+  game_deinit();
 }
