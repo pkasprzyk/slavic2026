@@ -18,7 +18,7 @@
 #define REACTOR_MIN_TEMP 0
 #define REACTOR_MAX_TEMP 200
 
-#define BLOWING_THRESHOLD 100
+#define BLOWING_THRESHOLD 10000
 #define BLOWING_DECREASE_AMOUNT 5
 
 // The sample rate used for the recording (samples per second)
@@ -63,26 +63,14 @@ void microphone_handler(void *completed_buffer, int length) {
     s16 *wave_buf = memUncached(completed_buffer);
 
     int blowing_samples = 0;
-    int blow_min = 16000;
-    int blow_max = 0;
     for (int i = 0; i < length; i++) {
-        s32 sample = wave_buf[i * 2]; // one channel only
-        int val = sample >> 7;
-        if (val < blow_min) {
-            blow_min = val;
-        }
-        if (val > blow_max) {
-            blow_max = val;
-        }
-        if (val > BLOWING_THRESHOLD) {
+        s32 sample = wave_buf[i];
+        if (abs(sample) > BLOWING_THRESHOLD) {
             blowing_samples++;
         }
     }
 
-    snprintf(blowing_debug, sizeof(blowing_debug), "BLOW samples: %03d counter: %03d min: %03d max: %03d threshold: %03d",
-     blowing_samples, blowing_counter, blow_min, blow_max, BLOWING_THRESHOLD);
-    
-    if (blowing_samples < 0.6 * length) {
+    if (blowing_samples < 0.4 * length) {
         // not blowing enough, reset the counter
         blowing_counter = 0;
         return;
