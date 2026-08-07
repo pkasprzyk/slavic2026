@@ -3,6 +3,7 @@
 build/
 build-all/
 compile_commands.json
+-Wp,-v
 nitrofiles/
 
 .idea
