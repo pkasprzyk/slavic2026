@@ -14,7 +14,7 @@
 
 #define COLMAP_SLOT 0
 #define TILE_SOLID 1
-#define MECH__MAX_WATER 1000
+#define MECH_MAX_WATER 1000
 
 static s16 mech_x;
 static s16 mech_y;
