@@ -11,5 +11,6 @@
 
 bool sprite_create(int screen, const SpriteDef *def, s32 x, s32 y);
 void sprite_move(int screen, const SpriteDef *def, s32 x, s32 y);
+void sprite_hflip(int screen, const SpriteDef *def, bool flip);
 
 #endif

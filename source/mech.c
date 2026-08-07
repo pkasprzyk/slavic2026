@@ -16,6 +16,8 @@
 
 static s16 mech_x;
 static s16 mech_y;
+static s16 last_mech_x;
+static s16 last_mech_y;
 
 void mech_init(void)
 {
@@ -48,6 +50,8 @@ static int mech_blocked(s32 x, s32 y)
 void mech_update(void)
 {
     u16 held = keysHeld();
+    last_mech_x = mech_x;
+    last_mech_y = mech_y;
     s16 nx = mech_x;
     s16 ny = mech_y;
 
@@ -78,4 +82,6 @@ void mech_update(void)
 
     sprite_move(SCR_WORLD, &SPRITES[SPR_MECH], mech_x - level_cam_x(),
                 mech_y - level_cam_y());
+    if (last_mech_x != mech_x)
+        sprite_hflip(SCR_WORLD, &SPRITES[SPR_MECH], last_mech_x > mech_x);
 }
