@@ -3,7 +3,7 @@
 
 #include <nds.h>
 
-#define LEVEL_W 272
+#define LEVEL_W 512
 #define LEVEL_H 256
 #define SCREEN_W 256
 #define SCREEN_H 192
