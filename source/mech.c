@@ -20,7 +20,7 @@ static s16 mech_y;
 
 void mech_init(void)
 {
-    NF_LoadSpriteGfx("spr/mech", 0, 32, 32);
+    NF_LoadSpriteGfx("spr/mech", 0, 16, 16);
     NF_LoadSpritePal("spr/mech", 0);
     NF_VramSpriteGfx(1, 0, 0, true);
     NF_VramSpritePal(1, 0, 0);
