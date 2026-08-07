@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -xeu
 
 BLOCKSDS="${BLOCKSDS:-/opt/blocksds/core/}"
 GRIT=$BLOCKSDS/tools/grit/grit
@@ -7,6 +7,11 @@ $GRIT ball.png -ftB -fh! -gTFF00FF -gt -gB8 -m!
 $GRIT mech.png -ftB -fh! -gTFF00FF -gt -gB8 -m!
 
 mv *.pal *.img ../nitrofiles/spr
+
+# compile the font
+$GRIT default.png -ftB -fh! -gTFF00FF -gt -gB8 -m!
+
+mv *.pal *.img ../nitrofiles/fnt
 
 # The two backgrounds that share the palette have been edited to use 128 colors
 # each, so that the final combined palette is 256 colors in size.
