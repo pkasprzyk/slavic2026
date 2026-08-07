@@ -45,6 +45,7 @@ int main(int argc, char **argv)
     NF_Init8bitsBgBuffers();        // Initialize storage buffers
     NF_InitBitmapBgSys(1, 0);       // Initialize 8-bit bitmap backgrounds
     NF_Init8bitsBackBuffer(1);      // Initialize backbuffer
+    NF_Init8bitsBackBuffer(1);      // Initialize backbuffer
     NF_Enable8bitsBackBuffer(1);    // Enable backbuffer
 
     // Initialize sprite system in the bottom screen
@@ -75,6 +76,16 @@ int main(int argc, char **argv)
     // Transfer the required sprites to VRAM
     NF_VramSpriteGfx(1, 0, 0, true);
     NF_VramSpritePal(1, 0, 0);
+
+    // Load text font files from NitroFS
+    NF_LoadTextFont("fnt/default", "normal", 256, 256, 0); // Load normal text
+
+    // Create text layers
+    NF_CreateTextLayer(0, 2, 0, "normal");
+
+    NF_WriteText(0, 2, 1, 1, "Hola Mundo!\n Hello World!");
+
+    NF_UpdateTextLayers();
 
     // Set random seed based on the current time
     srand(time(NULL));
