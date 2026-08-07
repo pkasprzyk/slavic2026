@@ -3,5 +3,3 @@
 build/
 build-all/
 compile_commands.json
-
--std=c17
