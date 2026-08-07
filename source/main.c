@@ -3,64 +3,71 @@
 #include <stdio.h>
 #include <time.h>
 
-#include <nds.h>
 #include <filesystem.h>
+#include <maxmod9.h>
+#include <nds.h>
+#include <soundbank.h>
 
 #include <nf_lib.h>
 
 #include "level.h"
 #include "mech.h"
 
-int main(void)
-{
-    NF_Set2D(0, 0);
-    NF_Set2D(1, 0);
-    consoleDemoInit();
-    printf("\n Chilling Mech\n\n NitroFS init...\n");
+int main(void) {
+  NF_Set2D(0, 0);
+  NF_Set2D(1, 0);
+  consoleDemoInit();
+  printf("\n Chilling Mech\n\n NitroFS init...\n");
+  swiWaitForVBlank();
+
+  if (!nitroFSInit(NULL)) {
+    perror("nitroFSInit()");
+    while (1)
+      swiWaitForVBlank();
+  }
+  NF_SetRootFolder("NITROFS");
+
+  NF_Set2D(0, 0);
+  NF_Set2D(1, 0);
+
+  NF_InitTiledBgBuffers();
+  NF_InitTiledBgSys(0);
+  NF_InitTiledBgSys(1);
+
+  NF_InitTextSys(0);
+  NF_InitSpriteBuffers();
+  NF_InitSpriteSys(1);
+
+  level_init();
+  mech_init();
+
+  NF_LoadTextFont("fnt/default", "normal", 256, 256, 0);
+  NF_CreateTextLayer(0, 2, 0, "normal");
+  NF_WriteText(0, 2, 2, 2, "CHILLING MECH");
+  NF_WriteText(0, 2, 2, 4, "D-Pad moves the mech");
+  NF_UpdateTextLayers();
+
+  srand(time(NULL));
+
+  mmInitDefault("nitro:/soundbank.bin");
+  mmLoad(MOD_JOINT_PEOPLE);
+
+  mmStart(MOD_JOINT_PEOPLE, MM_PLAY_LOOP);
+
+  while (1) {
+    scanKeys();
+
+    mech_update();
+
+    NF_SpriteOamSet(1);
+
     swiWaitForVBlank();
 
-    if (!nitroFSInit(NULL))
-    {
-        perror("nitroFSInit()");
-        while (1)
-            swiWaitForVBlank();
-    }
-    NF_SetRootFolder("NITROFS");
+    oamUpdate(&oamSub);
+  }
 
-    NF_Set2D(0, 0);
-    NF_Set2D(1, 0);
+  mmStop();
+  soundDisable();
 
-    NF_InitTiledBgBuffers();
-    NF_InitTiledBgSys(0);
-    NF_InitTiledBgSys(1);
-
-    NF_InitTextSys(0);
-    NF_InitSpriteBuffers();
-    NF_InitSpriteSys(1);
-
-    level_init();
-    mech_init();
-
-    NF_LoadTextFont("fnt/default", "normal", 256, 256, 0);
-    NF_CreateTextLayer(0, 2, 0, "normal");
-    NF_WriteText(0, 2, 2, 2, "CHILLING MECH");
-    NF_WriteText(0, 2, 2, 4, "D-Pad moves the mech");
-    NF_UpdateTextLayers();
-
-    srand(time(NULL));
-
-    while (1)
-    {
-        scanKeys();
-
-        mech_update();
-
-        NF_SpriteOamSet(1);
-
-        swiWaitForVBlank();
-
-        oamUpdate(&oamSub);
-    }
-
-    return 0;
+  return 0;
 }
