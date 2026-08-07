@@ -14,33 +14,32 @@
 #define MECH_W 32
 #define MECH_H 32
 
-#define MECH_MAX_WATER 1000
+#define MECH_MAX_WATER 200
+
+#define SPRITE_ID 0
 
 static s16 mech_x;
 static s16 mech_y;
 static s16 last_mech_x;
 static s16 last_mech_y;
-static s16 mech_water_remaining;
+static s8 mech_water_remaining;
+static u16 frame_cnt = 0;
 
-void mech_init(void)
-{
-    mech_x = 128;
-    mech_y = 128;
-    mech_water_remaining = MECH_MAX_WATER;
+void mech_init(void) {
+  mech_x = 128;
+  mech_y = 128;
+  mech_water_remaining = MECH_MAX_WATER;
 
-    if (!sprite_create(SCR_WORLD, &SPRITES[SPR_MECH], mech_x, mech_y))
-        while (1)
-            swiWaitForVBlank();
+  NF_CreateSprite(SCR_WORLD, SPRITE_ID, MECH, 0, mech_x, mech_y);
+  NF_SpriteLayer(SCR_WORLD, SPRITE_ID, LAYER_WORLD_BG);
 }
 
-static int tile_blocked(s32 x, s32 y)
-{
+static int tile_blocked(s32 x, s32 y) {
     int t = NF_GetTile(COLMAP_SLOT, x, y);
     return t == TILE_SOLID || t == TILE_WATER;
 }
 
-static int mech_blocked(s32 x, s32 y)
-{
+static int mech_blocked(s32 x, s32 y) {
     if (tile_blocked(x, y))
         return 1;
     if (tile_blocked(x + MECH_W - 1, y))
@@ -52,8 +51,10 @@ static int mech_blocked(s32 x, s32 y)
     return 0;
 }
 
-void mech_update(void)
-{
+void mech_update(void) {
+    ++frame_cnt;
+    frame_cnt %= 60;
+
     u16 held = keysHeld();
     last_mech_x = mech_x;
     last_mech_y = mech_y;
@@ -79,19 +80,20 @@ void mech_update(void)
             mech_y--;
     }
 
-    if (mech_x < 0)
-        mech_x = 0;
-    if (mech_y < 0)
-        mech_y = 0;
-    if (mech_x > LEVEL_W - MECH_W)
-        mech_x = LEVEL_W - MECH_W;
-    if (mech_y > LEVEL_H - MECH_H)
-        mech_y = LEVEL_H - MECH_H;
+  if (mech_x < 0)
+    mech_x = 0;
+  if (mech_y < 0)
+    mech_y = 0;
+  if (mech_x > LEVEL_W - MECH_W)
+    mech_x = LEVEL_W - MECH_W;
+  if (mech_y > LEVEL_H - MECH_H)
+    mech_y = LEVEL_H - MECH_H;
 
-    level_update_camera(mech_x + MECH_W / 2, mech_y + MECH_H / 2);
+  level_update_camera(mech_x + MECH_W / 2, mech_y + MECH_H / 2);
 
-    sprite_move(SCR_WORLD, &SPRITES[SPR_MECH], mech_x - level_cam_x(),
+  NF_MoveSprite(SCR_WORLD, SPRITE_ID, mech_x - level_cam_x(),
                 mech_y - level_cam_y());
-    if (last_mech_x != mech_x)
-        sprite_hflip(SCR_WORLD, &SPRITES[SPR_MECH], last_mech_x > mech_x);
+  NF_SpriteFrame(SCR_WORLD, SPRITE_ID, frame_cnt / 30);
+  if (last_mech_x != mech_x)
+    NF_HflipSprite(SCR_WORLD, SPRITE_ID, last_mech_x > mech_x);
 }
