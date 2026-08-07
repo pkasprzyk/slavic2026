@@ -8,6 +8,7 @@
 #include "audio.h"
 #include "game.h"
 #include "ids.h"
+#include "bunny.h"
 #include "level.h"
 #include "mech.h"
 
@@ -33,6 +34,7 @@ void game_init(void) {
 
   level_init();
   mech_init();
+  bunnies_init();
 
   NF_LoadTextFont(PATH_FONT, FONT_NORMAL, 256, 256, 0);
   NF_CreateTextLayer(SCR_CHAMBER, LAYER_CHAMBER_TEXT, 0, FONT_NORMAL);
@@ -48,4 +50,5 @@ void game_init(void) {
 void game_update(void) {
   mech_update();
   audio_update();
+  bunnies_update();
 }
