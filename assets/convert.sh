@@ -4,6 +4,7 @@ BLOCKSDS="${BLOCKSDS:-/opt/blocksds/core/}"
 GRIT=$BLOCKSDS/tools/grit/grit
 
 $GRIT ball.png -ftB -fh! -gTFF00FF -gt -gB8 -m!
+$GRIT mech.png -ftB -fh! -gTFF00FF -gt -gB8 -m!
 
 mv *.pal *.img ../nitrofiles/spr
 
@@ -13,6 +14,7 @@ mv *.pal *.img ../nitrofiles/spr
 $GRIT img8b_1.png img8b_2.png -ftB -fh! -gTFF00FF -gb -gB8 -pS -Oimg8b_1.pal
 
 $GRIT nfl.png -ftB -fh! -gTFF00FF -gt -gB8 -mR8 -mLs
+$GRIT forest.png -ftB -fh! -gTFF00FF -gt -gB8 -mR8 -mLs
 
 # This is required or the library will say that the second background doesn't
 # have a palette.
