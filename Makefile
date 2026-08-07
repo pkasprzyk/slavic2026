@@ -16,6 +16,14 @@ COMPDB = 1
 
 GFXDIRS		:= graphics
 
+# Libraries
+# ---------
+
+LIBS		+= -lnflib -ldswifi9 -lnds9 -lc
+LIBDIRS		+= $(BLOCKSDSEXT)/nflib \
+		   $(BLOCKSDS)/libs/dswifi \
+		   $(BLOCKSDS)/libs/libnds
+
 include $(BLOCKSDS)/sys/default_makefiles/rom_arm9/Makefile
 
 
