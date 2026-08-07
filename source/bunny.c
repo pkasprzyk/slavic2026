@@ -5,6 +5,8 @@
 #include <nf_lib.h>
 
 #include "level.h"
+#include "nds/dma.h"
+#include "sprites.h"
 
 typedef struct
 {
@@ -37,17 +39,12 @@ void add_bunny(int x, int y)
 
 void bunnies_init(void)
 {
-    NF_LoadSpriteGfx("spr/sprite_hare_idle", SPRIFE_DEF_ID, 16, 16);
-    NF_LoadSpritePal("spr/sprite_hare_idle", SPRIFE_DEF_ID);
-    NF_VramSpriteGfx(SCREEN_BOT, SPRIFE_DEF_ID, VRAM_ID, true);
-    NF_VramSpritePal(SCREEN_BOT, SPRIFE_DEF_ID, PALETTE_ID);
-
     for (u16 i = 0; i < BUNNIES_MAX; ++i){
         add_bunny(i*16, i*16);
     }
     for (u16 i = 0; i < bunnies_cnt; ++i)
     {
-        NF_CreateSprite(SCREEN_BOT, bunnies[i].oam_id, VRAM_ID, PALETTE_ID, bunnies[i].x , bunnies[i].y);
+        NF_CreateSprite(SCREEN_BOT, bunnies[i].oam_id, SPRITE_INFOS[RABBITS].img_id, SPRITE_INFOS[RABBITS].pal_id, bunnies[i].x , bunnies[i].y);
         //NF_SpriteLayer(SCREEN_BOT, 0, 3);
     }
 }

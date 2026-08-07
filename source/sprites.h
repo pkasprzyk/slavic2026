@@ -13,17 +13,17 @@ typedef struct {
   const char *path;
   uint16_t width;
   uint16_t height;
-  uint16_t id;
+  uint16_t img_id;
   uint16_t pal_id;
 } SpriteInfo;
 
 enum { MECH = 0, RABBITS = 1, FIRE = 2 };
 
-#define SPRITE_CNT 1
+#define SPRITE_CNT 2
 
 static const SpriteInfo SPRITE_INFOS[SPRITE_CNT] = {
     [MECH] = {"spr/sprite_robot_idle", 32, 32, 0, 0},
-    //[RABBITS] = {"spr/rabbits", 32, 32, 1, 0},
+    [RABBITS] = {"spr/sprite_hare_idle", 16, 16, 1, 1},
     //[FIRE] = {"spr/fire", 32, 32, 2, 0}
 };
 
