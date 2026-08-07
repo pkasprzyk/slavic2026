@@ -28,3 +28,7 @@ mv *.pal *.img *.map ../nitrofiles/bg
 $GRIT colmap.png -ftB -fh! -g! -gB8 -mRt -mLf -p!
 
 mv *.map ../nitrofiles/maps
+
+$GRIT default.png -ftB -fh! -gt -gB8 -m!
+
+mv default.pal default.img ../nitrofiles/fnt

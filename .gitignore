@@ -3,6 +3,6 @@
 build/
 build-all/
 compile_commands.json
-nitrofiles/.converted
+nitrofiles/
 
 .idea
