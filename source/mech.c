@@ -27,9 +27,8 @@ void mech_init(void) {
   mech_y = 128;
   mech_water_remaining = MECH_MAX_WATER;
 
-  if (!sprite_create(SCR_WORLD, &SPRITES[SPR_MECH], mech_x, mech_y))
-    while (1)
-      swiWaitForVBlank();
+  NF_CreateSprite(SCR_WORLD, MECH, MECH, 0, mech_x, mech_y);
+  NF_SpriteLayer(SCR_WORLD, 0, LAYER_WORLD_BG);
 }
 
 static int tile_solid(s32 x, s32 y) {
@@ -80,8 +79,7 @@ void mech_update(void) {
 
   level_update_camera(mech_x + MECH_W / 2, mech_y + MECH_H / 2);
 
-  sprite_move(SCR_WORLD, &SPRITES[SPR_MECH], mech_x - level_cam_x(),
-              mech_y - level_cam_y());
+  NF_MoveSprite(SCR_WORLD, 0, mech_x - level_cam_x(), mech_y - level_cam_y());
   if (last_mech_x != mech_x)
-    sprite_hflip(SCR_WORLD, &SPRITES[SPR_MECH], last_mech_x > mech_x);
+    NF_HflipSprite(SCR_WORLD, 0, last_mech_x > mech_x);
 }
