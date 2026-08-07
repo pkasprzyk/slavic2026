@@ -8,6 +8,7 @@
 #include "level.h"
 #include "mech.h"
 #include "sprites.h"
+#include "reactor.h"
 
 #define MECH_SPEED 2
 
@@ -30,7 +31,7 @@ void mech_init(void) {
   mech_y = 128;
   mech_water_remaining = MECH_MAX_WATER;
 
-  NF_CreateSprite(SCR_WORLD, SPRITE_ID, MECH, 0, mech_x, mech_y);
+  NF_CreateSprite(SCR_WORLD, SPRITE_ID, MECH, DEFAULT_SPRITE_PALETTE, mech_x, mech_y);
   NF_SpriteLayer(SCR_WORLD, SPRITE_ID, LAYER_WORLD_BG);
 }
 
@@ -58,10 +59,14 @@ void mech_update(void) {
     last_mech_y = mech_y;
     int dx = 0, dy = 0;
 
-    if (held & KEY_LEFT)
+    if (held & KEY_LEFT) {
         dx -= MECH_SPEED;
-    if (held & KEY_RIGHT)
+        reactor_increase_temp(MOVE_INCREASE_AMOUNT);
+    }
+    if (held & KEY_RIGHT) {
         dx += MECH_SPEED;
+        reactor_increase_temp(MOVE_INCREASE_AMOUNT);
+    }
     if (held & KEY_UP)
         dy -= MECH_SPEED;
     if (held & KEY_DOWN)

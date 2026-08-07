@@ -18,4 +18,6 @@ int main(void) {
     swiWaitForVBlank();
     oamUpdate(&oamSub);
   }
+
+  game_deinit();
 }
