@@ -11,6 +11,7 @@
 #include "bunny.h"
 #include "level.h"
 #include "mech.h"
+#include "sprites.h"
 
 void game_init(void) {
   consoleDemoInit();
@@ -32,6 +33,7 @@ void game_init(void) {
   NF_InitSpriteBuffers();
   NF_InitSpriteSys(1);
 
+  InitSprites();
   level_init();
   mech_init();
   bunnies_init();
