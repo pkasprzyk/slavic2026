@@ -26,7 +26,7 @@ static u8 mech_water_remaining = 0;
 static u8 frame_cnt = 0;
 
 void mech_init(void) {
-  mech_x = 128;
+  mech_x = 178;
   mech_y = 128;
   mech_water_remaining = MECH_MAX_WATER;
 
@@ -34,20 +34,18 @@ void mech_init(void) {
   NF_SpriteLayer(SCR_WORLD, SPRITE_ID, LAYER_WORLD_BG);
 }
 
-static int tile_blocked(s32 x, s32 y) {
-    int t = NF_GetTile(COLMAP_SLOT, x, y);
-    return t == TILE_SOLID || t == TILE_WATER;
-}
-
 static int mech_blocked(s32 x, s32 y) {
-    if (tile_blocked(x, y))
-        return 1;
-    if (tile_blocked(x + MECH_W - 1, y))
-        return 1;
-    if (tile_blocked(x, y + MECH_H - 1))
-        return 1;
-    if (tile_blocked(x + MECH_W - 1, y + MECH_H - 1))
-        return 1;
+    s32 x0 = x >> 3;
+    s32 y0 = y >> 3;
+    s32 x1 = (x + MECH_W - 1) >> 3;
+    s32 y1 = (y + MECH_H - 1) >> 3;
+
+    for (s32 ty = y0; ty <= y1; ty++)
+        for (s32 tx = x0; tx <= x1; tx++) {
+            int t = NF_GetTile(COLMAP_SLOT, tx << 3, ty << 3);
+            if (t == TILE_SOLID || t == TILE_WATER)
+                return 1;
+        }
     return 0;
 }
 
