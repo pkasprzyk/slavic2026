@@ -5,7 +5,12 @@
             "includePath": [
                 "/opt/wonderful/toolchain/gcc-arm-none-eabi/arm-none-eabi/include/**",
                 "/opt/wonderful/toolchain/gcc-arm-none-eabi/arm-none-eabi/include/c++/**",
-                "${workspaceFolder}/**"
+                "/opt/wonderful/thirdparty/blocksds/external/nflib/include/**",
+                "/opt/wonderful/thirdparty/blocksds/core/libs/dswifi/include/**",
+                "/opt/wonderful/thirdparty/blocksds/core/libs/libnds/include/**",
+                "/opt/wonderful/thirdparty/blocksds/core/libs/maxmod/include/**",
+                "${workspaceFolder}/**",
+                "${workspaceFolder}/build/**"
             ],
             "defines": [],
             "compilerPath": "/opt/wonderful/toolchain/gcc-arm-none-eabi/bin/arm-none-eabi-gcc",
