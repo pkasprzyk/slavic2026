@@ -12,6 +12,9 @@
 #define MECH_W 32
 #define MECH_H 32
 
+#define COLMAP_SLOT 0
+#define TILE_SOLID 1
+
 static s16 mech_x;
 static s16 mech_y;
 
@@ -22,25 +25,50 @@ void mech_init(void)
     NF_VramSpriteGfx(1, 0, 0, true);
     NF_VramSpritePal(1, 0, 0);
 
-    mech_x = (LEVEL_W - MECH_W) / 2;
-    mech_y = (LEVEL_H - MECH_H) / 2;
+    mech_x = 128;
+    mech_y = 128;
 
     NF_CreateSprite(1, 0, 0, 0, mech_x, mech_y);
     NF_SpriteLayer(1, 0, 3);
 }
 
+static int tile_solid(s32 x, s32 y)
+{
+    return NF_GetTile(COLMAP_SLOT, x, y) == TILE_SOLID;
+}
+
+static int mech_blocked(s32 x, s32 y)
+{
+    if (tile_solid(x, y))
+        return 1;
+    if (tile_solid(x + MECH_W - 1, y))
+        return 1;
+    if (tile_solid(x, y + MECH_H - 1))
+        return 1;
+    if (tile_solid(x + MECH_W - 1, y + MECH_H - 1))
+        return 1;
+    return 0;
+}
+
 void mech_update(void)
 {
     u16 held = keysHeld();
+    s16 nx = mech_x;
+    s16 ny = mech_y;
 
-    if (held & KEY_UP)
-        mech_y -= MECH_SPEED;
-    if (held & KEY_DOWN)
-        mech_y += MECH_SPEED;
     if (held & KEY_LEFT)
-        mech_x -= MECH_SPEED;
+        nx -= MECH_SPEED;
     if (held & KEY_RIGHT)
-        mech_x += MECH_SPEED;
+        nx += MECH_SPEED;
+    if (held & KEY_UP)
+        ny -= MECH_SPEED;
+    if (held & KEY_DOWN)
+        ny += MECH_SPEED;
+
+    if (nx != mech_x && !mech_blocked(nx, mech_y))
+        mech_x = nx;
+    if (ny != mech_y && !mech_blocked(mech_x, ny))
+        mech_y = ny;
 
     if (mech_x < 0)
         mech_x = 0;

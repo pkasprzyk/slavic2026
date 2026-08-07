@@ -17,6 +17,9 @@ void level_init(void)
     NF_LoadTiledBg("bg/forest", "forest", LEVEL_W, LEVEL_H);
     NF_CreateTiledBg(1, 3, "forest");
 
+    NF_InitCmapBuffers();
+    NF_LoadCollisionMap("maps/colmap", 0, LEVEL_W, LEVEL_H);
+
     cam_x = 0;
     cam_y = 0;
     NF_ScrollBg(1, 3, 0, 0);
