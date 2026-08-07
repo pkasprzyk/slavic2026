@@ -7,7 +7,7 @@
 #include "sprites.h"
 
 void InitSprites(void) {
-  NF_LoadSpritePal("spr/mech", 0);
+  NF_LoadSpritePal("spr/sprite_robot_idle", 0);
   NF_VramSpritePal(1, 0, 0);
   for (int i = 0; i < SPRITE_CNT; i++) {
     NF_LoadSpriteGfx(SPRITE_INFOS[i].path, SPRITE_INFOS[i].id,

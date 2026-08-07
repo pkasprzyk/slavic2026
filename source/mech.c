@@ -16,19 +16,22 @@
 
 #define MECH_MAX_WATER 200
 
+#define SPRITE_ID 0
+
 static s16 mech_x;
 static s16 mech_y;
 static s16 last_mech_x;
 static s16 last_mech_y;
 static s8 mech_water_remaining;
+static u16 frame_cnt = 0;
 
 void mech_init(void) {
   mech_x = 128;
   mech_y = 128;
   mech_water_remaining = MECH_MAX_WATER;
 
-  NF_CreateSprite(SCR_WORLD, MECH, MECH, 0, mech_x, mech_y);
-  NF_SpriteLayer(SCR_WORLD, 0, LAYER_WORLD_BG);
+  NF_CreateSprite(SCR_WORLD, SPRITE_ID, MECH, 0, mech_x, mech_y);
+  NF_SpriteLayer(SCR_WORLD, SPRITE_ID, LAYER_WORLD_BG);
 }
 
 static int tile_solid(s32 x, s32 y) {
@@ -48,6 +51,9 @@ static int mech_blocked(s32 x, s32 y) {
 }
 
 void mech_update(void) {
+  ++frame_cnt;
+  frame_cnt %= 60;
+
   u16 held = keysHeld();
   last_mech_x = mech_x;
   last_mech_y = mech_y;
@@ -79,7 +85,9 @@ void mech_update(void) {
 
   level_update_camera(mech_x + MECH_W / 2, mech_y + MECH_H / 2);
 
-  NF_MoveSprite(SCR_WORLD, 0, mech_x - level_cam_x(), mech_y - level_cam_y());
+  NF_MoveSprite(SCR_WORLD, SPRITE_ID, mech_x - level_cam_x(),
+                mech_y - level_cam_y());
+  NF_SpriteFrame(SCR_WORLD, SPRITE_ID, frame_cnt / 30);
   if (last_mech_x != mech_x)
-    NF_HflipSprite(SCR_WORLD, 0, last_mech_x > mech_x);
+    NF_HflipSprite(SCR_WORLD, SPRITE_ID, last_mech_x > mech_x);
 }
