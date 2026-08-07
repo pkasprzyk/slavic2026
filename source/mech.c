@@ -14,11 +14,13 @@
 
 #define COLMAP_SLOT 0
 #define TILE_SOLID 1
+#define MECH__MAX_WATER 1000
 
 static s16 mech_x;
 static s16 mech_y;
 static s16 last_mech_x;
 static s16 last_mech_y;
+static s16 mech_water_remaining;
 
 void mech_init(void) {
   NF_LoadSpriteGfx("spr/mech", 0, 32, 32);
