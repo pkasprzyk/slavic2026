@@ -13,6 +13,7 @@
 void game_init(void)
 {
     if (!nitroFSInit(NULL)) {
+        consoleDemoInit();
         perror("nitroFSInit()");
         while (1)
             swiWaitForVBlank();
