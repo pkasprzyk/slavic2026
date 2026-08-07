@@ -25,6 +25,7 @@ u16 VRAM_ID  = 1;
 u16 PALETTE_ID  = 1;
 
 u16 OAM_ID  = 1;
+u16 frame_cnt = 0;
 
 void add_bunny(int x, int y)
 {
@@ -53,8 +54,11 @@ void bunnies_init(void)
 
 void bunnies_update(void)
 {
+    ++ frame_cnt;
+    frame_cnt %= 60*2;
     for (u16 i = 0; i < bunnies_cnt; ++i)
     {
         NF_MoveSprite(SCREEN_BOT, bunnies[i].oam_id, bunnies[i].x - level_cam_x(), bunnies[i].y - level_cam_y());
+        NF_SpriteFrame(SCREEN_BOT, bunnies[i].oam_id, frame_cnt / 30);
     }
 }
