@@ -4,19 +4,17 @@
 #include <nds.h>
 #include <nf_lib.h>
 
-
 #include "game.h"
 
-int main(void)
-{
+int main(void) {
 
-    game_init();
+  game_init();
 
-    while (1) {
-        scanKeys();
-        game_update();
-        NF_SpriteOamSet(1);
-        swiWaitForVBlank();
-        oamUpdate(&oamSub);
-    }
+  while (1) {
+    scanKeys();
+    game_update();
+    NF_SpriteOamSet(1);
+    swiWaitForVBlank();
+    oamUpdate(&oamSub);
+  }
 }
