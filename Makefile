@@ -204,7 +204,7 @@ dump: $(DUMP)
 
 clean:
 	@echo "  CLEAN"
-	$(V)$(RM) $(ROM) $(DUMP) build $(SDIMAGE)
+	$(V)$(RM) $(ROM) $(DUMP) build $(SDIMAGE) compile_commands.json
 
 sdimage:
 	@echo "  MKFATIMG $(SDIMAGE) $(SDROOT)"
