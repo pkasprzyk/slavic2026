@@ -11,8 +11,8 @@
 #include "mech.h"
 
 void game_init(void) {
+  consoleDemoInit();
   if (!nitroFSInit(NULL)) {
-    consoleDemoInit();
     perror("nitroFSInit()");
     while (1)
       swiWaitForVBlank();
@@ -40,8 +40,8 @@ void game_init(void) {
   NF_UpdateTextLayers();
 
   srand(time(NULL));
-
-  audio_init_wav("nitro:/audio/sample.wav");
+  // consoleDemoInit();
+  audio_init_wav("nitro:/audio/sample3.wav");
 }
 
 void game_update(void) {

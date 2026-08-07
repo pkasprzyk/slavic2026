@@ -127,7 +127,7 @@ int checkWAVHeader(const WAVHeader_t header) {
     return 1;
   }
 
-  if (header.subchunk1ID != FMT_ID) {
+  /* if (header.subchunk1ID != FMT_ID) {
     printf("Wrong FMT_ID %lx\n", header.subchunk1ID);
     return 1;
   }
@@ -135,7 +135,7 @@ int checkWAVHeader(const WAVHeader_t header) {
   if (header.subchunk2ID != DATA_ID) {
     printf("Wrong Subchunk2ID %lx\n", header.subchunk2ID);
     return 1;
-  }
+  } */
 
   return 0;
 }
