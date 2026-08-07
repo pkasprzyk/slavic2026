@@ -19,8 +19,8 @@ void LoadGraphicImage(SpriteInfo info){
 }
 
 void InitSprites(void) {
-  LoadPalette(SPRITE_INFOS[MECH].path, SPRITE_INFOS[MECH].pal_id);
-  LoadPalette(SPRITE_INFOS[RABBITS].path, SPRITE_INFOS[RABBITS].pal_id);
+  LoadPalette("spr/default_sprite", DEFAULT_SPRITE_PALETTE);
+  // LoadPalette(SPRITE_INFOS[MECH].path, SPRITE_INFOS[MECH].pal_id);
 
   for (int i = 0; i < SPRITE_CNT; i++) {
     LoadGraphicImage(SPRITE_INFOS[i]);

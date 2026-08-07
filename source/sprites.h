@@ -21,9 +21,11 @@ enum { MECH = 0, RABBITS = 1, FIRE = 2 };
 
 #define SPRITE_CNT 2
 
+#define DEFAULT_SPRITE_PALETTE 0
+
 static const SpriteInfo SPRITE_INFOS[SPRITE_CNT] = {
-    [MECH] = {"spr/sprite_robot_idle", 32, 32, 0, 0},
-    [RABBITS] = {"spr/sprite_hare_idle", 16, 16, 1, 1},
+    [MECH] = {"spr/sprite_robot_idle", 32, 32, MECH, DEFAULT_SPRITE_PALETTE},
+    [RABBITS] = {"spr/sprite_hare_idle", 16, 16, RABBITS, DEFAULT_SPRITE_PALETTE},
     //[FIRE] = {"spr/fire", 32, 32, 2, 0}
 };
 
