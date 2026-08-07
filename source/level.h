@@ -3,10 +3,13 @@
 
 #include <nds.h>
 
-#define LEVEL_W 256
+#define LEVEL_W 512
 #define LEVEL_H 256
 #define SCREEN_W 256
 #define SCREEN_H 192
+
+#define BG_W (((LEVEL_W + 255) / 256) * 256)
+#define BG_H (((LEVEL_H + 255) / 256) * 256)
 
 void level_init(void);
 void level_update_camera(s16 target_x, s16 target_y);
