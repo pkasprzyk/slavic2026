@@ -18,8 +18,6 @@ GAME_SUBTITLE	:= NightFox’s lib example
 GAME_AUTHOR	:= github.com/knightfox75/nds_nflib
 GAME_ICON	:= $(BLOCKSDS)/sys/icon.bmp
 
-COMPDB = 1
-
 # Source code paths
 # -----------------
 
