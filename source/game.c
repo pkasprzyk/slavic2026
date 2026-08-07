@@ -7,11 +7,12 @@
 
 #include "audio.h"
 #include "bunny.h"
+#include "chamber.h"
+#include "fire.h"
 #include "game.h"
 #include "ids.h"
 #include "level.h"
 #include "mech.h"
-#include "chamber.h"
 #include "sprites.h"
 
 void game_init(void) {
@@ -37,6 +38,7 @@ void game_init(void) {
 
   InitSprites();
   level_init();
+  fire_init();
   mech_init();
   bunnies_init();
   chamber_init();
@@ -54,7 +56,7 @@ void game_init(void) {
 
 void game_update(void) {
   mech_update();
-  // audio_update_wav();
+  fire_update();
   bunnies_update();
   chamber_update();
   NF_UpdateTextLayers();
