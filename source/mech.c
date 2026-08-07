@@ -14,15 +14,19 @@
 #define MECH_W 32
 #define MECH_H 32
 
+#define MECH_MAX_WATER 1000
+
 static s16 mech_x;
 static s16 mech_y;
 static s16 last_mech_x;
 static s16 last_mech_y;
+static s16 mech_water_remaining;
 
 void mech_init(void)
 {
     mech_x = 128;
     mech_y = 128;
+    mech_water_remaining = MECH_MAX_WATER;
 
     if (!sprite_create(SCR_WORLD, &SPRITES[SPR_MECH], mech_x, mech_y))
         while (1)
