@@ -21,6 +21,8 @@ static s16 mech_y;
 static s16 last_mech_x;
 static s16 last_mech_y;
 static s16 mech_water_remaining;
+static SpriteGfx mech_gfx;
+static int mech_sprite = -1;
 
 void mech_init(void)
 {
@@ -28,7 +30,11 @@ void mech_init(void)
     mech_y = 128;
     mech_water_remaining = MECH_MAX_WATER;
 
-    if (!sprite_create(SCR_WORLD, &SPRITES[SPR_MECH], mech_x, mech_y))
+    if (!sprite_load(SCR_WORLD, &SPRITES[SPR_MECH], &mech_gfx))
+        while (1)
+            swiWaitForVBlank();
+    mech_sprite = sprite_create(SCR_WORLD, &mech_gfx, mech_x, mech_y);
+    if (mech_sprite < 0)
         while (1)
             swiWaitForVBlank();
 }
@@ -84,8 +90,8 @@ void mech_update(void)
 
     level_update_camera(mech_x + MECH_W / 2, mech_y + MECH_H / 2);
 
-    sprite_move(SCR_WORLD, &SPRITES[SPR_MECH], mech_x - level_cam_x(),
+    sprite_move(SCR_WORLD, mech_sprite, mech_x - level_cam_x(),
                 mech_y - level_cam_y());
     if (last_mech_x != mech_x)
-        sprite_hflip(SCR_WORLD, &SPRITES[SPR_MECH], last_mech_x > mech_x);
+        sprite_hflip(SCR_WORLD, mech_sprite, last_mech_x > mech_x);
 }

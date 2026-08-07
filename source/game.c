@@ -29,7 +29,7 @@ void game_init(void) {
 
   NF_InitTextSys(0);
   NF_InitSpriteBuffers();
-  NF_InitSpriteSys(1);
+  NF_InitSpriteSys(1, 128);
 
   level_init();
   mech_init();

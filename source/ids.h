@@ -34,11 +34,6 @@ typedef struct
     const char *path;
     uint16_t width;
     uint16_t height;
-    uint16_t gfx;
-    uint16_t pal;
-    uint16_t vgfx;
-    uint16_t vpal;
-    uint16_t sprite;
     uint16_t layer;
 } SpriteDef;
 
@@ -49,7 +44,7 @@ enum
 };
 
 static const SpriteDef SPRITES[SPR_COUNT] = {
-    [SPR_MECH] = { "spr/mech", 32, 32, 0, 0, 0, 0, 0, LAYER_WORLD_BG },
+    [SPR_MECH] = { "spr/mech", 32, 32, LAYER_WORLD_BG },
 };
 
 _Static_assert(SPR_COUNT <= SLOTS_SPRITE, "sprite map exceeds NFLib slot limit");

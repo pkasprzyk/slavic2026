@@ -9,8 +9,16 @@
 
 #include "ids.h"
 
-bool sprite_create(int screen, const SpriteDef *def, s32 x, s32 y);
-void sprite_move(int screen, const SpriteDef *def, s32 x, s32 y);
-void sprite_hflip(int screen, const SpriteDef *def, bool flip);
+typedef struct
+{
+    uint16_t vgfx;
+    uint16_t vpal;
+    uint16_t layer;
+} SpriteGfx;
+
+bool sprite_load(int screen, const SpriteDef *def, SpriteGfx *gfx);
+int sprite_create(int screen, const SpriteGfx *gfx, s32 x, s32 y);
+void sprite_move(int screen, int sprite, s32 x, s32 y);
+void sprite_hflip(int screen, int sprite, bool flip);
 
 #endif
