@@ -6,9 +6,9 @@
 #include <nf_lib.h>
 
 #include "audio.h"
+#include "bunny.h"
 #include "game.h"
 #include "ids.h"
-#include "bunny.h"
 #include "level.h"
 #include "mech.h"
 #include "sprites.h"
@@ -46,11 +46,11 @@ void game_init(void) {
 
   srand(time(NULL));
   // consoleDemoInit();
-  audio_init_wav("nitro:/audio/sample3.wav");
+  // audio_init_wav("nitro:/audio/sample3.wav");
 }
 
 void game_update(void) {
   mech_update();
-  audio_update();
+  // audio_update_wav();
   bunnies_update();
 }

@@ -10,8 +10,17 @@
 
 #define BUFFER_LENGTH 16384
 
+#include <filesystem.h>
+#include <maxmod9.h>
+#include <nds.h>
+#include <nds/arm9/dldi.h>
+
+void audio_init_SB(void);
 void audio_init_wav(char *path);
-void audio_update(void);
+void audio_update_wav(void);
 void audio_close_wav(void);
+void audio_play_sfx(mm_word sample_name, bool loop, u16 length);
+void audio_update_loops(void);
+void audio_stop_looped_sfx(mm_word sample_name);
 
 #endif
