@@ -41,7 +41,6 @@ void game_init(void) {
   NF_UpdateTextLayers();
 
   srand(time(NULL));
-  // consoleDemoInit();
   audio_init_wav("nitro:/audio/sample3.wav");
 }
 

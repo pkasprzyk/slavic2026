@@ -21,6 +21,8 @@ enum
 {
     COLMAP_SLOT = 0,
     TILE_SOLID  = 1,
+    TILE_WATER  = 2,
+    TILE_FIRE   = 3,
 };
 
 #define SLOTS_RAM_GFX   256
@@ -34,6 +36,7 @@ typedef struct
     const char *path;
     uint16_t width;
     uint16_t height;
+    const char *pal_path;
     uint16_t layer;
 } SpriteDef;
 
@@ -44,7 +47,7 @@ enum
 };
 
 static const SpriteDef SPRITES[SPR_COUNT] = {
-    [SPR_MECH] = { "spr/mech", 32, 32, LAYER_WORLD_BG },
+    [SPR_MECH] = { "spr/mech", 32, 32, NULL, LAYER_WORLD_BG },
 };
 
 _Static_assert(SPR_COUNT <= SLOTS_SPRITE, "sprite map exceeds NFLib slot limit");

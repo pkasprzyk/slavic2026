@@ -10,16 +10,21 @@
 typedef struct
 {
     char path[32];
+    char palpath[32];
     int screen;
-    uint16_t palram;
     uint16_t vgfx;
     uint16_t vpal;
     uint16_t layer;
-    bool used;
 } LoadedGfx;
+
+typedef struct
+{
+    char path[32];
+} LoadedPal;
 
 static LoadedGfx g_loaded[SPR_COUNT * 2];
 static int g_loaded_count;
+static LoadedPal g_pals[2][SLOTS_VRAM_PAL];
 
 static bool ram_gfx_alloc(uint16_t *slot)
 {
@@ -65,24 +70,22 @@ static bool vram_pal_alloc(int screen, uint16_t *slot)
     return false;
 }
 
-static int loaded_find(const char *path, int screen)
+static int loaded_find(int screen, const char *path, const char *palpath)
 {
     for (int i = 0; i < g_loaded_count; i++) {
-        if (g_loaded[i].used && g_loaded[i].screen == screen &&
-            strcmp(g_loaded[i].path, path) == 0)
+        if (g_loaded[i].screen == screen &&
+            strcmp(g_loaded[i].path, path) == 0 &&
+            strcmp(g_loaded[i].palpath, palpath) == 0)
             return i;
     }
     return -1;
 }
 
-static int pal_find(int screen, uint16_t palram)
+static int pal_find(int screen, const char *path)
 {
-    size_t size = NF_SPR256PAL[palram].size;
-    for (int i = 0; i < g_loaded_count; i++) {
-        if (g_loaded[i].used && g_loaded[i].screen == screen &&
-            size == NF_SPR256PAL[g_loaded[i].palram].size &&
-            memcmp(NF_BUFFER_SPR256PAL[palram],
-                   NF_BUFFER_SPR256PAL[g_loaded[i].palram], size) == 0)
+    for (int i = 0; i < SLOTS_VRAM_PAL; i++) {
+        if (g_pals[screen][i].path[0] &&
+            strcmp(g_pals[screen][i].path, path) == 0)
             return i;
     }
     return -1;
@@ -97,9 +100,18 @@ static int sprite_alloc(int screen)
     return -1;
 }
 
+static void pal_register(int screen, uint16_t vpal, const char *path)
+{
+    strncpy(g_pals[screen][vpal].path, path,
+            sizeof(g_pals[screen][vpal].path) - 1);
+    g_pals[screen][vpal].path[sizeof(g_pals[screen][vpal].path) - 1] = '\0';
+}
+
 bool sprite_load(int screen, const SpriteDef *def, SpriteGfx *gfx)
 {
-    int idx = loaded_find(def->path, screen);
+    const char *palpath = def->pal_path ? def->pal_path : def->path;
+
+    int idx = loaded_find(screen, def->path, palpath);
     if (idx >= 0) {
         gfx->vgfx = g_loaded[idx].vgfx;
         gfx->vpal = g_loaded[idx].vpal;
@@ -112,34 +124,28 @@ bool sprite_load(int screen, const SpriteDef *def, SpriteGfx *gfx)
         return false;
     }
 
-    uint16_t ramgfx, rampal, vgfx, vpal;
-    if (!ram_gfx_alloc(&ramgfx)) {
-        printf("no free ram gfx slot for %s\n", def->path);
-        return false;
-    }
-    if (!ram_pal_alloc(&rampal)) {
-        printf("no free ram pal slot for %s\n", def->path);
-        return false;
-    }
-    if (!vram_gfx_alloc(screen, &vgfx)) {
-        printf("no free vram gfx slot for %s\n", def->path);
-        return false;
-    }
-
-    NF_LoadSpriteGfx(def->path, ramgfx, def->width, def->height);
-    NF_LoadSpritePal(def->path, rampal);
-
-    idx = pal_find(screen, rampal);
+    uint16_t vpal;
+    idx = pal_find(screen, palpath);
     if (idx >= 0) {
-        vpal = g_loaded[idx].vpal;
+        vpal = idx;
     } else {
-        if (!vram_pal_alloc(screen, &vpal)) {
-            printf("no free vram pal slot for %s\n", def->path);
+        uint16_t rampal;
+        if (!ram_pal_alloc(&rampal) || !vram_pal_alloc(screen, &vpal)) {
+            printf("no free palette slot for %s\n", palpath);
             return false;
         }
+        NF_LoadSpritePal(palpath, rampal);
         NF_VramSpritePal(screen, rampal, vpal);
+        pal_register(screen, vpal, palpath);
     }
-    NF_VramSpriteGfx(screen, ramgfx, vgfx, true);
+
+    uint16_t ramgfx, vgfx;
+    if (!ram_gfx_alloc(&ramgfx) || !vram_gfx_alloc(screen, &vgfx)) {
+        printf("no free gfx slot for %s\n", def->path);
+        return false;
+    }
+    NF_LoadSpriteGfx(def->path, ramgfx, def->width, def->height);
+    NF_VramSpriteGfx(screen, ramgfx, vgfx, false);
 
     gfx->vgfx = vgfx;
     gfx->vpal = vpal;
@@ -148,12 +154,12 @@ bool sprite_load(int screen, const SpriteDef *def, SpriteGfx *gfx)
     LoadedGfx *entry = &g_loaded[g_loaded_count++];
     strncpy(entry->path, def->path, sizeof(entry->path) - 1);
     entry->path[sizeof(entry->path) - 1] = '\0';
+    strncpy(entry->palpath, palpath, sizeof(entry->palpath) - 1);
+    entry->palpath[sizeof(entry->palpath) - 1] = '\0';
     entry->screen = screen;
-    entry->palram = rampal;
     entry->vgfx = vgfx;
     entry->vpal = vpal;
     entry->layer = def->layer;
-    entry->used = true;
 
     return true;
 }
