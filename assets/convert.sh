@@ -22,3 +22,8 @@ $GRIT forest.png -ftB -fh! -gTFF00FF -gt -gB8 -mR8 -mLs
 cp img8b_1.pal img8b_2.pal
 
 mv *.pal *.img *.map ../nitrofiles/bg
+
+$GRIT colmap.png -ftB -fh! -g! -gB8 -mRt -mLf -p!
+
+mkdir -p ../nitrofiles/maps
+mv *.map ../nitrofiles/maps
