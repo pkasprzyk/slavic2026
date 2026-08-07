@@ -15,7 +15,7 @@ static s32 cam_y;
 
 void level_init(void)
 {
-    NF_LoadTiledBg(PATH_BG_FOREST, BG_FOREST, LEVEL_W, LEVEL_H);
+    NF_LoadTiledBg(PATH_BG_FOREST, BG_FOREST, BG_W, BG_H);
     NF_CreateTiledBg(SCR_WORLD, LAYER_WORLD_BG, BG_FOREST);
 
     NF_InitCmapBuffers();

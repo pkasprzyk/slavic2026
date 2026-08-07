@@ -1,10 +1,26 @@
 #!/usr/bin/env python3
 # SPDX-License-Identifier: CC0-1.0
 # Crop/pad an image to a target size for GRIT (called by assets/convert.sh).
+# Pad value: a hex color like "D3CFB2", or "solid" for a solid-block wall
+# pattern (used to pad backgrounds to a multiple of 256).
 
 import sys
 
-from PIL import Image
+from PIL import Image, ImageDraw
+
+TILE = 8
+SOLID_BASE = (101, 67, 33)
+SOLID_GRID = (70, 45, 20)
+
+
+def solid_block(w, h):
+    img = Image.new("RGBA", (w, h), SOLID_BASE + (255,))
+    d = ImageDraw.Draw(img)
+    for x in range(0, w + 1, TILE):
+        d.line([(x, 0), (x, h)], fill=SOLID_GRID + (255,), width=1)
+    for y in range(0, h + 1, TILE):
+        d.line([(0, y), (w, y)], fill=SOLID_GRID + (255,), width=1)
+    return img
 
 
 def main():
@@ -24,7 +40,10 @@ def main():
 
     if img.width < w or img.height < h:
         if img.mode == "L":
-            bg = Image.new("L", (w, h), 0)
+            fill = 255 if pad.lower() == "solid" else int(pad, 16)
+            bg = Image.new("L", (w, h), fill)
+        elif pad.lower() == "solid":
+            bg = solid_block(w, h)
         else:
             rgb = tuple(int(pad[i:i + 2], 16) for i in (0, 2, 4))
             bg = Image.new("RGBA", (w, h), rgb + (255,))
@@ -33,7 +52,7 @@ def main():
 
     img.save(dst)
     print("fit: %s (%dx%d) -> %s (%dx%d)" % (src, w, h, dst, img.width,
-                                             img.height))
+                                              img.height))
     return 0
 
 

@@ -16,9 +16,12 @@ from tilecanvas import tile_canvas
 TILE = 8
 GRASS = (211, 207, 178)
 TOL = 40
-MIN_WORLD = 256
+SCREEN_W = 256
+SCREEN_H = 192
 MAX_WORLD = 2048
-STEP = 256
+
+SOLID_BASE = (101, 67, 33)
+SOLID_GRID = (70, 45, 20)
 
 SOLID = 1
 WATER = 2
@@ -44,8 +47,18 @@ def repo_root():
     return os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 
 
-def snap(v):
-    return min(MAX_WORLD, max(MIN_WORLD, ((v + STEP - 1) // STEP) * STEP))
+def snap8(v):
+    return (v + TILE - 1) // TILE * TILE
+
+
+def solid_block(w, h):
+    img = Image.new("RGBA", (w, h), SOLID_BASE + (255,))
+    d = ImageDraw.Draw(img)
+    for x in range(0, w + 1, TILE):
+        d.line([(x, 0), (x, h)], fill=SOLID_GRID + (255,), width=1)
+    for y in range(0, h + 1, TILE):
+        d.line([(0, y), (w, y)], fill=SOLID_GRID + (255,), width=1)
+    return img
 
 
 def detect_state(img):
@@ -72,15 +85,28 @@ def detect_state(img):
 def prepare_canvas(art, w, h):
     img = art.convert("RGBA")
     note = []
+    aw = min(img.width, w)
+    ah = min(img.height, h)
     if img.width > w or img.height > h:
-        img = img.crop((0, 0, min(img.width, w), min(img.height, h)))
-        note.append("cropped")
+        img = img.crop((0, 0, aw, ah))
+        note.append("cropped (art larger than world)")
     if img.width < w or img.height < h:
-        pad = Image.new("RGBA", (w, h), GRASS + (255,))
+        pad = solid_block(w, h)
         pad.paste(img, (0, 0))
         img = pad
-        note.append("padded with floor color")
-    return img, note
+        note.append("padded with solid blocks")
+    return img, note, (aw, ah)
+
+
+def new_grid(ph, pw, aw, ah):
+    grid = np.zeros((ph, pw), dtype=np.uint8)
+    for tx in range(pw):
+        if tx * TILE >= aw:
+            grid[:, tx] = SOLID
+    for ty in range(ph):
+        if ty * TILE >= ah:
+            grid[ty, :] = SOLID
+    return grid
 
 
 def canvas_scale(w, h):
@@ -183,45 +209,46 @@ def main():
     if art is None:
         st.stop()
 
-    def_w = art.width if (art.width % STEP == 0 and art.width >= MIN_WORLD
-                          and art.width <= MAX_WORLD) else MIN_WORLD
-    def_h = art.height if (art.height % STEP == 0 and art.height >= MIN_WORLD
-                           and art.height <= MAX_WORLD) else MIN_WORLD
-    world_w = st.sidebar.number_input("World width (px)", min_value=MIN_WORLD,
-                                      max_value=MAX_WORLD, step=STEP,
-                                      value=def_w)
-    world_h = st.sidebar.number_input("World height (px)", min_value=MIN_WORLD,
-                                      max_value=MAX_WORLD, step=STEP,
-                                      value=def_h)
-    world_w = snap(world_w)
-    world_h = snap(world_h)
-    if world_w != def_w or world_h != def_h:
-        st.sidebar.caption("Snapped to multiples of %d: %dx%d" %
-                           (STEP, world_w, world_h))
+    min_w = max(SCREEN_W, snap8(min(art.width, MAX_WORLD)))
+    min_h = max(SCREEN_H, snap8(min(art.height, MAX_WORLD)))
+    world_w = st.sidebar.number_input("World width (px)", min_value=min_w,
+                                      max_value=MAX_WORLD, step=TILE,
+                                      value=min_w)
+    world_h = st.sidebar.number_input("World height (px)", min_value=min_h,
+                                      max_value=MAX_WORLD, step=TILE,
+                                      value=min_h)
+    world_w = min(MAX_WORLD, snap8(world_w))
+    world_h = min(MAX_WORLD, snap8(world_h))
 
-    canvas_img, notes = prepare_canvas(art, world_w, world_h)
+    canvas_img, notes, (aw, ah) = prepare_canvas(art, world_w, world_h)
     if notes:
         st.sidebar.caption("Art %dx%d → %s" % (art.width, art.height,
                                                ", ".join(notes)))
 
     pw = world_w // TILE
     ph = world_h // TILE
+    bg_w = ((world_w + 255) // 256) * 256
+    bg_h = ((world_h + 255) // 256) * 256
     scale = canvas_scale(world_w, world_h)
     st.sidebar.write("World: %dx%d px = %dx%d tiles" % (world_w, world_h, pw,
                                                         ph))
+    if (bg_w, bg_h) != (world_w, world_h):
+        st.sidebar.caption("DS bg padded to %dx%d (multiple of 256)" %
+                           (bg_w, bg_h))
 
     if "grid" not in st.session_state:
-        st.session_state.grid = np.zeros((ph, pw), dtype=np.uint8)
+        st.session_state.grid = None
     if "world_size" not in st.session_state:
-        st.session_state.world_size = (world_w, world_h)
+        st.session_state.world_size = (0, 0)
     if "rev" not in st.session_state:
         st.session_state.rev = 0
     if st.session_state.world_size != (world_w, world_h):
-        st.session_state.grid = np.zeros((ph, pw), dtype=np.uint8)
+        st.session_state.grid = new_grid(ph, pw, aw, ah)
         st.session_state.world_size = (world_w, world_h)
         st.session_state.rev += 1
-    if st.session_state.grid.shape != (ph, pw):
-        st.session_state.grid = np.zeros((ph, pw), dtype=np.uint8)
+    if (st.session_state.grid is None
+            or st.session_state.grid.shape != (ph, pw)):
+        st.session_state.grid = new_grid(ph, pw, aw, ah)
         st.session_state.rev += 1
 
     mode = st.sidebar.radio("Tool", [t[0] for t in TOOLS])
@@ -231,7 +258,7 @@ def main():
         st.session_state.grid = detect_state(canvas_img)
         st.session_state.rev += 1
     if st.sidebar.button("Clear"):
-        st.session_state.grid = np.zeros((ph, pw), dtype=np.uint8)
+        st.session_state.grid = new_grid(ph, pw, aw, ah)
         st.session_state.rev += 1
 
     result = tile_canvas(
@@ -247,9 +274,9 @@ def main():
     if result is not None:
         arr = np.asarray(result.get("grid", []), dtype=np.uint8)
         if arr.size == ph * pw:
-            new_grid = arr.reshape(ph, pw)
-            if not np.array_equal(new_grid, st.session_state.grid):
-                st.session_state.grid = new_grid
+            painted = arr.reshape(ph, pw)
+            if not np.array_equal(painted, st.session_state.grid):
+                st.session_state.grid = painted
 
     grid = st.session_state.grid
     counts = {v: int((grid == v).sum()) for v in (SOLID, WATER, FIRE)}

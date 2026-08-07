@@ -18,6 +18,8 @@ LEVEL_W=$(sed -n 's/.*#define LEVEL_W[[:space:]]*\([0-9][0-9]*\).*/\1/p' \
           ../source/level.h | head -1)
 LEVEL_H=$(sed -n 's/.*#define LEVEL_H[[:space:]]*\([0-9][0-9]*\).*/\1/p' \
           ../source/level.h | head -1)
+BG_W=$(( ((LEVEL_W + 255) / 256) * 256 ))
+BG_H=$(( ((LEVEL_H + 255) / 256) * 256 ))
 
 FIT_OK=0
 if [ -n "$LEVEL_W" ] && [ -n "$LEVEL_H" ] &&
@@ -33,7 +35,7 @@ if [ "$FIT_OK" = "1" ]; then
     TMPD=$(mktemp -d)
     trap 'rm -rf "$TMPD"' EXIT
     python3 fit_bg.py forest.png "$TMPD/forest.png" \
-        "$LEVEL_W" "$LEVEL_H" D3CFB2
+        "$BG_W" "$BG_H" solid
     BG_SRC="$TMPD/forest.png"
 else
     BG_SRC=forest.png
@@ -45,7 +47,7 @@ mv *.pal *.img *.map ../nitrofiles/bg
 
 if [ "$FIT_OK" = "1" ]; then
     python3 fit_bg.py colmap.png "$TMPD/colmap.png" \
-        "$LEVEL_W" "$((LEVEL_H + 8))" 000000
+        "$LEVEL_W" "$((LEVEL_H + 8))" solid
     COL_SRC="$TMPD/colmap.png"
 else
     COL_SRC=colmap.png
