@@ -32,6 +32,53 @@ void copy_sprite_frame(void *dst, int frame)
     memcpy(dst, base + offset, frame_size);
 }
 
+
+int process_movement(int *x, int *y)
+{
+    int moved = 0;
+
+    u16 keys_held = keysHeld();
+    if (keys_held & KEY_UP) {
+        (*y)--;
+        moved = 1;
+    } else if (keys_held & KEY_DOWN) {
+        (*y)++;
+        moved = 1;
+    }
+
+    if (keys_held & KEY_LEFT) {
+        (*x)--;
+        moved = 1;
+    } else if (keys_held & KEY_RIGHT) {
+        (*x)++;
+        moved = 1;
+    }
+
+    return moved;
+}
+
+
+void animate_player(int *frame, int *delay, int *moving, int *x, int *y) {
+    (*delay)++;
+    if (*delay > 7) {
+        *delay = 0;
+
+        if (*moving) {
+            (*frame)++;
+            if (*frame > 5)
+                *frame = 0;
+
+            // Copy a new frame for the pointer in the main screen
+            copy_sprite_frame(gfxOneFrame, *frame);
+
+            // Point the sprite in the sub screen to a new pre-loaded frame
+            oamSetGfx(&oamSub, 0, SpriteSize_32x64, SpriteColorFormat_256Color,
+                        gfxAllFrames[*frame]);
+        }
+    }
+}
+
+
 int main(int argc, char *argv[])
 {
     videoSetMode(MODE_0_2D);
@@ -51,6 +98,7 @@ int main(int argc, char *argv[])
     int frame = 0;
     int delay = 0;
     int x = 0, y = 0;
+    int moving = 0;
 
     while (1)
     {
@@ -64,36 +112,11 @@ int main(int argc, char *argv[])
         oamUpdate(&oamMain);
         oamUpdate(&oamSub);
 
-        delay++;
-        if (delay > 20)
-        {
-            delay = 0;
-
-            frame++;
-            if (frame > 5)
-                frame = 0;
-
-            // Copy a new frame for the pointer in the main screen
-            copy_sprite_frame(gfxOneFrame, frame);
-
-            // Point the sprite in the sub screen to a new pre-loaded frame
-            oamSetGfx(&oamSub, 0, SpriteSize_32x64, SpriteColorFormat_256Color,
-                      gfxAllFrames[frame]);
-        }
+        animate_player(&frame, &delay, &moving, &x, &y);
 
         scanKeys();
 
-        u16 keys_held = keysHeld();
-        if (keys_held & KEY_UP)
-            y--;
-        else if (keys_held & KEY_DOWN)
-            y++;
-
-        if (keys_held & KEY_LEFT)
-            x--;
-        else if (keys_held & KEY_RIGHT)
-            x++;
-       
+        moving = process_movement(&x, &y);
     }
 
     oamFreeGfx(&oamMain, gfxOneFrame);
