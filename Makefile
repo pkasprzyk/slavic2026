@@ -17,3 +17,8 @@ COMPDB = 1
 GFXDIRS		:= graphics
 
 include $(BLOCKSDS)/sys/default_makefiles/rom_arm9/Makefile
+
+
+run: $(ROM)
+	@echo "  RUN $(ROM)"
+	melonDS $<
