@@ -17,8 +17,12 @@ enum {
 
 enum {
     COLMAP_SLOT = 0,
-    TILE_SOLID = 1,
-    TILE_WATER = 2,
+    TILE_WALL = 1,
+    TILE_TREE = 2,
+    TILE_BUSH = 3,
+    TILE_SHALLOW_WATER = 4,
+    TILE_DEEP_WATER = 5,
+    TILE_FIRE = 6,
 };
 
 #define PATH_BG_FOREST "bg/forest"

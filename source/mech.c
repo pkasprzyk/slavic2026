@@ -44,7 +44,7 @@ static int mech_blocked(s32 x, s32 y) {
     for (s32 ty = y0; ty <= y1; ty++)
         for (s32 tx = x0; tx <= x1; tx++) {
             int t = NF_GetTile(COLMAP_SLOT, tx << 3, ty << 3);
-            if (t == TILE_SOLID || t == TILE_WATER)
+            if (t == TILE_WALL || t == TILE_TREE || t == TILE_DEEP_WATER)
                 return 1;
         }
     return 0;

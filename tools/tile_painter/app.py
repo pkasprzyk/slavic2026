@@ -23,21 +23,30 @@ MAX_WORLD = 2048
 SOLID_BASE = (101, 67, 33)
 SOLID_GRID = (70, 45, 20)
 
-SOLID = 1
-WATER = 2
-FIRE = 3
+WALL = 1
+TREE = 2
+BUSH = 3
+SHALLOW_WATER = 4
+DEEP_WATER = 5
+FIRE = 6
 
-FILL = {SOLID: 255, WATER: 200, FIRE: 128}
+FILL = {WALL: 255, TREE: 210, BUSH: 170, SHALLOW_WATER: 130, DEEP_WATER: 85, FIRE: 40}
 
 COLORS = {
-    SOLID: (101, 67, 33, 217),
-    WATER: (80, 140, 255, 217),
+    WALL: (101, 67, 33, 217),
+    TREE: (34, 100, 34, 217),
+    BUSH: (80, 150, 60, 200),
+    SHALLOW_WATER: (100, 180, 255, 190),
+    DEEP_WATER: (40, 100, 220, 217),
     FIRE: (255, 60, 60, 230),
 }
 
 TOOLS = [
-    ("Solid (red)", SOLID),
-    ("Water (blue)", WATER),
+    ("Wall (brown)", WALL),
+    ("Tree (dark green)", TREE),
+    ("Bush (green)", BUSH),
+    ("Shallow water (light blue)", SHALLOW_WATER),
+    ("Deep water (dark blue)", DEEP_WATER),
     ("Fire (orange)", FIRE),
     ("Erase", 0),
 ]
@@ -76,9 +85,18 @@ def detect_state(img):
                          (np.abs(g - GRASS[1]) <= TOL) &
                          (np.abs(b - GRASS[2]) <= TOL))
             if (b - r >= 30).mean() >= 0.5:
-                state[ty, tx] = WATER
+                state[ty, tx] = DEEP_WATER
             elif nongrass.mean() >= 0.5:
-                state[ty, tx] = SOLID
+                rm = r[nongrass].mean()
+                gm = g[nongrass].mean()
+                bm = b[nongrass].mean()
+                if gm > rm + 20 and gm > bm + 20:
+                    if gm < 100:
+                        state[ty, tx] = TREE
+                    else:
+                        state[ty, tx] = BUSH
+                else:
+                    state[ty, tx] = WALL
     return state
 
 
@@ -102,10 +120,10 @@ def new_grid(ph, pw, aw, ah):
     grid = np.zeros((ph, pw), dtype=np.uint8)
     for tx in range(pw):
         if tx * TILE >= aw:
-            grid[:, tx] = SOLID
+            grid[:, tx] = WALL
     for ty in range(ph):
         if ty * TILE >= ah:
-            grid[ty, :] = SOLID
+            grid[ty, :] = WALL
     return grid
 
 
@@ -254,7 +272,7 @@ def main():
     mode = st.sidebar.radio("Tool", [t[0] for t in TOOLS])
     paint_value = dict(TOOLS)[mode]
 
-    if st.sidebar.button("Detect (auto solid + water)"):
+    if st.sidebar.button("Detect (auto walls, trees, bushes, water)"):
         st.session_state.grid = detect_state(canvas_img)
         st.session_state.rev += 1
     if st.sidebar.button("Clear"):
@@ -279,7 +297,7 @@ def main():
                 st.session_state.grid = painted
 
     grid = st.session_state.grid
-    counts = {v: int((grid == v).sum()) for v in (SOLID, WATER, FIRE)}
+    counts = {v: int((grid == v).sum()) for v in (WALL, TREE, BUSH, SHALLOW_WATER, DEEP_WATER, FIRE)}
     colmap = build_colmap(grid, world_w, world_h)
 
     preview = grid_background(canvas_img, scale)
@@ -287,8 +305,8 @@ def main():
                                     Image.fromarray(state_to_mask(grid, scale)))
 
     c1, c2 = st.columns(2)
-    c1.write("Painted: solid %d | water %d | fire %d" %
-             (counts[SOLID], counts[WATER], counts[FIRE]))
+    c1.write("Painted: wall %d | tree %d | bush %d | shallow %d | deep %d | fire %d" %
+             (counts[WALL], counts[TREE], counts[BUSH], counts[SHALLOW_WATER], counts[DEEP_WATER], counts[FIRE]))
     c1.image(preview, use_column_width=True)
     c2.write("Exported collision map (%dx%d)" % (world_w, world_h + TILE))
     c2.image(colmap, use_column_width=True)
