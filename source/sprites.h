@@ -20,7 +20,7 @@ typedef struct {
 
 enum { MECH = 0, RABBITS = 1, REACTOR_CORE = 2, FIRE = 3, };
 
-#define SPRITE_CNT 3
+#define SPRITE_CNT 4
 
 #define DEFAULT_SPRITE_PALETTE 0
 
@@ -28,7 +28,7 @@ static const SpriteInfo SPRITE_INFOS[SPRITE_CNT] = {
     [MECH] = {"spr/sprite_robot_idle", 32, 32, MECH, DEFAULT_SPRITE_PALETTE, false},
     [RABBITS] = {"spr/sprite_hare_idle", 16, 16, RABBITS, DEFAULT_SPRITE_PALETTE, false},
     [REACTOR_CORE] = {"spr/reactor_core", 32, 32, REACTOR_CORE, DEFAULT_SPRITE_PALETTE, true},
-    //[FIRE] = {"spr/fire", 32, 32, 2, 0}
+    [FIRE] = {"spr/sprite_fire_small", 8, 8, FIRE, DEFAULT_SPRITE_PALETTE, false},
 };
 
 void InitSprites(void);
