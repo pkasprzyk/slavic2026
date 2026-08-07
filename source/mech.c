@@ -22,8 +22,8 @@ static s16 mech_x;
 static s16 mech_y;
 static s16 last_mech_x;
 static s16 last_mech_y;
-static s8 mech_water_remaining;
-static u16 frame_cnt = 0;
+static u8 mech_water_remaining = 0;
+static u8 frame_cnt = 0;
 
 void mech_init(void) {
   mech_x = 128;
