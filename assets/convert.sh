@@ -6,6 +6,7 @@ GRIT=$BLOCKSDS/tools/grit/grit
 mkdir -p ../nitrofiles/spr ../nitrofiles/bg ../nitrofiles/fnt ../nitrofiles/maps ../nitrofiles/audio
 
 $GRIT mech.png -ftB -fh! -gTFF00FF -gt -gB8 -m!
+$GRIT sprite_robot_idle.png -ftB -fh! -gTFF00FF -gt -gB8 -m!
 
 mv *.pal *.img ../nitrofiles/spr
 
