@@ -33,20 +33,21 @@ void mech_init(void)
             swiWaitForVBlank();
 }
 
-static int tile_solid(s32 x, s32 y)
+static int tile_blocked(s32 x, s32 y)
 {
-    return NF_GetTile(COLMAP_SLOT, x, y) == TILE_SOLID;
+    int t = NF_GetTile(COLMAP_SLOT, x, y);
+    return t == TILE_SOLID || t == TILE_WATER;
 }
 
 static int mech_blocked(s32 x, s32 y)
 {
-    if (tile_solid(x, y))
+    if (tile_blocked(x, y))
         return 1;
-    if (tile_solid(x + MECH_W - 1, y))
+    if (tile_blocked(x + MECH_W - 1, y))
         return 1;
-    if (tile_solid(x, y + MECH_H - 1))
+    if (tile_blocked(x, y + MECH_H - 1))
         return 1;
-    if (tile_solid(x + MECH_W - 1, y + MECH_H - 1))
+    if (tile_blocked(x + MECH_W - 1, y + MECH_H - 1))
         return 1;
     return 0;
 }
@@ -56,22 +57,27 @@ void mech_update(void)
     u16 held = keysHeld();
     last_mech_x = mech_x;
     last_mech_y = mech_y;
-    s16 nx = mech_x;
-    s16 ny = mech_y;
+    int dx = 0, dy = 0;
 
     if (held & KEY_LEFT)
-        nx -= MECH_SPEED;
+        dx -= MECH_SPEED;
     if (held & KEY_RIGHT)
-        nx += MECH_SPEED;
+        dx += MECH_SPEED;
     if (held & KEY_UP)
-        ny -= MECH_SPEED;
+        dy -= MECH_SPEED;
     if (held & KEY_DOWN)
-        ny += MECH_SPEED;
+        dy += MECH_SPEED;
 
-    if (nx != mech_x && !mech_blocked(nx, mech_y))
-        mech_x = nx;
-    if (ny != mech_y && !mech_blocked(mech_x, ny))
-        mech_y = ny;
+    for (int s = 0; s < MECH_SPEED; s++) {
+        if (dx > 0 && !mech_blocked(mech_x + 1, mech_y))
+            mech_x++;
+        if (dx < 0 && !mech_blocked(mech_x - 1, mech_y))
+            mech_x--;
+        if (dy > 0 && !mech_blocked(mech_x, mech_y + 1))
+            mech_y++;
+        if (dy < 0 && !mech_blocked(mech_x, mech_y - 1))
+            mech_y--;
+    }
 
     if (mech_x < 0)
         mech_x = 0;

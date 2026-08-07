@@ -21,6 +21,7 @@ enum
 {
     COLMAP_SLOT = 0,
     TILE_SOLID  = 1,
+    TILE_WATER  = 2,
 };
 
 #define SLOTS_RAM_GFX   256
