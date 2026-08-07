@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>tile canvas</title>
+<style>
+  html, body { margin: 0; padding: 0; background: #fff; }
+  #tile-canvas {
+    display: block;
+    image-rendering: pixelated;
+    touch-action: none;
+    cursor: crosshair;
+  }
+</style>
+</head>
+<body>
+<canvas id="tile-canvas"></canvas>
+<script>
+(function () {
+  var canvas = document.getElementById("tile-canvas");
+  var ctx = canvas.getContext("2d");
+
+  var state = { cols: 0, rows: 0, tile: 0, grid: [], paintValue: 1 };
+  var bg = null;
+  var localRev = -1;
+
+  var TILE_COLORS = {
+    1: "rgba(101, 67, 33, 0.85)",
+    2: "rgba(80, 140, 255, 0.85)",
+    3: "rgba(255, 60, 60, 0.9)",
+  };
+
+  function setGrid(arr) {
+    var n = state.cols * state.rows;
+    var g = new Array(n);
+    for (var i = 0; i < n; i++) g[i] = arr && arr[i] ? arr[i] | 0 : 0;
+    state.grid = g;
+  }
+
+  function redraw() {
+    var w = canvas.width, h = canvas.height, tile = state.tile,
+        cols = state.cols, rows = state.rows;
+    ctx.clearRect(0, 0, w, h);
+    if (bg) {
+      ctx.drawImage(bg, 0, 0, w, h);
+    } else {
+      ctx.fillStyle = "#e8e8e8";
+      ctx.fillRect(0, 0, w, h);
+    }
+    var g = state.grid;
+    for (var y = 0; y < state.rows; y++) {
+      for (var x = 0; x < cols; x++) {
+        var v = g[y * cols + x];
+        if (v) {
+          ctx.fillStyle = TILE_COLORS[v] || "rgba(255, 60, 60, 0.85)";
+          ctx.fillRect(x * tile, y * tile, tile, tile);
+        }
+      }
+    }
+    ctx.strokeStyle = "rgba(120, 120, 120, 0.35)";
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    for (var x = 0; x <= cols; x++) {
+      ctx.moveTo(x * tile + 0.5, 0);
+      ctx.lineTo(x * tile + 0.5, h);
+    }
+    for (var y = 0; y <= rows; y++) {
+      ctx.moveTo(0, y * tile + 0.5);
+      ctx.lineTo(w, y * tile + 0.5);
+    }
+    ctx.stroke();
+  }
+
+  function render(args) {
+    var cols = args.cols | 0, rows = args.rows | 0, tile = args.tile | 0;
+    if (!cols || !rows || !tile) return;
+    var sizeChanged = cols !== state.cols || rows !== state.rows ||
+                      tile !== state.tile;
+    state.cols = cols;
+    state.rows = rows;
+    state.tile = tile;
+    state.paintValue = args.paintValue | 0;
+    var rev = args.rev | 0;
+    if (sizeChanged || rev !== localRev) {
+      canvas.width = cols * tile;
+      canvas.height = rows * tile;
+      setGrid(args.grid);
+      localRev = rev;
+    }
+    var url = args.backgroundUrl;
+    if (url && (!bg || url !== bg._url)) {
+      var next = new Image();
+      next._url = url;
+      next.onload = function () { bg = next; redraw(); setFrameHeight(); };
+      next.src = url;
+    } else {
+      redraw();
+      setFrameHeight();
+    }
+  }
+
+  function tileAt(clientX, clientY) {
+    var r = canvas.getBoundingClientRect();
+    var x = (clientX - r.left) * (canvas.width / r.width);
+    var y = (clientY - r.top) * (canvas.height / r.height);
+    var c = Math.floor(x / state.tile);
+    var t = Math.floor(y / state.tile);
+    if (c < 0 || t < 0 || c >= state.cols || t >= state.rows) return null;
+    return { c: c, r: t };
+  }
+
+  function paint(c, r) {
+    var idx = r * state.cols + c;
+    var want = state.paintValue | 0;
+    if (state.grid[idx] !== want) {
+      state.grid[idx] = want;
+      dirty = true;
+    }
+  }
+
+  function paintLine(c0, r0, c1, r1) {
+    var dx = Math.abs(c1 - c0), dy = -Math.abs(r1 - r0);
+    var sx = c0 < c1 ? 1 : -1, sy = r0 < r1 ? 1 : -1;
+    var err = dx + dy;
+    for (;;) {
+      if (c0 >= 0 && r0 >= 0 && c0 < state.cols && r0 < state.rows) paint(c0, r0);
+      if (c0 === c1 && r0 === r1) break;
+      var e2 = 2 * err;
+      if (e2 >= dy) { err += dy; c0 += sx; }
+      if (e2 <= dx) { err += dx; r0 += sy; }
+    }
+  }
+
+  var painting = false;
+  var lastTile = null;
+  var dirty = false;
+
+  function onDown(e) {
+    if (e.button !== 0) return;
+    painting = true;
+    var t = tileAt(e.clientX, e.clientY);
+    lastTile = t;
+    if (t) paint(t.c, t.r);
+    redraw();
+  }
+
+  function onMove(e) {
+    if (!painting) return;
+    var t = tileAt(e.clientX, e.clientY);
+    if (t && lastTile && (t.c !== lastTile.c || t.r !== lastTile.r)) {
+      paintLine(lastTile.c, lastTile.r, t.c, t.r);
+      lastTile = t;
+      redraw();
+    }
+  }
+
+  function onUp() {
+    painting = false;
+    lastTile = null;
+    redraw();
+    if (dirty) {
+      dirty = false;
+      sendGrid();
+    }
+  }
+
+  canvas.addEventListener("pointerdown", onDown);
+  canvas.addEventListener("pointermove", onMove);
+  window.addEventListener("pointerup", onUp);
+  window.addEventListener("pointercancel", onUp);
+  canvas.addEventListener("contextmenu", function (e) { e.preventDefault(); });
+
+  var Streamlit = {
+    RENDER_EVENT: "streamlit:render",
+    setComponentReady: function () {
+      window.addEventListener("message", onMessage);
+      post({ type: "streamlit:componentReady", apiVersion: 1 });
+    },
+    setComponentValue: function (value) {
+      post({ type: "streamlit:setComponentValue", value: value, dataType: "json" });
+    },
+    setFrameHeight: function () {
+      post({ type: "streamlit:setFrameHeight", height: document.body.scrollHeight });
+    },
+  };
+
+  function post(msg) {
+    msg.isStreamlitMessage = true;
+    window.parent.postMessage(msg, "*");
+  }
+
+  function onMessage(e) {
+    if (e.data && e.data.type === Streamlit.RENDER_EVENT) render(e.data.args || {});
+  }
+
+  function setFrameHeight() {
+    Streamlit.setFrameHeight();
+  }
+
+  function sendGrid() {
+    var payload = { grid: state.grid.slice(), cols: state.cols,
+                    rows: state.rows, rev: localRev };
+    Streamlit.setComponentValue(payload);
+  }
+
+  Streamlit.setComponentReady();
+})();
+</script>
+</body>
+</html>
