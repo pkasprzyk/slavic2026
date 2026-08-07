@@ -11,22 +11,6 @@
 
 int main(void)
 {
-    NF_Set2D(0, 0);
-    NF_Set2D(1, 0);
-    consoleDemoInit();
-    printf("\n Chilling Mech\n\n NitroFS init...\n");
-    swiWaitForVBlank();
-
-    if (!nitroFSInit(NULL)) {
-        perror("nitroFSInit()");
-        while (1)
-            swiWaitForVBlank();
-    }
-    NF_SetRootFolder("NITROFS");
-
-    NF_Set2D(0, 0);
-    NF_Set2D(1, 0);
-
     game_init();
 
     while (1) {

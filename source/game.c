@@ -11,6 +11,16 @@
 
 void game_init(void)
 {
+    if (!nitroFSInit(NULL)) {
+        perror("nitroFSInit()");
+        while (1)
+            swiWaitForVBlank();
+    }
+    NF_SetRootFolder("NITROFS");
+
+    NF_Set2D(0, 0);
+    NF_Set2D(1, 0);
+
     NF_InitTiledBgBuffers();
     NF_InitTiledBgSys(0);
     NF_InitTiledBgSys(1);
