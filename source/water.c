@@ -9,17 +9,20 @@
 #include "level.h"
 #include "sprites.h"
 #include "water.h"
+#include "reactor.h"
 
 #define WATER_STREAM_DEBUG 1
 
 #define WATER_SPRAY_DISTANCE 50
 #define WATER_SPRAY_INTERVAL 10
 #define WATER_DROP_LIFETIME 20
+#define WATER_LEAK_INTERVAL 30
 
 #define WATER_DROP_SIZE 16
 
 int water_spray_cooldown = 0;
 int water_drop_cooldown = 0;
+int water_leak_cooldown = 0;
 
 #define MAX_WATER 1000
 #define WATER_DROP_AMOUNT 10
@@ -100,12 +103,22 @@ void water_init(void) {
 }
 
 void water_update(void) {
+
   water_drop_update();
   show_water_remaining();
   if (water_drop_cooldown > 0)
     water_drop_cooldown--;
   if (water_spray_cooldown > 0)
     water_spray_cooldown--;
+  if (water_leak_cooldown > 0)
+    water_leak_cooldown--;
+
+  if (water_leak_cooldown == 0 && water_leak_rate > 0 && water_remaining > 0) {
+    water_remaining -= water_leak_rate;
+    if (water_remaining < 0)
+      water_remaining = 0;
+    water_leak_cooldown = WATER_LEAK_INTERVAL;
+  }
 }
 
 void water_fill_update(void) {

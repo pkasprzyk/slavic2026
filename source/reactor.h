@@ -5,6 +5,7 @@
 
 extern int fire_heat_cooldown;
 extern int heat_speed_penalty;
+extern int water_leak_rate;
 
 void reactor_init(void);
 void reactor_update(void);
