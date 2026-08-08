@@ -5,8 +5,8 @@
 #define MAX_GRID_Y 64
 #define FIRE_CELLS_MAX 2048
 #define FIRE_BURN_DURATION (60 * 60)
-#define FIRE_SPREAD_MIN (1 * 60)
-#define FIRE_SPREAD_MAX (3 * 60)
+#define FIRE_SPREAD_MIN (2 * 60)
+#define FIRE_SPREAD_MAX (8 * 60)
 #define FIRE_FRAME_TOGGLE 15
 
 void fire_init(void);
