@@ -61,7 +61,12 @@ void fire_start_cell_fire(int cell_index, int tx, int ty) {
   cells[cell_index].heat_level = INITIAL_HEAT_LEVEL;
   cells[cell_index].spread_cooldown =
       FIRE_SPREAD_MIN + (rand() % (FIRE_SPREAD_MAX - FIRE_SPREAD_MIN + 1));
-  NF_MoveSprite(SCR_WORLD, FIRE_OAM_BASE + cell_index, tx * 8, ty * 8);
+  s16 sx = tx * 8 - level_cam_x();
+  s16 sy = ty * 8 - level_cam_y();
+  if (sx < -8 || sx >= SCREEN_W || sy < -8 || sy >= SCREEN_H)
+    NF_MoveSprite(SCR_WORLD, FIRE_OAM_BASE + cell_index, -16, -16);
+  else
+    NF_MoveSprite(SCR_WORLD, FIRE_OAM_BASE + cell_index, sx, sy);
 }
 
 void fire_init(void) {
@@ -144,9 +149,14 @@ void fire_update(void) {
       }
     }
 
-    NF_MoveSprite(SCR_WORLD, FIRE_OAM_BASE + i, cells[i].tx * 8 - level_cam_x(),
-                  cells[i].ty * 8 - level_cam_y());
-    NF_SpriteFrame(SCR_WORLD, FIRE_OAM_BASE + i, frame);
+    s16 sx = cells[i].tx * 8 - level_cam_x();
+    s16 sy = cells[i].ty * 8 - level_cam_y();
+    if (sx < -8 || sx >= SCREEN_W || sy < -8 || sy >= SCREEN_H) {
+      NF_MoveSprite(SCR_WORLD, FIRE_OAM_BASE + i, -16, -16);
+    } else {
+      NF_MoveSprite(SCR_WORLD, FIRE_OAM_BASE + i, sx, sy);
+      NF_SpriteFrame(SCR_WORLD, FIRE_OAM_BASE + i, frame);
+    }
   }
 
   if (fire_heat_cooldown == 0) {
