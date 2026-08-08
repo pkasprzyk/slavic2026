@@ -3,8 +3,13 @@
 #ifndef GAME_H
 #define GAME_H
 
+enum { GAME_TITLE, GAME_INSTRUCTIONS, GAME_PLAYING };
+
+extern int game_state;
+
 void game_init(void);
 void game_update(void);
 void game_deinit(void);
+void game_start_play(void);
 
 #endif

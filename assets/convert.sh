@@ -52,6 +52,12 @@ $GRIT "$BG_SRC" -ftB -fh! -gTFF00FF -gt -gB8 -mR8 -mLs
 
 mv *.pal *.img *.map ../nitrofiles/bg
 
+# =========== MENU / INSTRUCTIONS BG PLACEHOLDERS
+
+$GRIT menu_bg.png -ftB -fh! -gTFF00FF -gt -gB8 -mR8 -mLs
+$GRIT instr_bg.png -ftB -fh! -gTFF00FF -gt -gB8 -mR8 -mLs
+mv *.pal *.img *.map ../nitrofiles/bg
+
 # =========== COLISION MAP
 
 $GRIT "$COL_SRC" -ftB -fh! -g! -gB8 -mRt -mLf -p!

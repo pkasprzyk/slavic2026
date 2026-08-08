@@ -14,7 +14,26 @@
 #include "level.h"
 #include "mech.h"
 #include "sprites.h"
+#include "title.h"
 #include "water.h"
+
+int game_state;
+
+static bool playing;
+
+void game_start_play(void) {
+  NF_LoadTiledBg(PATH_BG_FOREST, BG_FOREST, BG_W, BG_H);
+  NF_CreateTiledBg(SCR_WORLD, LAYER_WORLD_BG, BG_FOREST);
+  NF_LoadTilesForBg("bg/fire_tileset", "dynamic_fire_map", BG_W, BG_H, 0, 3);
+  NF_CreateTiledBg(SCR_WORLD, LAYER_WORLD_FIRE, "dynamic_fire_map");
+
+  fire_init();
+  water_init();
+  mech_init();
+  bunnies_init();
+  chamber_init();
+  playing = true;
+}
 
 void game_init(void) {
   consoleDemoInit();
@@ -33,32 +52,39 @@ void game_init(void) {
   NF_InitTiledBgSys(1);
 
   NF_InitTextSys(0);
+  NF_InitTextSys(1);
   NF_InitSpriteBuffers();
   NF_InitSpriteSys(0);
   NF_InitSpriteSys(1);
 
   InitSprites();
   level_init();
-  fire_init();
-  water_init();
-  mech_init();
-  bunnies_init();
-  chamber_init();
 
   NF_LoadTextFont(PATH_FONT, FONT_NORMAL, 256, 256, 0);
   NF_CreateTextLayer(SCR_CHAMBER, LAYER_CHAMBER_TEXT, 0, FONT_NORMAL);
+  NF_CreateTextLayer(SCR_WORLD, LAYER_WORLD_TEXT, 0, FONT_NORMAL);
+
   NF_WriteText(SCR_CHAMBER, LAYER_CHAMBER_TEXT, 2, 2, "CHILLING MECH");
   NF_WriteText(SCR_CHAMBER, LAYER_CHAMBER_TEXT, 2, 4, "D-Pad moves the mech");
   NF_UpdateTextLayers();
 
   srand(time(NULL));
-  // consoleDemoInit();
   audio_init_wav("nitro:/audio/SGJ2026-Music-22khz-loop.wav");
-  // consoleDemoInit();
   audio_play_sfx(SFX_SFX_FIRE_LOOP, true, 180);
+
+  playing = false;
+  game_state = GAME_TITLE;
+  title_init();
 }
 
 void game_update(void) {
+  if (!playing) {
+    title_update();
+    audio_update_wav();
+    audio_update_loops();
+    return;
+  }
+
   mech_update();
   fire_update();
   water_update();
