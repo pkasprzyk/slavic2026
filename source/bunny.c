@@ -16,6 +16,7 @@ typedef struct {
   s16 x;
   s16 y;
   s16 oam_id;
+  s16 hp;
 } bunny_s;
 
 static bunny_s bunnies[BUNNIES_MAX];
@@ -23,6 +24,7 @@ static bunny_s bunnies[BUNNIES_MAX];
 s16 bunnies_cnt = 0;
 int bunnies_total = 0;
 s16 bunnies_collected = 0;
+s16 bunnies_died = 0;
 
 typedef struct {
   s16 x;
@@ -45,19 +47,20 @@ static savedBunnySlot savedSlots [BUNNIES_MAX] = {
 
 static u16 frame_cnt = 0;
 
-void add_bunny(int x, int y) {
+void add_bunny(int x, int y, s16 hp) {
   bunnies[bunnies_cnt].oam_id = BUNNIES_OAM_ID + bunnies_cnt;
   bunnies[bunnies_cnt].x = x;
   bunnies[bunnies_cnt].y = y;
+  bunnies[bunnies_cnt].hp = hp;
   ++bunnies_cnt;
 }
 
 void bunnies_init(void) {
-  add_bunny(8, 8);
-  add_bunny(224, 24);
-  add_bunny(80, 132);
-  add_bunny(16, 200);
-  add_bunny(224, 224);
+  add_bunny(8, 8, 500);
+  add_bunny(224, 24, 600);
+  add_bunny(80, 132, 700);
+  add_bunny(16, 200, 800);
+  add_bunny(224, 224, 1000);
   bunnies_total = bunnies_cnt;
   for (u16 i = 0; i < bunnies_cnt; ++i) {
     NF_CreateSprite(SCR_WORLD, bunnies[i].oam_id, SPRITE_INFOS[RABBITS].img_id,
@@ -78,7 +81,11 @@ bool collides_with_mech(u16 i) {
   return inSquare(xOffset, yOffset, 16, 16);
 }
 
-bool collect(u16 bunnyId) {
+bool bunny_in_fire(u16 i){
+  return true;
+}
+
+static void collect(u16 bunnyId) {
   audio_play_sfx(SFX_SFX_BUNNY_PICK_UP, false, IGNORED_LEN, DEFAULT_VOLUME);
   NF_DeleteSprite(SCR_WORLD, bunnies[bunnyId].oam_id);
   bunnies[bunnyId] = bunnies[bunnies_cnt - 1];
@@ -87,8 +94,14 @@ bool collect(u16 bunnyId) {
   NF_CreateSprite(SCR_CHAMBER, bunnies_collected, SPRITE_INFOS[RABBITS].img_id,
                 SPRITE_INFOS[RABBITS].pal_id, savedSlots[bunnies_collected].x, savedSlots[bunnies_collected].y);
   ++bunnies_collected;
+}
 
-  return true;
+static void kill_bunny(u16 bunnyId) {
+  audio_play_sfx(SFX_SFX_BUNNY_DEATH, false, IGNORED_LEN, DEFAULT_VOLUME);
+  NF_DeleteSprite(SCR_WORLD, bunnies[bunnyId].oam_id);
+  bunnies[bunnyId] = bunnies[bunnies_cnt - 1];
+  --bunnies_cnt;
+  ++bunnies_died;
 }
 
 void bunnies_update(void) {
@@ -98,6 +111,14 @@ void bunnies_update(void) {
     if (collides_with_mech(i)) {
       collect(i);
       continue;
+    }
+    if (bunny_in_fire(i)){
+      bunnies[i].hp -= 1;
+      if (bunnies[i].hp <= 0){
+        bunnies[i].hp = 0;
+        kill_bunny(i);
+        continue;
+      }
     }
     s16 phaseSin = sinLerp((frame_cnt - 60) * (32767 / 60)); // 4.12 fixed
     s16 offset = (3 * phaseSin) >> 12;
