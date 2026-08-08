@@ -20,8 +20,9 @@ typedef struct {
 
 static bunny_s bunnies[BUNNIES_MAX];
 
-static s16 bunnies_cnt = 0;
-static s16 bunnies_saved = 0;
+s16 bunnies_cnt = 0;
+int bunnies_total = 0;
+s16 bunnies_collected = 0;
 
 typedef struct {
   s16 x;
@@ -57,6 +58,7 @@ void bunnies_init(void) {
   add_bunny(80, 132);
   add_bunny(16, 200);
   add_bunny(224, 224);
+  bunnies_total = bunnies_cnt;
   for (u16 i = 0; i < bunnies_cnt; ++i) {
     NF_CreateSprite(SCR_WORLD, bunnies[i].oam_id, SPRITE_INFOS[RABBITS].img_id,
                     SPRITE_INFOS[RABBITS].pal_id, bunnies[i].x, bunnies[i].y);
@@ -81,10 +83,10 @@ bool collect(u16 bunnyId) {
   NF_DeleteSprite(SCR_WORLD, bunnies[bunnyId].oam_id);
   bunnies[bunnyId] = bunnies[bunnies_cnt - 1];
   --bunnies_cnt;
- 
-  NF_CreateSprite(SCR_CHAMBER, bunnies_saved, SPRITE_INFOS[RABBITS].img_id,
-                SPRITE_INFOS[RABBITS].pal_id, savedSlots[bunnies_saved].x, savedSlots[bunnies_saved].y);
-  ++bunnies_saved;
+
+  NF_CreateSprite(SCR_CHAMBER, bunnies_collected, SPRITE_INFOS[RABBITS].img_id,
+                SPRITE_INFOS[RABBITS].pal_id, savedSlots[bunnies_collected].x, savedSlots[bunnies_collected].y);
+  ++bunnies_collected;
 
   return true;
 }
@@ -110,7 +112,7 @@ void bunnies_update(void) {
     NF_MoveSprite(SCR_WORLD, bunnies[i].oam_id, x, y);
     NF_SpriteFrame(SCR_WORLD, bunnies[i].oam_id, frame_cnt / 30);
   }
-  for (s16 i = 0 ; i < bunnies_saved; ++i) {
+  for (s16 i = 0 ; i < bunnies_collected; ++i) {
     s16 phaseSin = sinLerp((frame_cnt - 60) * (32767 / 60)); // 4.12 fixed
     s16 offset = (10 * phaseSin) >> 12;
     s16 x = savedSlots[i].x;
