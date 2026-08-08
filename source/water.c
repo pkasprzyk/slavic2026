@@ -147,8 +147,12 @@ void water_hide_pump() {
 }
 
 void water_operate_pump(int x, int y) {
-  u16 pump_upper_threshold = 96 - 32;
-  u16 pump_lower_threshold = 96 + 32;
+  u16 pump_upper_threshold = 96 - 30;
+  u16 pump_lower_threshold = 96 + 30;
+  if (y > 132)
+    y = 132;
+  else if (y < 60)
+    y = 60;
   NF_MoveSprite(SCR_WORLD, PUMP_HANDLE_OAM_ID, 192, y - 16);
   if (y <= pump_upper_threshold) {
     if (pump_was_in != 1) {
