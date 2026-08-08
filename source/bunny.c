@@ -10,6 +10,7 @@
 #include "ids.h"
 #include "level.h"
 #include "mech.h"
+#include "spawn_points.h"
 #include "sprites.h"
 static const bool DIE_FAST = false;
 
@@ -56,11 +57,13 @@ void add_bunny(int x, int y, s16 hp) {
 }
 
 void bunnies_init(void) {
-  add_bunny(8, 8, 500);
-  add_bunny(224, 24, 600);
-  add_bunny(80, 132, 700);
-  add_bunny(16, 200, 800);
-  add_bunny(224, 224, 1000);
+  add_bunny(BUNNY_SPAWN_0_X, BUNNY_SPAWN_0_Y, 500);
+  add_bunny(BUNNY_SPAWN_1_X, BUNNY_SPAWN_1_Y, 600);
+  add_bunny(BUNNY_SPAWN_2_X, BUNNY_SPAWN_2_Y, 700);
+  add_bunny(BUNNY_SPAWN_3_X, BUNNY_SPAWN_3_Y, 800);
+#if BUNNY_COUNT > 4
+  add_bunny(BUNNY_SPAWN_4_X, BUNNY_SPAWN_4_Y, 1000);
+#endif
   bunnies_total = bunnies_cnt;
   for (u16 i = 0; i < bunnies_cnt; ++i) {
     NF_CreateSprite(SCR_WORLD, bunnies[i].oam_id, SPRITE_INFOS[RABBITS].img_id,
