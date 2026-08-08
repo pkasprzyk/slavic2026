@@ -28,7 +28,8 @@ static void draw_bad_ending(void) {
   NF_CreateTiledBg(SCR_WORLD, LAYER_ENDING_IMAGE, "bad_ending");
 
   char buf[50];
-  snprintf(buf, sizeof(buf), "You failed to save\n all %d bunnies...", bunnies_died);
+  snprintf(buf, sizeof(buf), "You failed to save\n all %d bunnies...",
+           bunnies_died);
   NF_ClearTextLayer(SCR_CHAMBER, LAYER_CHAMBER_TEXT);
   NF_WriteText(SCR_CHAMBER, LAYER_CHAMBER_TEXT, 11, 5, "BAD ENDING");
   NF_WriteText(SCR_CHAMBER, LAYER_CHAMBER_TEXT, 1, 10, buf);
@@ -43,7 +44,8 @@ static void draw_mid_ending(void) {
   NF_CreateTiledBg(SCR_WORLD, LAYER_ENDING_IMAGE, "mid_ending");
 
   char buf[38];
-  snprintf(buf, sizeof(buf), "You rescued only\n %d bunnies...", bunnies_collected);
+  snprintf(buf, sizeof(buf), "You rescued only\n %d bunnies...",
+           bunnies_collected);
   NF_ClearTextLayer(SCR_CHAMBER, LAYER_CHAMBER_TEXT);
   NF_WriteText(SCR_CHAMBER, LAYER_CHAMBER_TEXT, 11, 5, "THE END");
   NF_WriteText(SCR_CHAMBER, LAYER_CHAMBER_TEXT, 1, 10, buf);
@@ -141,7 +143,6 @@ void draw_ending() {
   NF_DeleteTiledBg(SCR_WORLD, 2);
   NF_DeleteTiledBg(SCR_WORLD, 3);
 
-
   swiWaitForVBlank();
   audio_init_wav("nitro:/audio/SGJ2026-Music-Win-Chill-22khz-loop.wav");
   if (game_state == GAME_BAD_ENDING) {
@@ -173,7 +174,7 @@ void game_update(void) {
   audio_update_wav();
   audio_update_loops();
 
-  if (game_state == GAME_TITLE || game_state == GAME_INSTRUCTIONS) {
+  if (game_state == GAME_TITLE) {
     title_update();
     return;
   }

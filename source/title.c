@@ -5,12 +5,11 @@
 #include "ids.h"
 #include "title.h"
 
-enum MenuState
-{
+enum MenuState {
   TITLE_SCREEN = 0,
   INSTRUCTIONS_SCREEN = 1,
+  CREDITS_SCREEN = 2
 };
-
 
 static int screen;
 
@@ -40,8 +39,9 @@ static void draw_title(void) {
   NF_WriteText(SCR_WORLD, LAYER_WORLD_TEXT, 10, 2, "CHILLING MECH");
   NF_WriteText(SCR_WORLD, LAYER_WORLD_TEXT, 10, 4, "A Slavic Game");
   NF_WriteText(SCR_WORLD, LAYER_WORLD_TEXT, 12, 5, "Jam 2026");
-  NF_WriteText(SCR_WORLD, LAYER_WORLD_TEXT, 9, 9, "[   START   ]");
+  NF_WriteText(SCR_WORLD, LAYER_WORLD_TEXT, 8, 9, "[    START    ]");
   NF_WriteText(SCR_WORLD, LAYER_WORLD_TEXT, 8, 13, "[ HOW TO PLAY ]");
+  NF_WriteText(SCR_WORLD, LAYER_WORLD_TEXT, 8, 17, "[   CREDITS   ]");
   NF_UpdateTextLayers();
 }
 
@@ -49,16 +49,25 @@ static void draw_instructions(void) {
   clear_all();
   load_instr_bg();
   NF_WriteText(SCR_WORLD, LAYER_WORLD_TEXT, 10, 2, "HOW TO PLAY");
-  NF_WriteText(SCR_WORLD, LAYER_WORLD_TEXT, 2, 5,
-               "D-Pad: Move the mech");
-  NF_WriteText(SCR_WORLD, LAYER_WORLD_TEXT, 2, 7,
-               "Touch: Spray water on fire");
+  NF_WriteText(SCR_WORLD, LAYER_WORLD_TEXT, 2, 5, "D-Pad: Move the mech");
+  NF_WriteText(SCR_WORLD, LAYER_WORLD_TEXT, 2, 7, "Touch: Spray water on fire");
   NF_WriteText(SCR_WORLD, LAYER_WORLD_TEXT, 2, 9,
                "Blow into mic: Cool reactor");
-  NF_WriteText(SCR_WORLD, LAYER_WORLD_TEXT, 2, 11,
-               "Rescue animals from the");
-  NF_WriteText(SCR_WORLD, LAYER_WORLD_TEXT, 2, 12,
-               "burning forest!");
+  NF_WriteText(SCR_WORLD, LAYER_WORLD_TEXT, 2, 11, "Rescue animals from the");
+  NF_WriteText(SCR_WORLD, LAYER_WORLD_TEXT, 2, 12, "burning forest!");
+  NF_WriteText(SCR_WORLD, LAYER_WORLD_TEXT, 9, 17, "[   BACK   ]");
+  NF_UpdateTextLayers();
+}
+
+static void draw_credits(void) {
+  clear_all();
+  load_instr_bg();
+  NF_WriteText(SCR_WORLD, LAYER_WORLD_TEXT, 2, 3, "Programmer 1");
+  NF_WriteText(SCR_WORLD, LAYER_WORLD_TEXT, 2, 5, "Programmer 2");
+  NF_WriteText(SCR_WORLD, LAYER_WORLD_TEXT, 2, 7, "Programmer 3");
+  NF_WriteText(SCR_WORLD, LAYER_WORLD_TEXT, 2, 9, "Programmer 4");
+  NF_WriteText(SCR_WORLD, LAYER_WORLD_TEXT, 2, 11, "Justi");
+  NF_WriteText(SCR_WORLD, LAYER_WORLD_TEXT, 2, 13, "Yreron");
   NF_WriteText(SCR_WORLD, LAYER_WORLD_TEXT, 9, 17, "[   BACK   ]");
   NF_UpdateTextLayers();
 }
@@ -85,13 +94,24 @@ void title_update(void) {
       draw_instructions();
       return;
     }
-    if (touch_in_rect(touch.px, touch.py, 72, 70, 104, 16)) {
+    if (touch_in_rect(touch.px, touch.py, 64, 134, 120, 16)) {
+      screen = CREDITS_SCREEN;
+      draw_credits();
+      return;
+    }
+    if (touch_in_rect(touch.px, touch.py, 64, 70, 120, 16)) {
       clear_all();
       NF_UpdateTextLayers();
       game_start_play();
       return;
     }
-  } else if (screen == INSTRUCTIONS_SCREEN)  {
+  } else if (screen == INSTRUCTIONS_SCREEN) {
+    if (touch_in_rect(touch.px, touch.py, 72, 134, 104, 16)) {
+      screen = TITLE_SCREEN;
+      draw_title();
+      return;
+    }
+  } else if (screen == CREDITS_SCREEN) {
     if (touch_in_rect(touch.px, touch.py, 72, 134, 104, 16)) {
       screen = TITLE_SCREEN;
       draw_title();
