@@ -1,0 +1,19 @@
+#ifndef SPAWN_POINTS_H__
+#define SPAWN_POINTS_H__
+
+#define PLAYER_SPAWN_X 200
+#define PLAYER_SPAWN_Y 200
+
+#define BUNNY_COUNT 5
+#define BUNNY_SPAWN_0_X 60
+#define BUNNY_SPAWN_0_Y 60
+#define BUNNY_SPAWN_1_X 350
+#define BUNNY_SPAWN_1_Y 80
+#define BUNNY_SPAWN_2_X 150
+#define BUNNY_SPAWN_2_Y 280
+#define BUNNY_SPAWN_3_X 400
+#define BUNNY_SPAWN_3_Y 300
+#define BUNNY_SPAWN_4_X 300
+#define BUNNY_SPAWN_4_Y 380
+
+#endif
