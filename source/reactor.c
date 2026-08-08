@@ -34,7 +34,9 @@
 #define REACTOR_THRESHOLD_3 150
 #define REACTOR_HEAT_4_SPEED_PENALTY 16
 
-#define FIRE_HEAT_DISTANCE 32
+#define FIRE_HEAT_DISTANCE 24
+#define FIRE_HEAT_MULTIPLIER 100
+
 #define FIRE_HEAT_COOLDOWN 10
 
 int blowing_counter = 0;
@@ -235,11 +237,13 @@ void reactor_heat_from_fire(s32 distance_sq) {
   int heat_amount = 0;
   if (distance_sq < (FIRE_HEAT_DISTANCE * FIRE_HEAT_DISTANCE)) {
     // scales up to 10
-    heat_amount = (FIRE_HEAT_DISTANCE * FIRE_HEAT_DISTANCE - distance_sq) / 100;
-    if (heat_amount > 0) {
-      reactor_increase_temp(heat_amount);
-      fire_heat_cooldown = FIRE_HEAT_COOLDOWN;
+    heat_amount = (FIRE_HEAT_DISTANCE * FIRE_HEAT_DISTANCE - distance_sq) /
+                  FIRE_HEAT_MULTIPLIER;
+    if (heat_amount == 0) {
+      heat_amount = 1;
     }
+    reactor_increase_temp(heat_amount);
+    fire_heat_cooldown = FIRE_HEAT_COOLDOWN;
   }
 #if HEAT_DEBUG
   char buffer[128];
