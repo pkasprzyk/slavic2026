@@ -332,10 +332,10 @@
   <image source="tile_0109.png" width="8" height="8"/>
  </tile>
  <tile id="110">
-  <image source="../../../../../../../../../../Users/owca0/Desktop/d2.png" width="24" height="24"/>
+  <image source="d2.png" width="24" height="24"/>
  </tile>
  <tile id="112">
-  <image source="../../../../../../../../../../Users/owca0/Desktop/d1.png" width="24" height="24"/>
+  <image source="d1.png" width="24" height="24"/>
  </tile>
  <wangsets>
   <wangset name="big_tree_1" type="mixed" tile="-1">
