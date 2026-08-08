@@ -3,6 +3,7 @@
 #include <nds.h>
 
 #include <nf_lib.h>
+#include <stdbool.h>
 
 #include "level.h"
 #include "sprites.h"
@@ -38,9 +39,11 @@ void add_bunny(int x, int y)
 
 void bunnies_init(void)
 {
-    for (u16 i = 0; i < BUNNIES_MAX; ++i){
-        add_bunny(i*16, i*16);
-    }
+    add_bunny(8,8);
+    add_bunny(224,24);
+    add_bunny(80,132);
+    add_bunny(16,200);
+    add_bunny(224,224);
     for (u16 i = 0; i < bunnies_cnt; ++i)
     {
         NF_CreateSprite(SCREEN_BOT, bunnies[i].oam_id, SPRITE_INFOS[RABBITS].img_id, SPRITE_INFOS[RABBITS].pal_id, bunnies[i].x , bunnies[i].y);
@@ -56,7 +59,15 @@ void bunnies_update(void)
     {
         s16 phaseSin = sinLerp((frame_cnt-60)*(32767/60)); // 4.12 fixed
         s16 offset = (5 * phaseSin) >>12;
-        NF_MoveSprite(SCREEN_BOT, bunnies[i].oam_id, bunnies[i].x - level_cam_x(), bunnies[i].y - level_cam_y() + offset);
+        s16 x = bunnies[i].x - level_cam_x();
+        s16 y = bunnies[i].y - level_cam_y() + offset;
+        if ( x < -16 || x > 256 || y < -16 || y > 192) // off screen
+        {
+            NF_ShowSprite(SCREEN_BOT, bunnies[i].oam_id, false);
+            continue;
+        }
+        NF_ShowSprite(SCREEN_BOT, bunnies[i].oam_id, true);
+        NF_MoveSprite(SCREEN_BOT, bunnies[i].oam_id, x, y);
         NF_SpriteFrame(SCREEN_BOT, bunnies[i].oam_id, frame_cnt / 30);
     }
 }
