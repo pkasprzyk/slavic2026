@@ -75,9 +75,7 @@ void bunnies_init(void) {
   }
 }
 
-void bunnies_restart(void){
-  
-}
+void bunnies_restart(void) {}
 
 bool inSquare(s16 x, s16 y, s16 w, s16 h) {
   if (x < 0 || x > w || y < 0 || y > h)
@@ -123,8 +121,9 @@ static void collect(u16 bunnyId) {
   ++bunnies_collected;
 }
 
-static void kill_bunny(u16 bunnyId) {
-  audio_play_sfx(SFX_SFX_BUNNY_DEATH, false, IGNORED_LEN, 190);
+static void kill_bunny(u16 bunnyId, bool silent) {
+  if (!silent)
+    audio_play_sfx(SFX_SFX_BUNNY_DEATH, false, IGNORED_LEN, 190);
   NF_ShowSprite(SCR_WORLD, bunnies[bunnyId].indicator_oam_id, false);
   NF_DeleteSprite(SCR_WORLD, bunnies[bunnyId].oam_id);
   bunnies[bunnyId] = bunnies[bunnies_cnt - 1];
@@ -134,7 +133,7 @@ static void kill_bunny(u16 bunnyId) {
 
 void kill_all_bunnies(void) {
   for (s16 i = bunnies_cnt - 1; i >= 0; i--) {
-    kill_bunny(i);
+    kill_bunny(i, true);
   }
 }
 
@@ -222,7 +221,7 @@ static void updateBunny(int i) {
     isHurt = true;
     if (bunnies[i].hp <= 0) {
       bunnies[i].hp = 0;
-      kill_bunny(i);
+      kill_bunny(i, false);
       return;
     }
   }
@@ -258,7 +257,7 @@ static void updateBunny(int i) {
   NF_VflipSprite(SCR_WORLD, bunnies[i].oam_id, isHurt);
 }
 
-void updateChamberBunnies(){
+void updateChamberBunnies() {
   for (s16 i = 0; i < bunnies_collected; ++i) {
     s16 phaseSin = sinLerp((frame_cnt - 60) * (32767 / 60));
     s16 offset = (10 * phaseSin) >> 12;
@@ -279,7 +278,7 @@ void bunnies_update(void) {
   updateChamberBunnies();
 }
 
-void  bunnies_end_screen_update(){
+void bunnies_end_screen_update() {
   ++frame_cnt;
   frame_cnt %= 60 * 2;
   updateChamberBunnies();

@@ -156,6 +156,7 @@ void draw_ending() {
   if (game_state == GAME_BAD_ENDING) {
     draw_bad_ending();
     audio_set_looped_volume(SFX_SFX_FIRE_LOOP, 150);
+    audio_play_sfx(SFX_SFX_BUNNY_DEATH, false, IGNORED_LEN, 190);
   } else if (game_state == GAME_GOOD_ENDING) {
     draw_good_ending();
     audio_stop_looped_sfx(SFX_SFX_FIRE_LOOP);
