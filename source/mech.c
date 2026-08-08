@@ -165,12 +165,12 @@ void mech_update(void) {
   if (is_in_water(mech_precise_x, mech_precise_y)) {
     water_fill_update();
     if (!was_in_water) {
-      audio_set_looped_volume(SFX_SFX_FIRE_LOOP, 90);
+      audio_set_looped_volume(SFX_SFX_FIRE_LOOP, 80);
       was_in_water = true;
     }
   } else if (was_in_water) {
     was_in_water = false;
-    audio_set_looped_volume(SFX_SFX_FIRE_LOOP, 190);
+    audio_set_looped_volume(SFX_SFX_FIRE_LOOP, 170);
   }
 
   if (mech_precise_x < 0)
@@ -200,7 +200,7 @@ void mech_update(void) {
       footstep_sfx = (footstep_sfx + 1) % 2;
       audio_play_sfx(footstep_sfx == 0 ? SFX_SFX_FOOTSTEP_1
                                        : SFX_SFX_FOOTSTEP_2,
-                     false, DEFAULT_VOLUME, 255);
+                     false, IGNORED_LEN, 210);
       footstep_timer = 30;
     }
   }
