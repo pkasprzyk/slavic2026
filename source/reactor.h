@@ -4,6 +4,7 @@
 #include <nds.h>
 
 extern int fire_heat_cooldown;
+extern int heat_speed_penalty;
 
 void reactor_init(void);
 void reactor_update(void);

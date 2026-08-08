@@ -20,7 +20,7 @@
 #define REACTOR_MAX_TEMP 200
 
 #define BLOWING_THRESHOLD 10000
-#define BLOWING_DECREASE_AMOUNT 5
+#define BLOWING_DECREASE_AMOUNT 15
 
 // The sample rate used for the recording (samples per second)
 #define SAMPLE_RATE 8000
@@ -28,8 +28,11 @@
 #define BLOWING_FRAMES_REQUIRED 20
 
 #define REACTOR_THRESHOLD_1 50
+#define REACTOR_HEAT_2_SPEED_PENALTY 0
 #define REACTOR_THRESHOLD_2 100
+#define REACTOR_HEAT_3_SPEED_PENALTY 8
 #define REACTOR_THRESHOLD_3 150
+#define REACTOR_HEAT_4_SPEED_PENALTY 16
 
 #define FIRE_HEAT_DISTANCE 32
 #define FIRE_HEAT_COOLDOWN 10
@@ -37,6 +40,7 @@
 int blowing_counter = 0;
 int reactor_temp;
 int fire_heat_cooldown;
+int heat_speed_penalty;
 
 // This is the size of the temporary buffer that the ARM7 will use to record
 // audio. When the callback is called, you will get a pointer to some address
@@ -114,6 +118,7 @@ void reactor_init(void) {
   reactor_temp = 0;
   blowing_counter = 0;
   fire_heat_cooldown = 0;
+  heat_speed_penalty = 0;
 
   soundEnable();
 
@@ -198,11 +203,24 @@ void reactor_deinit(void) {
   soundMicOff();
 }
 
+void resolve_speed_penalty() {
+  if (reactor_temp > REACTOR_THRESHOLD_3) {
+    heat_speed_penalty = REACTOR_HEAT_4_SPEED_PENALTY;
+  } else if (reactor_temp > REACTOR_THRESHOLD_2) {
+    heat_speed_penalty = REACTOR_HEAT_3_SPEED_PENALTY;
+  } else if (reactor_temp > REACTOR_THRESHOLD_1) {
+    heat_speed_penalty = REACTOR_HEAT_2_SPEED_PENALTY;
+  } else {
+    heat_speed_penalty = 0;
+  }
+}
+
 void reactor_increase_temp(int amount) {
   reactor_temp += amount;
   if (reactor_temp > REACTOR_MAX_TEMP) {
     reactor_temp = REACTOR_MAX_TEMP;
   }
+  resolve_speed_penalty();
 }
 
 void reactor_decrease_temp(int amount) {
@@ -210,6 +228,7 @@ void reactor_decrease_temp(int amount) {
   if (reactor_temp < REACTOR_MIN_TEMP) {
     reactor_temp = REACTOR_MIN_TEMP;
   }
+  resolve_speed_penalty();
 }
 
 void reactor_heat_from_fire(s32 distance_sq) {

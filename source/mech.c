@@ -14,12 +14,15 @@
 #include "soundbank.h"
 #include "sprites.h"
 #include "water.h"
+#include "reactor.h"
 
-#define MECH_SPEED 8
+#define MECH_SPEED 32
 
 #define MECH_W 24
 #define MECH_H 24
 #define MECH_FEET_H 8
+
+#define PRECISION_BITS 5
 
 #define SPRITE_ID MECH_OAM_ID
 
@@ -45,8 +48,8 @@ static s16 footstep_timer = 0;
 void mech_init(void) {
   mech_x = 178;
   mech_y = 128;
-  mech_precise_x = mech_x << 3;
-  mech_precise_y = mech_y << 3;
+  mech_precise_x = mech_x << PRECISION_BITS;
+  mech_precise_y = mech_y << PRECISION_BITS;
 
   NF_CreateSprite(SCR_WORLD, SPRITE_ID, MECH, DEFAULT_SPRITE_PALETTE, mech_x,
                   mech_y);
@@ -54,11 +57,11 @@ void mech_init(void) {
 }
 
 static int mech_blocked(s32 x, s32 y) {
-  s32 x0 = x >> 6;
+  s32 x0 = x >> (3 + PRECISION_BITS);
   // only collide on feet
-  s32 y0 = ((y >> 3) + MECH_H - MECH_FEET_H) >> 3;
-  s32 x1 = ((x >> 3) + MECH_W - 1) >> 3;
-  s32 y1 = ((y >> 3) + MECH_H - 1) >> 3;
+  s32 y0 = ((y >> PRECISION_BITS) + MECH_H - MECH_FEET_H) >> 3;
+  s32 x1 = ((x >> PRECISION_BITS) + MECH_W - 1) >> 3;
+  s32 y1 = ((y >> PRECISION_BITS) + MECH_H - 1) >> 3;
 
   for (s32 ty = y0; ty <= y1; ty++)
     for (s32 tx = x0; tx <= x1; tx++) {
@@ -70,11 +73,11 @@ static int mech_blocked(s32 x, s32 y) {
 }
 
 static bool is_in_water(s32 x, s32 y) {
-  s32 x0 = x >> 6;
+  s32 x0 = x >> (3 + PRECISION_BITS);
   // only check on feet
-  s32 y0 = ((y >> 3) + MECH_H - MECH_FEET_H) >> 3;
-  s32 x1 = ((x >> 3) + MECH_W - 1) >> 3;
-  s32 y1 = ((y >> 3) + MECH_H - 1) >> 3;
+  s32 y0 = ((y >> PRECISION_BITS) + MECH_H - MECH_FEET_H) >> 3;
+  s32 x1 = ((x >> PRECISION_BITS) + MECH_W - 1) >> 3;
+  s32 y1 = ((y >> PRECISION_BITS) + MECH_H - 1) >> 3;
 
   for (s32 ty = y0; ty <= y1; ty++)
     for (s32 tx = x0; tx <= x1; tx++) {
@@ -143,17 +146,23 @@ void mech_update(void) {
   last_mech_y = mech_precise_y;
   int dx = 0, dy = 0;
 
+  int speed = MECH_SPEED - heat_speed_penalty;
+
+  char buffer[128];
+  snprintf(buffer, sizeof(buffer), "SPEEED: %03d", speed);
+  NF_WriteText(SCR_CHAMBER, LAYER_CHAMBER_TEXT, 0, 8, buffer);
+
   if (held & KEY_LEFT) {
-    dx -= MECH_SPEED;
+    dx -= speed;
   }
   if (held & KEY_RIGHT) {
-    dx += MECH_SPEED;
+    dx += speed;
   }
   if (held & KEY_UP) {
-    dy -= MECH_SPEED;
+    dy -= speed;
   }
   if (held & KEY_DOWN) {
-    dy += MECH_SPEED;
+    dy += speed;
   }
   if (held & KEY_START) {
     holding_start = true;
@@ -163,7 +172,7 @@ void mech_update(void) {
     audio_init_wav("nitro:/audio/SGJ2026-Music-22khz-loop.wav");
   }
 
-  for (int s = 0; s < MECH_SPEED; s++) {
+  for (int s = 0; s < speed; s++) {
     if (dx > 0 && !mech_blocked(mech_precise_x + 1, mech_precise_y))
       mech_precise_x++;
     if (dx < 0 && !mech_blocked(mech_precise_x - 1, mech_precise_y))
@@ -190,10 +199,10 @@ void mech_update(void) {
     mech_precise_x = 0;
   if (mech_precise_y < 0)
     mech_precise_y = 0;
-  if (mech_precise_x > (LEVEL_W - MECH_W) << 3)
-    mech_precise_x = (LEVEL_W - MECH_W) << 3;
-  if (mech_precise_y > (LEVEL_H - MECH_H) << 3)
-    mech_precise_y = (LEVEL_H - MECH_H) << 3;
+  if (mech_precise_x > (LEVEL_W - MECH_W) << PRECISION_BITS)
+    mech_precise_x = (LEVEL_W - MECH_W) << PRECISION_BITS;
+  if (mech_precise_y > (LEVEL_H - MECH_H) << PRECISION_BITS)
+    mech_precise_y = (LEVEL_H - MECH_H) << PRECISION_BITS;
 
   if (last_mech_x < mech_precise_x) {
     anim = MECH_ANIM_WALK_RIGHT;
@@ -205,8 +214,8 @@ void mech_update(void) {
     anim = MECH_ANIM_WALK_UP;
   }
 
-  mech_x = mech_precise_x >> 3;
-  mech_y = mech_precise_y >> 3;
+  mech_x = mech_precise_x >> PRECISION_BITS;
+  mech_y = mech_precise_y >> PRECISION_BITS;
 
   if (mech_precise_x != last_mech_x || mech_precise_y != last_mech_y) {
     if (footstep_timer <= 0) {
