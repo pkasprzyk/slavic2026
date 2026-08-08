@@ -20,8 +20,10 @@ int water_spray_cooldown = 0;
 int water_drop_cooldown = 0;
 
 #define MAX_WATER 1000
-#define WATER_DROP_AMOUNT 15
+#define WATER_DROP_AMOUNT 10
 #define WATER_FILL_AMOUNT 3
+
+#define WATER_EXTINGUISH_AMOUNT 5
 
 static s16 water_remaining = 500;
 static u8 water_fill_timer = 0;
@@ -147,7 +149,7 @@ void water_spray(int mech_cx, int mech_cy, int target_x, int target_y) {
   int tile_tx = hit_x >> 3;
   int tile_ty = hit_y >> 3;
   if (fire_is_burning(tile_tx, tile_ty))
-    fire_partial_extinguish(tile_tx, tile_ty, 1);
+    fire_partial_extinguish(tile_tx, tile_ty, WATER_EXTINGUISH_AMOUNT);
 
   if (water_drop_cooldown > 0)
     return;

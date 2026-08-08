@@ -15,7 +15,7 @@
 #define TILE_FIRE2 2
 #define TILE_BURNED 3
 
-#define INITIAL_HEAT_LEVEL 5
+#define INITIAL_HEAT_LEVEL 10
 
 typedef struct {
   int tx, ty;

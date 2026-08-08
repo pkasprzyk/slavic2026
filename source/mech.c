@@ -15,7 +15,7 @@
 #include "sprites.h"
 #include "water.h"
 
-#define MECH_SPEED 4
+#define MECH_SPEED 8
 
 #define MECH_W 24
 #define MECH_H 24
