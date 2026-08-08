@@ -33,6 +33,9 @@ static const SpriteInfo SPRITE_INFOS[SPRITE_CNT] = {
 
 void InitSprites(void);
 
+
+#define MECH_OAM_ID 0
+
 #define BUNNIES_OAM_ID 1
 #define BUNNIES_MAX 10
 
