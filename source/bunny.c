@@ -63,7 +63,7 @@ void add_bunny(int x, int y, s16 hp) {
 void bunnies_init(void) {
   u8 count = spawn_bunny_count();
   for (u8 i = 0; i < count; i++)
-    add_bunny(spawn_bunny_x(i), spawn_bunny_y(i), 2500);
+    add_bunny(spawn_bunny_x(i), spawn_bunny_y(i), 2700);
   bunnies_total = bunnies_cnt;
   bunnies_died = 0;
   bunnies_collected = 0;
@@ -135,7 +135,7 @@ static void collect(u16 bunnyId) {
                   SPRITE_INFOS[RABBITS].pal_id, chamberSlots[slot].x,
                   chamberSlots[slot].y);
   NF_EnableSpriteRotScale(SCR_CHAMBER, bunnies_collected, bunnies_collected,
-                           false);
+                          false);
   ++bunnies_collected;
 }
 
