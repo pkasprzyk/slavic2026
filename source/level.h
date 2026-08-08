@@ -12,6 +12,7 @@
 #define BG_H (((LEVEL_H + 255) / 256) * 256)
 
 void level_init(void);
+void level_restart();
 void level_update_camera(s16 target_x, s16 target_y);
 s16 level_cam_x(void);
 s16 level_cam_y(void);

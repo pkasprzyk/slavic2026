@@ -10,6 +10,7 @@
 #define FIRE_FRAME_TOGGLE 15
 
 void fire_init(void);
+void fire_restart(void);
 void fire_update(void);
 int fire_is_burning(int tx, int ty);
 void fire_extinguish(int tx, int ty);

@@ -142,6 +142,10 @@ void reactor_init(void) {
                  SAMPLE_RATE, microphone_handler);
 }
 
+void reactor_restart(void){
+  
+}
+
 static u16 last_frame = 0;
 
 void UpdateReactorImg() {

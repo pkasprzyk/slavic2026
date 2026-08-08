@@ -75,6 +75,10 @@ void bunnies_init(void) {
   }
 }
 
+void bunnies_restart(void){
+  
+}
+
 bool inSquare(s16 x, s16 y, s16 w, s16 h) {
   if (x < 0 || x > w || y < 0 || y > h)
     return false;

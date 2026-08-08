@@ -72,6 +72,10 @@ void title_init(void) {
   draw_title();
 }
 
+void title_restart(void){
+
+}
+
 void title_update(void) {
   if (!(keysDown() & KEY_TOUCH))
     return;

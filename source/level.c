@@ -31,6 +31,10 @@ void level_init(void) {
   NF_ScrollBg(SCR_WORLD, LAYER_WORLD_BG, 0, 0);
 }
 
+void level_restart(){
+  
+}
+
 void level_update_camera(s16 target_x, s16 target_y) {
   s32 tx = target_x - SCREEN_W / 2;
   s32 ty = target_y - SCREEN_H / 2;

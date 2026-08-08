@@ -8,6 +8,7 @@ extern int heat_speed_penalty;
 extern int water_leak_rate;
 
 void reactor_init(void);
+void reactor_restart(void);
 void reactor_update(void);
 void reactor_deinit(void);
 

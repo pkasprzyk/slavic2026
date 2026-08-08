@@ -4,6 +4,7 @@
 #include <nds.h>
 
 void mech_init(void);
+void mech_restart(void);
 void mech_update(void);
 
 extern s16 mech_x;

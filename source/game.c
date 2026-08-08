@@ -68,9 +68,9 @@ static void draw_good_ending(void) {
   ending_drawn = 1;
 }
 
-// static bool touch_in_rect(int x, int y, int rx, int ry, int rw, int rh) {
-//   return x >= rx && x <= rx + rw && y >= ry && y <= ry + rh;
-// }
+static bool touch_in_rect(int x, int y, int rx, int ry, int rw, int rh) {
+  return x >= rx && x <= rx + rw && y >= ry && y <= ry + rh;
+}
 
 void game_return_to_title(void) {
   game_state = GAME_TITLE;
@@ -132,6 +132,16 @@ void game_init(void) {
   title_init();
 }
 
+void restart_game()
+{
+
+  level_restart();
+  chamber_restart();
+
+  game_return_to_title();
+
+}
+
 void draw_ending() {
   audio_close_wav();
   ending_drawn = true;
@@ -161,12 +171,14 @@ void end_state_update() {
     draw_ending();
   }
   bunnies_end_screen_update();
-  // if (keysDown() & KEY_TOUCH) {
-  //   touchPosition touch;
-  //   touchRead(&touch);
-  //   if (touch_in_rect(touch.px, touch.py, 88, 134, 80, 16))
-  //     game_return_to_title();
-  // }
+  if (keysDown() & KEY_TOUCH) {
+    touchPosition touch;
+    touchRead(&touch);
+    if (touch_in_rect(touch.px, touch.py, 88, 134, 80, 16)){
+      // TODO: uncomment when restart is fixed
+      //restart_game();
+    }
+  }
 }
 
 void game_update(void) {
