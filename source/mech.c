@@ -25,8 +25,8 @@
 #define WATER_SPRAY_DISTANCE 50
 #define FIRE_EXTINGUISH_FRAMES 30
 
-static s16 mech_x;
-static s16 mech_y;
+s16 mech_x;
+s16 mech_y;
 static s16 last_mech_x;
 static s16 last_mech_y;
 static u8 mech_water_remaining = 0;

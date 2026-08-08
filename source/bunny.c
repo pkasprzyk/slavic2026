@@ -7,6 +7,7 @@
 
 #include "level.h"
 #include "sprites.h"
+#include "mech.h"
 
 typedef struct
 {
@@ -15,23 +16,16 @@ typedef struct
     s16 oam_id;
 } bunny_s;
 
-#define BUNNIES_MAX 10
-bunny_s bunnies [BUNNIES_MAX];
+static bunny_s bunnies [BUNNIES_MAX];
 
-u16 bunnies_cnt = 0;
+static s16 bunnies_cnt = 0;
 
 #define SCREEN_BOT 1
-
-u16 SPRIFE_DEF_ID  = 1;
-u16 VRAM_ID  = 1;
-u16 PALETTE_ID  = 1;
-
-u16 OAM_ID  = 1;
-u16 frame_cnt = 0;
+static u16 frame_cnt = 0;
 
 void add_bunny(int x, int y)
 {
-    bunnies[bunnies_cnt].oam_id = 1 + bunnies_cnt;
+    bunnies[bunnies_cnt].oam_id = BUNNIES_OAM_ID + bunnies_cnt;
     bunnies[bunnies_cnt].x = x;
     bunnies[bunnies_cnt].y = y;
     ++bunnies_cnt;
@@ -51,12 +45,35 @@ void bunnies_init(void)
     }
 }
 
+bool inSquare(s16 x, s16 y, s16 w, s16 h){
+    if (x < 0 || x > w || y < 0 || y > h)
+        return false;
+    return true;
+}
+
+bool collides_with_mech(u16 i){
+    s16 xOffset = bunnies[i].x - mech_x;
+    s16 yOffset = bunnies[i].y - mech_y;
+    return inSquare(xOffset, yOffset, 16, 16);
+}
+
+bool collect(u16 bunnyId){
+    NF_DeleteSprite(SCREEN_BOT, bunnies[bunnyId].oam_id);
+    bunnies[bunnyId] = bunnies[bunnies_cnt-1];
+    --bunnies_cnt;
+    return true;
+}
+
 void bunnies_update(void)
 {
     ++ frame_cnt;
     frame_cnt %= 60*2;
-    for (u16 i = 0; i < bunnies_cnt; ++i)
+    for (s16 i = bunnies_cnt - 1; i >=0 ; --i)
     {
+        if (collides_with_mech(i)){
+            collect(i);
+            continue;
+        }
         s16 phaseSin = sinLerp((frame_cnt-60)*(32767/60)); // 4.12 fixed
         s16 offset = (5 * phaseSin) >>12;
         s16 x = bunnies[i].x - level_cam_x();
@@ -69,5 +86,6 @@ void bunnies_update(void)
         NF_ShowSprite(SCREEN_BOT, bunnies[i].oam_id, true);
         NF_MoveSprite(SCREEN_BOT, bunnies[i].oam_id, x, y);
         NF_SpriteFrame(SCREEN_BOT, bunnies[i].oam_id, frame_cnt / 30);
+
     }
 }
