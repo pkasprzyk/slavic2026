@@ -8,6 +8,8 @@
 mm_word lopped_names[] = {0, 0, 0, 0, 0, 0};
 u16 looped_lengths[] = {0, 0, 0, 0, 0, 0};
 u16 looped_remaining[] = {0, 0, 0, 0, 0, 0};
+u8 looped_volumes[] = {0, 0, 0, 0, 0, 0};
+mm_word looped_handles[] = {0, 0, 0, 0, 0, 0};
 u8 current_size = 0;
 
 typedef struct WAVHeader {
@@ -189,7 +191,7 @@ void audio_init_wav(char *path) {
   mmSelectMode(MM_MODE_B);
 
   // Open the stream
-  mm_stream stream = {
+  /* mm_stream stream = {
       .sampling_rate = wavHeader.sampleRate,
       .buffer_length = 2048,
       .callback = streamingCallback,
@@ -197,10 +199,12 @@ void audio_init_wav(char *path) {
       .timer = MM_TIMER0,
       .manual = false,
   };
-  mmStreamOpen(&stream);
+  mmStreamOpen(&stream); */
 }
 
-void audio_update_wav(void) { streamingFillBuffer(false); }
+void audio_update_wav(void) {
+  // streamingFillBuffer(false);
+}
 
 void audio_close_wav(void) {
   mmStreamClose();
@@ -217,7 +221,8 @@ void audio_init_SB(void) {
 }
 void audio_play_sfx(mm_word sample_name, bool loop, u16 length) {
   mmLoadEffect(sample_name);
-  if (mmEffect(sample_name) == MM_SFXHAND_INVALID) {
+  mm_word handle = mmEffect(sample_name);
+  if (handle == MM_SFXHAND_INVALID) {
     printf("Failed to play sample");
     waitForever();
   }
@@ -225,6 +230,8 @@ void audio_play_sfx(mm_word sample_name, bool loop, u16 length) {
     lopped_names[current_size] = sample_name;
     looped_lengths[current_size] = length;
     looped_remaining[current_size] = length;
+    looped_volumes[current_size] = 255;
+    looped_handles[current_size] = handle;
     current_size++;
   }
 }
@@ -234,9 +241,21 @@ void audio_update_loops(void) {
     if (looped_remaining[i] > 0) {
       looped_remaining[i]--;
       if (looped_remaining[i] <= 0) {
-        mmEffect(lopped_names[i]);
+        mm_word handle = mmEffect(lopped_names[i]);
         looped_remaining[i] = looped_lengths[i];
+        looped_handles[i] = handle;
+        mmEffectVolume(handle, looped_volumes[i]);
       }
+    }
+  }
+}
+
+void audio_set_looped_volume(mm_word sample_name, u8 volume) {
+  for (u8 i = 0; i < current_size; ++i) {
+    if (lopped_names[i] == sample_name) {
+      looped_volumes[i] = volume;
+      mmEffectVolume(looped_handles[i], volume);
+      return;
     }
   }
 }
@@ -249,6 +268,8 @@ void audio_stop_looped_sfx(mm_word sample_name) {
       lopped_names[i] = 0;
       looped_lengths[i] = 0;
       looped_remaining[i] = 0;
+      looped_volumes[i] = 0;
+      looped_handles[i] = 0;
       break;
     }
   }
@@ -258,7 +279,21 @@ void audio_stop_looped_sfx(mm_word sample_name) {
       lopped_names[found_index] = lopped_names[current_size - 1];
       looped_lengths[found_index] = looped_lengths[current_size - 1];
       looped_remaining[found_index] = looped_remaining[current_size - 1];
+      looped_volumes[found_index] = looped_volumes[current_size - 1];
+      looped_handles[found_index] = looped_handles[current_size - 1];
     }
     current_size--;
+  }
+}
+
+void audio_stop_all_sfx(void) {
+  mmEffectCancelAll();
+  current_size = 0;
+}
+
+void audio_unload_all_sfx(void) {
+  audio_stop_all_sfx();
+  for (u8 i = 0; i < MSL_BANKSIZE; ++i) {
+    mmUnloadEffect(i);
   }
 }

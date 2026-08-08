@@ -7,9 +7,11 @@
 
 #include <nf_lib.h>
 
+#include "audio.h"
 #include "ids.h"
 #include "level.h"
 #include "mech.h"
+#include "soundbank.h"
 #include "sprites.h"
 #include "water.h"
 
@@ -27,6 +29,7 @@ static s16 last_mech_x;
 static s16 last_mech_y;
 static u8 frame_cnt = 0;
 static bool flipped;
+static bool was_in_water = false;
 
 void mech_init(void) {
   mech_x = 178;
@@ -129,8 +132,16 @@ void mech_update(void) {
       mech_y--;
   }
 
-  if (is_in_water(mech_x, mech_y))
+  if (is_in_water(mech_x, mech_y)) {
     water_fill_update();
+    if (!was_in_water) {
+      audio_set_looped_volume(SFX_SFX_FIRE_LOOP, 100);
+      was_in_water = true;
+    }
+  } else if (was_in_water) {
+    was_in_water = false;
+    audio_set_looped_volume(SFX_SFX_FIRE_LOOP, 255);
+  }
 
   if (mech_x < 0)
     mech_x = 0;
