@@ -24,5 +24,8 @@ void audio_close_wav(void);
 void audio_play_sfx(mm_word sample_name, bool loop, u16 length);
 void audio_update_loops(void);
 void audio_stop_looped_sfx(mm_word sample_name);
+void audio_set_looped_volume(mm_word sample_name, u8 volume);
+void audio_stop_all_sfx(void);
+void audio_unload_all_sfx(void);
 
 #endif

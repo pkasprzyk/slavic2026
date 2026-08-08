@@ -16,9 +16,9 @@ void LoadGraphicImage(SpriteInfo info) {
   u16 imgId = info.img_id;
   NF_LoadSpriteGfx(info.path, imgId, info.width, info.height);
   if (info.is_top_screen) {
-    NF_VramSpriteGfx(SCR_CHAMBER, imgId, imgId, true);
+    NF_VramSpriteGfx(SCR_CHAMBER, imgId, imgId, false);
   } else {
-    NF_VramSpriteGfx(SCR_WORLD, imgId, imgId, true);
+    NF_VramSpriteGfx(SCR_WORLD, imgId, imgId, false);
   }
 }
 
