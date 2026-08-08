@@ -9,6 +9,7 @@
 #include "level.h"
 #include "mech.h"
 #include "sprites.h"
+#include "audio.h"
 
 typedef struct {
   s16 x;
@@ -56,6 +57,7 @@ bool collides_with_mech(u16 i) {
 }
 
 bool collect(u16 bunnyId) {
+  audio_play_sfx(SFX_SFX_BUNNY_PICK_UP, false, IGNORED_LEN);
   NF_DeleteSprite(SCREEN_BOT, bunnies[bunnyId].oam_id);
   bunnies[bunnyId] = bunnies[bunnies_cnt - 1];
   --bunnies_cnt;

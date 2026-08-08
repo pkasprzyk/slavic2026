@@ -9,6 +9,7 @@
 #define WAVE_ID 0x45564157
 
 #define BUFFER_LENGTH 16384
+#define IGNORED_LEN 0
 
 #include <filesystem.h>
 #include <maxmod9.h>
