@@ -90,15 +90,20 @@ bool collides_with_mech(u16 i) {
   return inSquare(xOffset, yOffset, 16, 16);
 }
 
+s16  distance_sq(s16 x1, s16 y1, s16 x2, s16 y2){
+  return (x1-x2)*(x1-x2)+(y1-y2)*(y1-y2);
+}
+
 bool bunny_in_fire(u16 i){
   s16 tx = bunnies[i].x >> 3;
   s16 ty = bunnies[i].y >> 3;
 
-  const s16 radius = 3;
-  for (s16 x = tx-radius; x < tx + radius; ++x)
-    for (s16 y = ty-radius; y < ty + radius; ++y)
+  const s16 radius = 4;
+  for (s16 x = tx-radius; x < tx + radius+1; ++x)
+    for (s16 y = ty-radius; y < ty + radius+1; ++y)
       if (fire_is_burning(x, y))
-        return true;
+        if (distance_sq((x<<3)+4, (y<<3)+4, bunnies[i].x+8, bunnies[i].y+8) <= radius * radius * 8 * 8)
+          return true;
   return false;
 }
 
