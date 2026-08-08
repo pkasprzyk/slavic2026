@@ -14,6 +14,7 @@
 #include "level.h"
 #include "mech.h"
 #include "sprites.h"
+#include "water.h"
 
 void game_init(void) {
   consoleDemoInit();
@@ -39,6 +40,7 @@ void game_init(void) {
   InitSprites();
   level_init();
   fire_init();
+  water_init();
   mech_init();
   bunnies_init();
   chamber_init();
@@ -59,6 +61,7 @@ void game_init(void) {
 void game_update(void) {
   mech_update();
   fire_update();
+  water_update();
   bunnies_update();
   chamber_update();
   NF_UpdateTextLayers();
