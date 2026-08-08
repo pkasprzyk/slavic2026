@@ -4,6 +4,7 @@
 extern int bunnies_cnt;
 extern int bunnies_total;
 extern int bunnies_collected;
+extern int bunnies_died;
 
 void bunnies_init(void);
 void bunnies_update(void);

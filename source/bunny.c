@@ -12,6 +12,7 @@
 #include "sprites.h"
 #include "fire.h"
 
+static const bool DIE_FAST = false;
 
 typedef struct {
   s16 x;
@@ -55,6 +56,11 @@ void add_bunny(int x, int y, s16 hp) {
   bunnies[bunnies_cnt].x = x;
   bunnies[bunnies_cnt].y = y;
   bunnies[bunnies_cnt].hp = hp;
+  
+  if (DIE_FAST)
+  {
+      bunnies[bunnies_cnt].hp = 5;
+  }
   ++bunnies_cnt;
 }
 
@@ -104,7 +110,8 @@ bool bunny_in_fire(u16 i){
       if (fire_is_burning(x, y))
         if (distance_sq((x<<3)+4, (y<<3)+4, bunnies[i].x+8, bunnies[i].y+8) <= radius * radius * 8 * 8)
           return true;
-  return false;
+
+  return DIE_FAST;
 }
 
 static void collect(u16 bunnyId) {

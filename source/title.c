@@ -5,13 +5,14 @@
 #include "ids.h"
 #include "title.h"
 
-#define TITLE_SCREEN  0
-#define INSTR_SCREEN  1
+enum MenuState
+{
+  TITLE_SCREEN = 0,
+  INSTRUCTIONS_SCREEN = 1,
+};
 
-#define TITLE_LAYER 1
 
 static int screen;
-static u16 saved_palette[256];
 
 static void clear_row(int row) {
   NF_WriteText(SCR_WORLD, LAYER_WORLD_TEXT, 0, row,
@@ -25,12 +26,12 @@ static void clear_all(void) {
 
 static void load_menu_bg(void) {
   NF_LoadTiledBg("bg/menu_bg", "menu_bg", 256, 256);
-  NF_CreateTiledBg(SCR_WORLD, TITLE_LAYER, "menu_bg");
+  NF_CreateTiledBg(SCR_WORLD, LAYER_TITLE_TEXT, "menu_bg");
 }
 
 static void load_instr_bg(void) {
   NF_LoadTiledBg("bg/instr_bg", "instr_bg", 256, 256);
-  NF_CreateTiledBg(SCR_WORLD, TITLE_LAYER, "instr_bg");
+  NF_CreateTiledBg(SCR_WORLD, LAYER_TITLE_TEXT, "instr_bg");
 }
 
 static void draw_title(void) {
@@ -67,8 +68,6 @@ static bool touch_in_rect(int x, int y, int rx, int ry, int rw, int rh) {
 }
 
 void title_init(void) {
-  for (int i = 0; i < 256; i++)
-    saved_palette[i] = BG_PALETTE_SUB[i];
   screen = TITLE_SCREEN;
   draw_title();
 }
@@ -82,22 +81,17 @@ void title_update(void) {
 
   if (screen == TITLE_SCREEN) {
     if (touch_in_rect(touch.px, touch.py, 64, 102, 120, 16)) {
-      screen = INSTR_SCREEN;
+      screen = INSTRUCTIONS_SCREEN;
       draw_instructions();
       return;
     }
     if (touch_in_rect(touch.px, touch.py, 72, 70, 104, 16)) {
       clear_all();
       NF_UpdateTextLayers();
-      REG_DISPCNT_SUB &= ~DISPLAY_BG1_ACTIVE;
-      swiWaitForVBlank();
-      for (int i = 0; i < 256; i++)
-        BG_PALETTE_SUB[i] = saved_palette[i];
-      game_state = GAME_PLAYING;
       game_start_play();
       return;
     }
-  } else {
+  } else if (screen == INSTRUCTIONS_SCREEN)  {
     if (touch_in_rect(touch.px, touch.py, 72, 134, 104, 16)) {
       screen = TITLE_SCREEN;
       draw_title();

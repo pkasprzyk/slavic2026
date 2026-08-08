@@ -19,6 +19,9 @@ enum {
   LAYER_WORLD_TEXT = 0,
   LAYER_WORLD_BG = 3,
   LAYER_WORLD_FIRE = 2,
+
+  LAYER_ENDING_IMAGE = 1,
+  LAYER_TITLE_TEXT = 1,
 };
 
 enum {

@@ -67,6 +67,7 @@ mv *.pal *.img *.map ../nitrofiles/bg
 $GRIT menu_bg.png -ftB -fh! -gTFF00FF -gt -gB8 -mR8 -mLs
 $GRIT instr_bg.png -ftB -fh! -gTFF00FF -gt -gB8 -mR8 -mLs
 $GRIT bg_bad_ending.png -ftB -fh! -gTFF00FF -gt -gB8 -mR8 -mLs
+$GRIT bg_mid_ending.png -ftB -fh! -gTFF00FF -gt -gB8 -mR8 -mLs
 $GRIT bg_good_ending.png -ftB -fh! -gTFF00FF -gt -gB8 -mR8 -mLs
 mv *.pal *.img *.map ../nitrofiles/bg
 

@@ -3,7 +3,15 @@
 #ifndef GAME_H
 #define GAME_H
 
-enum { GAME_TITLE, GAME_INSTRUCTIONS, GAME_PLAYING, GAME_BAD_ENDING, GAME_GOOD_ENDING };
+enum GameState
+{
+    GAME_TITLE,
+    GAME_INSTRUCTIONS,
+    GAME_PLAYING,
+    GAME_BAD_ENDING,
+    GAME_GOOD_ENDING,
+    GAME_MID_ENDING,
+};
 
 extern int game_state;
 
