@@ -12,8 +12,8 @@
 
 #define MECH_SPEED 2
 
-#define MECH_W 32
-#define MECH_H 32
+#define MECH_W 24
+#define MECH_H 24
 
 #define MECH_MAX_WATER 200
 
@@ -25,6 +25,7 @@ static s16 last_mech_x;
 static s16 last_mech_y;
 static u8 mech_water_remaining = 0;
 static u8 frame_cnt = 0;
+static bool flipped;
 
 void mech_init(void) {
   mech_x = 178;
@@ -94,9 +95,12 @@ void mech_update(void) {
 
   level_update_camera(mech_x + MECH_W / 2, mech_y + MECH_H / 2);
 
-  NF_MoveSprite(SCR_WORLD, SPRITE_ID, mech_x - level_cam_x(),
-                mech_y - level_cam_y());
   NF_SpriteFrame(SCR_WORLD, SPRITE_ID, frame_cnt / 30);
-  if (last_mech_x != mech_x)
-    NF_HflipSprite(SCR_WORLD, SPRITE_ID, last_mech_x > mech_x);
+  if (last_mech_x != mech_x){
+    flipped = last_mech_x < mech_x;
+    NF_HflipSprite(SCR_WORLD, SPRITE_ID, flipped);
+  }
+  s16 xOffset = flipped ? -8 : 0;
+  NF_MoveSprite(SCR_WORLD, SPRITE_ID, mech_x - level_cam_x() + xOffset,
+                mech_y - level_cam_y());
 }
