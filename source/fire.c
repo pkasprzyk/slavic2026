@@ -16,9 +16,13 @@
 #define TILE_FIRE2 2
 #define TILE_BURNED 3
 
+// think of it as fire's life
+#define INITIAL_HEAT_LEVEL 5
+
 typedef struct {
   int tx, ty;
   int burn_life;
+  int heat_level;
   int spread_cooldown;
   u8 active;
 } fire_cell_t;
@@ -34,6 +38,7 @@ static int alloc_cell(void) {
   for (int i = 0; i < FIRE_CELLS_MAX; i++) {
     if (!cells[i].active) {
       cells[i].active = 1;
+      cells[i].heat_level = INITIAL_HEAT_LEVEL;
       cell_count++;
       return i;
     }
@@ -46,6 +51,17 @@ static void free_cell(int i) {
   NF_MoveSprite(SCR_WORLD, sid, -16, -16);
   cells[i].active = 0;
   cell_count--;
+}
+
+void fire_start_cell_fire(int cell_index, int tx, int ty) {
+  grid_state[ty][tx] = 1;
+  cells[cell_index].tx = tx;
+  cells[cell_index].ty = ty;
+  cells[cell_index].burn_life = FIRE_BURN_DURATION;
+  cells[cell_index].heat_level = INITIAL_HEAT_LEVEL;
+  cells[cell_index].spread_cooldown =
+      FIRE_SPREAD_MIN + (rand() % (FIRE_SPREAD_MAX - FIRE_SPREAD_MIN + 1));
+  NF_MoveSprite(SCR_WORLD, FIRE_OAM_BASE + cell_index, tx * 8, ty * 8);
 }
 
 void fire_init(void) {
@@ -69,14 +85,7 @@ void fire_init(void) {
         int ci = alloc_cell();
         if (ci < 0)
           break;
-        grid_state[ty][tx] = 1;
-        cells[ci].tx = tx;
-        cells[ci].ty = ty;
-        cells[ci].burn_life = FIRE_BURN_DURATION;
-        cells[ci].spread_cooldown =
-            FIRE_SPREAD_MIN +
-            (rand() % (FIRE_SPREAD_MAX - FIRE_SPREAD_MIN + 1));
-        NF_MoveSprite(SCR_WORLD, FIRE_OAM_BASE + ci, tx * 8, ty * 8);
+        fire_start_cell_fire(ci, tx, ty);
       }
     }
 
@@ -120,14 +129,7 @@ void fire_update(void) {
         if (t == TILE_TREE || t == TILE_BUSH) {
           int ci = alloc_cell();
           if (ci >= 0) {
-            grid_state[ny][nx] = 1;
-            cells[ci].tx = nx;
-            cells[ci].ty = ny;
-            cells[ci].burn_life = FIRE_BURN_DURATION;
-            cells[ci].spread_cooldown =
-                FIRE_SPREAD_MIN +
-                (rand() % (FIRE_SPREAD_MAX - FIRE_SPREAD_MIN + 1));
-            NF_MoveSprite(SCR_WORLD, FIRE_OAM_BASE + ci, nx * 8, ny * 8);
+            fire_start_cell_fire(ci, nx, ny);
           }
         }
       }
@@ -169,6 +171,23 @@ void fire_extinguish(int tx, int ty) {
   for (int i = 0; i < FIRE_CELLS_MAX; i++) {
     if (cells[i].active && cells[i].tx == tx && cells[i].ty == ty) {
       free_cell(i);
+      return;
+    }
+  }
+}
+
+void fire_partial_extinguish(int tx, int ty, int value) {
+  if (tx < 0 || tx >= MAX_GRID_X || ty < 0 || ty >= MAX_GRID_Y)
+    return;
+  if (grid_state[ty][tx] != 1)
+    return;
+  for (int i = 0; i < FIRE_CELLS_MAX; i++) {
+    if (cells[i].active && cells[i].tx == tx && cells[i].ty == ty) {
+      cells[i].heat_level -= value;
+      if (cells[i].heat_level <= 0) {
+        grid_state[ty][tx] = 0;
+        free_cell(i);
+      }
       return;
     }
   }

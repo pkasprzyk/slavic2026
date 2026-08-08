@@ -3,11 +3,9 @@
 
 #include <nds.h>
 
-#define WATER_DROP_INTERVAL 5
-
 void water_init(void);
 void water_update(void);
-void water_drop_spawn(s16 x, s16 y);
+void water_spray(int mech_cx, int mech_cy, int target_x, int target_y);
 void water_fill_update(void);
 
 #endif

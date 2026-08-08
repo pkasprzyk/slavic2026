@@ -3,10 +3,10 @@
 #include <math.h>
 #include <nds.h>
 #include <stdbool.h>
+#include <stdio.h>
 
 #include <nf_lib.h>
 
-#include "fire.h"
 #include "ids.h"
 #include "level.h"
 #include "mech.h"
@@ -21,19 +21,12 @@
 
 #define SPRITE_ID MECH_OAM_ID
 
-#define WATER_SPRAY_DISTANCE 50
-#define FIRE_EXTINGUISH_FRAMES 30
-
 s16 mech_x;
 s16 mech_y;
 static s16 last_mech_x;
 static s16 last_mech_y;
 static u8 frame_cnt = 0;
 static bool flipped;
-static u16 extinguish_frame_cnt = 0;
-static bool extinguish_target_active = false;
-static s16 extinguish_tx = -1;
-static s16 extinguish_ty = -1;
 
 void mech_init(void) {
   mech_x = 178;
@@ -91,63 +84,15 @@ void mech_spray_water(void) {
   touchPosition touchscreen;
   touchRead(&touchscreen);
 
-  bool touching = touchscreen.px >= 0 && touchscreen.py >= 0;
-  bool should_spray = false;
+  bool touching = touchscreen.px > 0 && touchscreen.py > 0;
 
-  /* Check if touching a tile with fire */
+  /* Convert screen touch coords to world tile coords */
+  s16 mech_cx = mech_x + MECH_W / 2;
+  s16 mech_cy = mech_y + MECH_H / 2;
+
   if (touching) {
-    /* Convert screen touch coords to world tile coords */
-    int screen_tx = touchscreen.px + level_cam_x();
-    int screen_ty = touchscreen.py + level_cam_y();
-    int tile_tx = screen_tx >> 3; /* divide by 8 */
-    int tile_ty = screen_ty >> 3;
-
-    if (fire_is_burning(tile_tx, tile_ty)) {
-      s32 dist_sq = mech_fire_distance_sq(tile_tx, tile_ty);
-
-      if (dist_sq < (WATER_SPRAY_DISTANCE * WATER_SPRAY_DISTANCE)) {
-        should_spray = true;
-      }
-    }
-  }
-
-  if (should_spray) {
-    if (!extinguish_target_active) {
-      /* Determine which fire tile we're targeting */
-      int screen_tx = touchscreen.px + level_cam_x();
-      int screen_ty = touchscreen.py + level_cam_y();
-      extinguish_tx = screen_tx >> 3;
-      extinguish_ty = screen_ty >> 3;
-      extinguish_frame_cnt = 0;
-      extinguish_target_active = true;
-    }
-
-    /* Spawn water drops to form a line from mech to target */
-    if (extinguish_frame_cnt % WATER_DROP_INTERVAL == 0) {
-      s16 mech_cx = mech_x + MECH_W / 2;
-      s16 mech_cy = mech_y + MECH_H / 2;
-      s16 target_cx = extinguish_tx * 8 + 4;
-      s16 target_cy = extinguish_ty * 8 + 4;
-
-      /* Interpolate position along the line */
-      float t = (float)extinguish_frame_cnt / (float)FIRE_EXTINGUISH_FRAMES;
-      s16 spawn_x = mech_cx + (target_cx - mech_cx) * t;
-      s16 spawn_y = mech_cy + (target_cy - mech_cy) * t;
-
-      water_drop_spawn(spawn_x - 8, spawn_y - 8);
-    }
-
-    extinguish_frame_cnt++;
-    if (extinguish_frame_cnt >= FIRE_EXTINGUISH_FRAMES) {
-      fire_extinguish(extinguish_tx, extinguish_ty);
-      extinguish_target_active = false;
-    }
-  } else {
-    if (extinguish_target_active) {
-      /* Lost target or no longer spraying — reset counter */
-      extinguish_frame_cnt = 0;
-      extinguish_target_active = false;
-    }
+    water_spray(mech_cx, mech_cy, touchscreen.px + level_cam_x(),
+                touchscreen.py + level_cam_y());
   }
 }
 

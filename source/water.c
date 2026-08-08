@@ -3,9 +3,21 @@
 #include <nf_lib.h>
 #include <stdio.h>
 
+#include "fire.h"
 #include "level.h"
 #include "sprites.h"
 #include "water.h"
+
+#define WATER_STREAM_DEBUG 1
+
+#define WATER_SPRAY_DISTANCE 50
+#define WATER_SPRAY_INTERVAL 10
+#define WATER_DROP_LIFETIME 20
+
+#define WATER_DROP_SIZE 16
+
+int water_spray_cooldown = 0;
+int water_drop_cooldown = 0;
 
 #define MAX_WATER 1000
 #define WATER_DROP_AMOUNT 20
@@ -19,7 +31,6 @@ typedef struct {
   s16 x, y;
   u8 life;
   u8 active;
-  u8 frame; /* 0 or 1 for animation */
 } water_drop_t;
 
 static water_drop_t water_drops[WATER_DROP_MAX];
@@ -34,7 +45,7 @@ void water_drop_init(void) {
   for (int i = 0; i < WATER_DROP_MAX; i++) {
     water_drops[i].active = 0;
     NF_CreateSprite(SCR_WORLD, WATER_DROP_OAM_BASE + i, WATER_DROPS,
-                    DEFAULT_SPRITE_PALETTE, -16, -16);
+                    DEFAULT_SPRITE_PALETTE, -WATER_DROP_SIZE, -WATER_DROP_SIZE);
     NF_SpriteLayer(SCR_WORLD, WATER_DROP_OAM_BASE + i, LAYER_WORLD_BG);
   }
 }
@@ -48,7 +59,8 @@ void water_drop_update(void) {
 
     if (water_drops[i].life <= 0) {
       water_drops[i].active = 0;
-      NF_MoveSprite(SCR_WORLD, WATER_DROP_OAM_BASE + i, -16, -16);
+      NF_MoveSprite(SCR_WORLD, WATER_DROP_OAM_BASE + i, -WATER_DROP_SIZE,
+                    -WATER_DROP_SIZE);
       continue;
     }
 
@@ -63,6 +75,10 @@ void water_init(void) { water_drop_init(); }
 void water_update(void) {
   water_drop_update();
   show_water_remaining();
+  if (water_drop_cooldown > 0)
+    water_drop_cooldown--;
+  if (water_spray_cooldown > 0)
+    water_spray_cooldown--;
 }
 
 void water_fill_update(void) {
@@ -75,20 +91,69 @@ void water_fill_update(void) {
     water_remaining = MAX_WATER;
 }
 
-void water_drop_spawn(s16 x, s16 y) {
-  if (water_remaining > 0) {
-    water_remaining -= WATER_DROP_AMOUNT;
-    if (water_remaining < 0)
-      water_remaining = 0;
-  }
-
+void water_drop_spawn(int x, int y) {
   for (int i = 0; i < WATER_DROP_MAX; i++) {
     if (!water_drops[i].active) {
-      water_drops[i].x = x;
-      water_drops[i].y = y;
-      water_drops[i].life = 20 + (rand() % 10); /* 20..29 frames */
+      water_drops[i].x = x - WATER_DROP_SIZE / 2;
+      water_drops[i].y = y - WATER_DROP_SIZE / 2;
+      water_drops[i].life = WATER_DROP_LIFETIME;
       water_drops[i].active = 1;
       return;
     }
   }
+}
+
+void water_spray(int mech_cx, int mech_cy, int target_x, int target_y) {
+  // control damage done
+  if (water_spray_cooldown > 0) {
+    return;
+  }
+
+  if (water_remaining > 0) {
+    water_remaining -= WATER_DROP_AMOUNT;
+    if (water_remaining < 0)
+      water_remaining = 0;
+  } else {
+    return;
+  }
+
+  water_spray_cooldown = WATER_SPRAY_INTERVAL;
+
+  // calculate actual stream hit point based on range
+  float dx = target_x - mech_cx;
+  float dy = target_y - mech_cy;
+  s32 distance = hw_sqrtf(dx * dx + dy * dy);
+  if (distance > WATER_SPRAY_DISTANCE) {
+    float scale = (float)WATER_SPRAY_DISTANCE / distance;
+    distance = WATER_SPRAY_DISTANCE;
+    dx = (float)(dx * scale);
+    dy = (float)(dy * scale);
+    target_x = mech_cx + dx;
+    target_y = mech_cy + dy;
+  }
+
+  // resolve tile coordinates of the hit point
+  int tile_tx = target_x >> 3;
+  int tile_ty = target_y >> 3;
+  if (fire_is_burning(tile_tx, tile_ty)) {
+    fire_partial_extinguish(tile_tx, tile_ty, 1);
+  }
+
+  // control animation speed
+  if (water_drop_cooldown > 0) {
+    return;
+  }
+
+  water_drop_cooldown = WATER_DROP_LIFETIME;
+
+  // spawn water particles on the way
+  int steps = (distance / WATER_DROP_SIZE) + 1;
+  dx /= steps;
+  dy /= steps;
+  for (int i = 0; i < steps; i++) {
+    int spawn_x = mech_cx + (int)(dx * (i + 1));
+    int spawn_y = mech_cy + (int)(dy * (i + 1));
+    water_drop_spawn(spawn_x, spawn_y);
+  }
+  
 }
