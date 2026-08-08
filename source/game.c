@@ -155,7 +155,7 @@ void draw_ending() {
   audio_init_wav("nitro:/audio/SGJ2026-Music-Win-Chill-22khz-loop.wav");
   if (game_state == GAME_BAD_ENDING) {
     draw_bad_ending();
-    audio_set_looped_volume(SFX_SFX_FIRE_LOOP, 200);
+    audio_set_looped_volume(SFX_SFX_FIRE_LOOP, 150);
   } else if (game_state == GAME_GOOD_ENDING) {
     draw_good_ending();
     audio_stop_looped_sfx(SFX_SFX_FIRE_LOOP);
