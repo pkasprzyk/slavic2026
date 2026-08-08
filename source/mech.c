@@ -10,7 +10,6 @@
 #include "ids.h"
 #include "level.h"
 #include "mech.h"
-#include "reactor.h"
 #include "sprites.h"
 
 #define MECH_SPEED 2
@@ -62,6 +61,17 @@ static int mech_blocked(s32 x, s32 y) {
   return 0;
 }
 
+s32 mech_fire_distance_sq(s16 fire_tx, s16 fire_ty) {
+  /* Calculate distance from mech center to fire tile center */
+  s16 mech_cx = mech_x + MECH_W / 2;
+  s16 mech_cy = mech_y + MECH_H / 2;
+  s16 fire_cx = fire_tx * 8 + 4;
+  s16 fire_cy = fire_ty * 8 + 4;
+  s16 dx = mech_cx - fire_cx;
+  s16 dy = mech_cy - fire_cy;
+  return (s32)dx * dx + (s32)dy * dy;
+}
+
 void mech_spray_water(void) {
   touchPosition touchscreen;
   touchRead(&touchscreen);
@@ -78,14 +88,7 @@ void mech_spray_water(void) {
     int tile_ty = screen_ty >> 3;
 
     if (fire_is_burning(tile_tx, tile_ty)) {
-      /* Calculate distance from mech center to fire tile center */
-      s16 mech_cx = mech_x + MECH_W / 2;
-      s16 mech_cy = mech_y + MECH_H / 2;
-      s16 fire_cx = tile_tx * 8 + 4;
-      s16 fire_cy = tile_ty * 8 + 4;
-      s16 dx = mech_cx - fire_cx;
-      s16 dy = mech_cy - fire_cy;
-      s32 dist_sq = (s32)dx * dx + (s32)dy * dy;
+      s32 dist_sq = mech_fire_distance_sq(tile_tx, tile_ty);
 
       if (dist_sq < (WATER_SPRAY_DISTANCE * WATER_SPRAY_DISTANCE)) {
         should_spray = true;
@@ -131,16 +134,16 @@ void mech_update(void) {
 
   if (held & KEY_LEFT) {
     dx -= MECH_SPEED;
-    reactor_increase_temp(MOVE_INCREASE_AMOUNT);
   }
   if (held & KEY_RIGHT) {
     dx += MECH_SPEED;
-    reactor_increase_temp(MOVE_INCREASE_AMOUNT);
   }
-  if (held & KEY_UP)
+  if (held & KEY_UP) {
     dy -= MECH_SPEED;
-  if (held & KEY_DOWN)
+  }
+  if (held & KEY_DOWN) {
     dy += MECH_SPEED;
+  }
 
   for (int s = 0; s < MECH_SPEED; s++) {
     if (dx > 0 && !mech_blocked(mech_x + 1, mech_y))

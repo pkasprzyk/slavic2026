@@ -8,6 +8,8 @@
 #include "fire.h"
 #include "ids.h"
 #include "level.h"
+#include "mech.h"
+#include "reactor.h"
 #include "sprites.h"
 
 #define TILE_FIRE1 1
@@ -90,6 +92,8 @@ void fire_update(void) {
   fire_frame_cnt++;
   int frame = (fire_frame_cnt / FIRE_FRAME_TOGGLE) & 1;
 
+  s32 mech_closest_dist_sq = 0x7FFFFFFF;
+
   for (int i = 0; i < FIRE_CELLS_MAX; i++) {
     if (!cells[i].active)
       continue;
@@ -131,10 +135,22 @@ void fire_update(void) {
           FIRE_SPREAD_MIN + (rand() % (FIRE_SPREAD_MAX - FIRE_SPREAD_MIN + 1));
     }
 
+    if (fire_heat_cooldown == 0) {
+      s32 mech_distance = mech_fire_distance_sq(cells[i].tx, cells[i].ty);
+      if (mech_distance < mech_closest_dist_sq) {
+        mech_closest_dist_sq = mech_distance;
+      }
+    }
+
     NF_MoveSprite(SCR_WORLD, FIRE_OAM_BASE + i, cells[i].tx * 8 - level_cam_x(),
                   cells[i].ty * 8 - level_cam_y());
     NF_SpriteFrame(SCR_WORLD, FIRE_OAM_BASE + i, frame);
   }
+
+  if (fire_heat_cooldown == 0) {
+    reactor_heat_from_fire(mech_closest_dist_sq);
+  }
+
   NF_ScrollBg(SCR_WORLD, LAYER_WORLD_FIRE, level_cam_x(), level_cam_y());
 }
 

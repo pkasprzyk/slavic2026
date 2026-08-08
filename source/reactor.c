@@ -29,8 +29,12 @@
 #define REACTOR_THRESHOLD_2 100
 #define REACTOR_THRESHOLD_3 150
 
+#define FIRE_HEAT_DISTANCE 32
+#define FIRE_HEAT_COOLDOWN 10
+
 int blowing_counter = 0;
 int reactor_temp;
+int fire_heat_cooldown;
 
 // This is the size of the temporary buffer that the ARM7 will use to record
 // audio. When the callback is called, you will get a pointer to some address
@@ -52,6 +56,7 @@ static uint16_t temporary_buffer[MICROPHONE_BUFFER_SIZE];
 static int cnt = 0;
 
 #define BLOW_DEBUG 0
+#define HEAT_DEBUG 0
 
 #if BLOW_DEBUG
 #define DEBUG_CALLBACKS_UPDATE_TEXT 60
@@ -109,6 +114,7 @@ void reactor_init(void) {
   NF_SpriteLayer(SCR_CHAMBER, SPRITE_ID, LAYER_WORLD_BG);
   reactor_temp = 0;
   blowing_counter = 0;
+  fire_heat_cooldown = 0;
 
   soundEnable();
 
@@ -145,6 +151,10 @@ void reactor_update(void) {
   } else {
     NF_SpriteFrame(SCR_CHAMBER, SPRITE_ID, 3);
   }
+
+  if (fire_heat_cooldown > 0) {
+    fire_heat_cooldown--;
+  }
 }
 
 void reactor_deinit(void) {
@@ -164,4 +174,22 @@ void reactor_decrease_temp(int amount) {
   if (reactor_temp < REACTOR_MIN_TEMP) {
     reactor_temp = REACTOR_MIN_TEMP;
   }
+}
+
+void reactor_heat_from_fire(s32 distance_sq) {
+  int heat_amount = 0;
+  if (distance_sq < (FIRE_HEAT_DISTANCE * FIRE_HEAT_DISTANCE)) {
+    // scales up to 10
+    heat_amount = (FIRE_HEAT_DISTANCE * FIRE_HEAT_DISTANCE - distance_sq) / 100;
+    if (heat_amount > 0) {
+      reactor_increase_temp(heat_amount);
+      fire_heat_cooldown = FIRE_HEAT_COOLDOWN;
+    }
+  }
+#if HEAT_DEBUG
+  char buffer[128];
+  snprintf(buffer, sizeof(buffer), "HEAT: %03d  DIST: %010d COOLDN: %03d",
+           heat_amount, distance_sq, fire_heat_cooldown);
+  NF_WriteText(SCR_CHAMBER, LAYER_CHAMBER_TEXT, 0, 8, buffer);
+#endif
 }
