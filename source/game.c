@@ -192,7 +192,6 @@ void game_update(void) {
     if (bunnies_collected == 0)
     {
       game_state = GAME_BAD_ENDING;
-      game_state = GAME_MID_ENDING;
     }
     else if (bunnies_collected == bunnies_total)
     {
