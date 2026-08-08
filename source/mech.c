@@ -142,7 +142,7 @@ void mech_update(void) {
   if (footstep_timer > 0) {
     footstep_timer--;
     if (footstep_timer <= 0) {
-      footstep_timer = 0;
+      footstep_timer = -2;
     }
   }
 
@@ -172,8 +172,8 @@ void mech_update(void) {
     dy += speed;
   }
   if (held & KEY_LID) {
-    if (timer_to_end < 0)
-      timer_to_end = 1;
+    if (timer_to_end >= -1)
+      timer_to_end = 2;
   }
 
   for (int s = 0; s < speed; s++) {
