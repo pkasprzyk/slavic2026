@@ -168,7 +168,7 @@ def composite_forest(layers, tile_images, map_w, map_h):
                     continue
                 tile_img, tw, th = entry
                 x = tx * TILE
-                y = ty * TILE
+                y = (ty + 1) * TILE - th
                 if tw != TILE or th != TILE:
                     final_w = tw
                     final_h = th
@@ -208,7 +208,7 @@ def build_colmap(layers, tile_images, map_w, map_h):
                     cells_h = th // TILE
                     for dy in range(cells_h):
                         for dx in range(cells_w):
-                            cy = ty + dy
+                            cy = ty - dy
                             cx = tx + dx
                             if 0 <= cy < map_h and 0 <= cx < map_w:
                                 col_grid[cy][cx] = col_type
