@@ -3,6 +3,7 @@
 #include <nf_lib.h>
 #include <stdio.h>
 
+#include "audio.h"
 #include "fire.h"
 #include "ids.h"
 #include "level.h"
@@ -22,7 +23,7 @@ int water_drop_cooldown = 0;
 
 #define MAX_WATER 1000
 #define WATER_DROP_AMOUNT 10
-#define WATER_FILL_AMOUNT 25
+#define WATER_FILL_AMOUNT 20
 
 #define WATER_EXTINGUISH_AMOUNT 5
 
@@ -149,18 +150,20 @@ void water_hide_pump() {
 void water_operate_pump(int x, int y) {
   u16 pump_upper_threshold = 96 - 30;
   u16 pump_lower_threshold = 96 + 30;
-  if (y > 132)
-    y = 132;
-  else if (y < 60)
-    y = 60;
+  if (y > 134)
+    y = 134;
+  else if (y < 58)
+    y = 58;
   NF_MoveSprite(SCR_WORLD, PUMP_HANDLE_OAM_ID, 192, y - 16);
   if (y <= pump_upper_threshold) {
     if (pump_was_in != 1) {
+      audio_play_sfx(SFX_SFX_PUMP_UP, false, IGNORED_LEN, 210);
       pump_was_in = 1;
       water_fill_update();
     }
   } else if (y >= pump_lower_threshold) {
     if (pump_was_in != 2) {
+      audio_play_sfx(SFX_SFX_PUMP_DOWN, false, IGNORED_LEN, 210);
       pump_was_in = 2;
       water_fill_update();
     }
