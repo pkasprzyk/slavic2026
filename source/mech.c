@@ -24,6 +24,8 @@
 #define WATER_SPRAY_DISTANCE 50
 #define FIRE_EXTINGUISH_FRAMES 30
 
+#define WATER_DROP_INTERVAL 5
+
 s16 mech_x;
 s16 mech_y;
 static s16 last_mech_x;
@@ -36,6 +38,56 @@ static bool extinguish_target_active = false;
 static s16 extinguish_tx = -1;
 static s16 extinguish_ty = -1;
 
+/* Water drop particles */
+typedef struct {
+  s16 x, y;
+  u8 life;
+  u8 active;
+  u8 frame; /* 0 or 1 for animation */
+} water_drop_t;
+
+static water_drop_t water_drops[WATER_DROP_MAX];
+
+static void water_drop_spawn(s16 x, s16 y) {
+  for (int i = 0; i < WATER_DROP_MAX; i++) {
+    if (!water_drops[i].active) {
+      water_drops[i].x = x;
+      water_drops[i].y = y;
+      water_drops[i].life = 20 + (rand() % 10); /* 20..29 frames */
+      water_drops[i].active = 1;
+      return;
+    }
+  }
+}
+
+static void water_drop_update(void) {
+  for (int i = 0; i < WATER_DROP_MAX; i++) {
+    if (!water_drops[i].active)
+      continue;
+
+    water_drops[i].life--;
+
+    if (water_drops[i].life <= 0) {
+      water_drops[i].active = 0;
+      NF_MoveSprite(SCR_WORLD, WATER_DROP_OAM_BASE + i, -16, -16);
+      continue;
+    }
+
+    NF_MoveSprite(SCR_WORLD, WATER_DROP_OAM_BASE + i,
+                  water_drops[i].x - level_cam_x(),
+                  water_drops[i].y - level_cam_y());
+  }
+}
+
+static void water_drop_init(void) {
+  for (int i = 0; i < WATER_DROP_MAX; i++) {
+    water_drops[i].active = 0;
+    NF_CreateSprite(SCR_WORLD, WATER_DROP_OAM_BASE + i, WATER_DROPS,
+                    DEFAULT_SPRITE_PALETTE, -16, -16);
+    NF_SpriteLayer(SCR_WORLD, WATER_DROP_OAM_BASE + i, LAYER_WORLD_BG);
+  }
+}
+
 void mech_init(void) {
   mech_x = 178;
   mech_y = 128;
@@ -44,6 +96,8 @@ void mech_init(void) {
   NF_CreateSprite(SCR_WORLD, SPRITE_ID, MECH, DEFAULT_SPRITE_PALETTE, mech_x,
                   mech_y);
   NF_SpriteLayer(SCR_WORLD, SPRITE_ID, LAYER_WORLD_BG);
+
+  water_drop_init();
 }
 
 static int mech_blocked(s32 x, s32 y) {
@@ -107,7 +161,20 @@ void mech_spray_water(void) {
       extinguish_target_active = true;
     }
 
-    // FIXME: animation + water usage
+    /* Spawn water drops to form a line from mech to target */
+    if (extinguish_frame_cnt % WATER_DROP_INTERVAL == 0) {
+      s16 mech_cx = mech_x + MECH_W / 2;
+      s16 mech_cy = mech_y + MECH_H / 2;
+      s16 target_cx = extinguish_tx * 8 + 4;
+      s16 target_cy = extinguish_ty * 8 + 4;
+
+      /* Interpolate position along the line */
+      float t = (float)extinguish_frame_cnt / (float)FIRE_EXTINGUISH_FRAMES;
+      s16 spawn_x = mech_cx + (target_cx - mech_cx) * t;
+      s16 spawn_y = mech_cy + (target_cy - mech_cy) * t;
+
+      water_drop_spawn(spawn_x - 8, spawn_y - 8);
+    }
 
     extinguish_frame_cnt++;
     if (extinguish_frame_cnt >= FIRE_EXTINGUISH_FRAMES) {
@@ -176,5 +243,6 @@ void mech_update(void) {
   NF_MoveSprite(SCR_WORLD, SPRITE_ID, mech_x - level_cam_x() + xOffset,
                 mech_y - level_cam_y());
 
+  water_drop_update();
   mech_spray_water();
 }
