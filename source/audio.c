@@ -186,6 +186,7 @@ void audio_init_wav(char *path) {
   // We are not using a soundbank so we need to manually initialize
   // mm_ds_system.
   mmInitDefault("nitro:/soundbank.bin");
+  mmSelectMode(MM_MODE_B);
 
   // Open the stream
   mm_stream stream = {
