@@ -16,6 +16,7 @@
 
 #define MECH_W 24
 #define MECH_H 24
+#define MECH_FEET_H 8
 
 #define MECH_MAX_WATER 200
 
@@ -102,7 +103,8 @@ void mech_init(void) {
 
 static int mech_blocked(s32 x, s32 y) {
   s32 x0 = x >> 3;
-  s32 y0 = y >> 3;
+  // only collide on feet
+  s32 y0 = (y + MECH_H - MECH_FEET_H) >> 3;
   s32 x1 = (x + MECH_W - 1) >> 3;
   s32 y1 = (y + MECH_H - 1) >> 3;
 
