@@ -142,9 +142,7 @@ void reactor_init(void) {
                  SAMPLE_RATE, microphone_handler);
 }
 
-void reactor_restart(void){
-  
-}
+void reactor_restart(void) {}
 
 static u16 last_frame = 0;
 
@@ -192,9 +190,9 @@ void UpdateReactorImg() {
 }
 
 void reactor_update(void) {
-  char buffer[64];
+  /* char buffer[64];
   snprintf(buffer, sizeof(buffer), "TEMP: %03d", reactor_temp);
-  NF_WriteText(SCR_CHAMBER, LAYER_CHAMBER_TEXT, 2, 6, buffer);
+  NF_WriteText(SCR_CHAMBER, LAYER_CHAMBER_TEXT, 2, 6, buffer); */
 
 #if BLOW_DEBUG
   NF_WriteText(SCR_CHAMBER, LAYER_CHAMBER_TEXT, 0, 8, blowing_debug_str);

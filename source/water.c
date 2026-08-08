@@ -7,9 +7,10 @@
 #include "fire.h"
 #include "ids.h"
 #include "level.h"
+#include "reactor.h"
 #include "sprites.h"
 #include "water.h"
-#include "reactor.h"
+
 
 #define WATER_STREAM_DEBUG 1
 
@@ -45,9 +46,9 @@ typedef struct {
 static water_drop_t water_drops[WATER_DROP_MAX];
 
 void show_water_remaining(void) {
-  char buffer[64];
+  /* char buffer[64];
   snprintf(buffer, sizeof(buffer), "WATER: %04d", water_remaining);
-  NF_WriteText(SCR_CHAMBER, LAYER_CHAMBER_TEXT, 3, 15, buffer);
+  NF_WriteText(SCR_CHAMBER, LAYER_CHAMBER_TEXT, 3, 15, buffer); */
 
   const s32 MAX_SCROLL = 95;
   s32 pos = (MAX_SCROLL * (s32)water_remaining) / MAX_WATER;
@@ -102,9 +103,7 @@ void water_init(void) {
   water_pump_init();
 }
 
-void water_restart(void){
-
-}
+void water_restart(void) {}
 
 void water_update(void) {
 

@@ -59,10 +59,7 @@ void mech_init(void) {
   NF_SpriteLayer(SCR_WORLD, SPRITE_ID, LAYER_WORLD_BG);
 }
 
-void mech_restart(void){
-  
-}
-
+void mech_restart(void) {}
 
 static int mech_blocked(s32 x, s32 y) {
   s32 x0 = x >> (3 + PRECISION_BITS);
@@ -158,9 +155,9 @@ void mech_update(void) {
 
   int speed = MECH_SPEED - heat_speed_penalty;
 
-  char buffer[128];
+  /* char buffer[128];
   snprintf(buffer, sizeof(buffer), "SPEEED: %03d", speed);
-  NF_WriteText(SCR_CHAMBER, LAYER_CHAMBER_TEXT, 0, 8, buffer);
+  NF_WriteText(SCR_CHAMBER, LAYER_CHAMBER_TEXT, 0, 8, buffer); */
 
   if (held & KEY_LEFT) {
     dx -= speed;
