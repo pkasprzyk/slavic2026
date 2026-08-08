@@ -3,6 +3,7 @@
 #include <nds.h>
 #include <nf_lib.h>
 
+#include "audio.h"
 #include "ids.h"
 #include "reactor.h"
 #include "sprites.h"
@@ -134,11 +135,9 @@ void reactor_init(void) {
                  SAMPLE_RATE, microphone_handler);
 }
 
-
 static u16 last_frame = 0;
 
-void UpdateReactorImg()
-{
+void UpdateReactorImg() {
   u16 frame = 0;
   if (reactor_temp < REACTOR_THRESHOLD_1) {
     frame = 0;
@@ -150,10 +149,30 @@ void UpdateReactorImg()
     frame = 3;
   }
 
-  if (frame == last_frame){
+  if (frame == last_frame) {
     return;
   }
   last_frame = frame;
+
+  mm_word sfx = 0;
+
+  switch (frame) {
+  case 0:
+    sfx = SFX_SFX_HEAT_PHASE_1;
+    break;
+  case 1:
+    sfx = SFX_SFX_HEAT_PHASE_2;
+    break;
+  case 2:
+    sfx = SFX_SFX_HEAT_PHASE_3;
+    break;
+  case 3:
+    sfx = SFX_SFX_HEAT_PHASE_4;
+    break;
+  default:
+    break;
+  }
+  audio_play_sfx(sfx, false, IGNORED_LEN, 255);
 
   NF_DeleteTiledBg(SCR_CHAMBER, LAYER_CHAMBER_REACTOR);
   NF_UnloadTiledBg(REACTOR_BG_NAME);
@@ -171,12 +190,11 @@ void reactor_update(void) {
 #endif
 
   UpdateReactorImg();
-  
+
   if (fire_heat_cooldown > 0) {
     fire_heat_cooldown--;
   }
 }
-
 
 void reactor_deinit(void) {
   // Turn off the microphone when you're done.
