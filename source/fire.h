@@ -3,6 +3,7 @@
 
 #define MAX_GRID_X 64
 #define MAX_GRID_Y 32
+#define FIRE_CELLS_MAX 64
 #define FIRE_BURN_DURATION (30 * 60)
 #define FIRE_SPREAD_MIN (1 * 60)
 #define FIRE_SPREAD_MAX (5 * 60)

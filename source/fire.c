@@ -10,13 +10,11 @@
 #include "level.h"
 #include "mech.h"
 #include "reactor.h"
-#include "sprites.h"
 
 #define TILE_FIRE1 1
 #define TILE_FIRE2 2
 #define TILE_BURNED 3
 
-// think of it as fire's life
 #define INITIAL_HEAT_LEVEL 5
 
 typedef struct {
@@ -47,10 +45,12 @@ static int alloc_cell(void) {
 }
 
 static void free_cell(int i) {
-  u16 sid = FIRE_OAM_BASE + i;
-  NF_MoveSprite(SCR_WORLD, sid, -16, -16);
   cells[i].active = 0;
   cell_count--;
+}
+
+static void write_fire_tile(int tx, int ty, int tile) {
+  NF_SetTileOfMap(SCR_WORLD, LAYER_WORLD_FIRE, tx, ty, tile);
 }
 
 void fire_start_cell_fire(int cell_index, int tx, int ty) {
@@ -61,12 +61,7 @@ void fire_start_cell_fire(int cell_index, int tx, int ty) {
   cells[cell_index].heat_level = INITIAL_HEAT_LEVEL;
   cells[cell_index].spread_cooldown =
       FIRE_SPREAD_MIN + (rand() % (FIRE_SPREAD_MAX - FIRE_SPREAD_MIN + 1));
-  s16 sx = tx * 8 - level_cam_x();
-  s16 sy = ty * 8 - level_cam_y();
-  if (sx < -8 || sx >= SCREEN_W || sy < -8 || sy >= SCREEN_H)
-    NF_MoveSprite(SCR_WORLD, FIRE_OAM_BASE + cell_index, -16, -16);
-  else
-    NF_MoveSprite(SCR_WORLD, FIRE_OAM_BASE + cell_index, sx, sy);
+  write_fire_tile(tx, ty, TILE_FIRE1);
 }
 
 void fire_init(void) {
@@ -74,12 +69,8 @@ void fire_init(void) {
     for (int x = 0; x < MAX_GRID_X; x++)
       grid_state[y][x] = 0;
 
-  for (int i = 0; i < FIRE_CELLS_MAX; i++) {
+  for (int i = 0; i < FIRE_CELLS_MAX; i++)
     cells[i].active = 0;
-    u16 sid = FIRE_OAM_BASE + i;
-    NF_CreateSprite(SCR_WORLD, sid, FIRE, DEFAULT_SPRITE_PALETTE, -16, -16);
-    NF_SpriteLayer(SCR_WORLD, sid, LAYER_WORLD_BG);
-  }
   cell_count = 0;
   fire_frame_cnt = 0;
 
@@ -94,10 +85,7 @@ void fire_init(void) {
       }
     }
 
-  // NF_SetTileOfMap(SCR_WORLD, LAYER_WORLD_FIRE, 1, 1, TILE_FIRE1);
-  // NF_SetTileOfMap(SCR_WORLD, LAYER_WORLD_FIRE, 2, 2, TILE_FIRE2);
-  // NF_SetTileOfMap(SCR_WORLD, LAYER_WORLD_FIRE, 3, 3, TILE_BURNED);
-  // NF_UpdateVramMap(SCR_WORLD, LAYER_WORLD_FIRE);
+  NF_UpdateVramMap(SCR_WORLD, LAYER_WORLD_FIRE);
 }
 
 static const s8 dirs[4][2] = {{1, 0}, {-1, 0}, {0, 1}, {0, -1}};
@@ -105,6 +93,8 @@ static const s8 dirs[4][2] = {{1, 0}, {-1, 0}, {0, 1}, {0, -1}};
 void fire_update(void) {
   fire_frame_cnt++;
   int frame = (fire_frame_cnt / FIRE_FRAME_TOGGLE) & 1;
+  int fire_tile = frame ? TILE_FIRE2 : TILE_FIRE1;
+  bool dirty = false;
 
   s32 mech_closest_dist_sq = 0x7FFFFFFF;
 
@@ -114,14 +104,15 @@ void fire_update(void) {
 
     cells[i].burn_life--;
     if (cells[i].burn_life <= 0) {
-      NF_SetTileOfMap(SCR_WORLD, LAYER_WORLD_FIRE, cells[i].tx, cells[i].ty,
-                      TILE_BURNED);
-      NF_UpdateVramMap(SCR_WORLD, LAYER_WORLD_FIRE);
-
+      write_fire_tile(cells[i].tx, cells[i].ty, TILE_BURNED);
       grid_state[cells[i].ty][cells[i].tx] = 2;
       free_cell(i);
+      dirty = true;
       continue;
     }
+
+    write_fire_tile(cells[i].tx, cells[i].ty, fire_tile);
+    dirty = true;
 
     cells[i].spread_cooldown--;
     if (cells[i].spread_cooldown <= 0) {
@@ -148,16 +139,10 @@ void fire_update(void) {
         mech_closest_dist_sq = mech_distance;
       }
     }
-
-    s16 sx = cells[i].tx * 8 - level_cam_x();
-    s16 sy = cells[i].ty * 8 - level_cam_y();
-    if (sx < -8 || sx >= SCREEN_W || sy < -8 || sy >= SCREEN_H) {
-      NF_MoveSprite(SCR_WORLD, FIRE_OAM_BASE + i, -16, -16);
-    } else {
-      NF_MoveSprite(SCR_WORLD, FIRE_OAM_BASE + i, sx, sy);
-      NF_SpriteFrame(SCR_WORLD, FIRE_OAM_BASE + i, frame);
-    }
   }
+
+  if (dirty)
+    NF_UpdateVramMap(SCR_WORLD, LAYER_WORLD_FIRE);
 
   if (fire_heat_cooldown == 0) {
     reactor_heat_from_fire(mech_closest_dist_sq);
@@ -178,6 +163,8 @@ void fire_extinguish(int tx, int ty) {
   if (grid_state[ty][tx] != 1)
     return;
   grid_state[ty][tx] = 0;
+  write_fire_tile(tx, ty, 0);
+  NF_UpdateVramMap(SCR_WORLD, LAYER_WORLD_FIRE);
   for (int i = 0; i < FIRE_CELLS_MAX; i++) {
     if (cells[i].active && cells[i].tx == tx && cells[i].ty == ty) {
       free_cell(i);
@@ -196,6 +183,8 @@ void fire_partial_extinguish(int tx, int ty, int value) {
       cells[i].heat_level -= value;
       if (cells[i].heat_level <= 0) {
         grid_state[ty][tx] = 0;
+        write_fire_tile(tx, ty, 0);
+        NF_UpdateVramMap(SCR_WORLD, LAYER_WORLD_FIRE);
         free_cell(i);
       }
       return;

@@ -40,9 +40,7 @@ void InitSprites(void);
 #define BUNNIES_OAM_ID 1
 #define BUNNIES_MAX 10
 
-#define FIRE_OAM_BASE 11
-#define FIRE_CELLS_MAX 40
-#define WATER_DROP_OAM_BASE (FIRE_OAM_BASE + FIRE_CELLS_MAX)
+#define WATER_DROP_OAM_BASE 11
 #define WATER_DROP_MAX 5
 
 
