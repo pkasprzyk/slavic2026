@@ -12,8 +12,10 @@ jobs:
     container:
       image: skylyrac/blocksds:slim-latest
     steps:
-      - name: Install python3 + Pillow
+      - name: Install NFLib + python3 + Pillow
         run: |
+          wf-pacman -S --noconfirm blocksds-nflib && \
+          wf-config clean-caches --all && \
           apt-get update && \
           apt-get install -y --no-install-recommends python3 python3-pil && \
           apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/*
