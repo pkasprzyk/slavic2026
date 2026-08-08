@@ -39,6 +39,8 @@ static s32 last_mech_x;
 static s32 last_mech_y;
 static u8 frame_cnt = 0;
 static bool was_in_water = false;
+static u8 footstep_sfx = 0;
+static s16 footstep_timer = 0;
 
 void mech_init(void) {
   mech_x = 178;
@@ -115,6 +117,13 @@ void mech_update(void) {
   ++frame_cnt;
   frame_cnt %= 60;
 
+  if (footstep_timer > 0) {
+    footstep_timer--;
+    if (footstep_timer <= 0) {
+      footstep_timer = 0;
+    }
+  }
+
   enum MECH_ANIM anim = MECH_ANIM_IDLE;
 
   u16 held = keysHeld();
@@ -173,7 +182,6 @@ void mech_update(void) {
   if (mech_precise_y > (LEVEL_H - MECH_H) << 3)
     mech_precise_y = (LEVEL_H - MECH_H) << 3;
 
-
   if (last_mech_x < mech_precise_x) {
     anim = MECH_ANIM_WALK_RIGHT;
   } else if (last_mech_x > mech_precise_x) {
@@ -186,6 +194,16 @@ void mech_update(void) {
 
   mech_x = mech_precise_x >> 3;
   mech_y = mech_precise_y >> 3;
+
+  if (mech_precise_x != last_mech_x || mech_precise_y != last_mech_y) {
+    if (footstep_timer <= 0) {
+      footstep_sfx = (footstep_sfx + 1) % 2;
+      audio_play_sfx(footstep_sfx == 0 ? SFX_SFX_FOOTSTEP_1
+                                       : SFX_SFX_FOOTSTEP_2,
+                     false, DEFAULT_VOLUME, 255);
+      footstep_timer = 30;
+    }
+  }
   level_update_camera(mech_x + MECH_W / 2, mech_y + MECH_H / 2);
 
   NF_SpriteFrame(SCR_WORLD, SPRITE_ID, anim + frame_cnt / 30);
