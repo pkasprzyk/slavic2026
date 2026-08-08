@@ -62,6 +62,7 @@ void game_update(void) {
   bunnies_update();
   chamber_update();
   NF_UpdateTextLayers();
+  audio_update_wav();
   audio_update_loops();
 }
 
