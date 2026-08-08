@@ -168,12 +168,12 @@ static void compute_edge_indicator(s16 bunny_wx, s16 bunny_wy, s16 *out_x,
 
   if (*out_x < 0)
     *out_x = 0;
-  if (*out_x >= SCREEN_W)
-    *out_x = SCREEN_W - 1;
+  if (*out_x >= SCREEN_W - 8)
+    *out_x = SCREEN_W - 9;
   if (*out_y < 0)
     *out_y = 0;
-  if (*out_y >= SCREEN_H)
-    *out_y = SCREEN_H - 1;
+  if (*out_y >= SCREEN_H - 8)
+    *out_y = SCREEN_H - 9;
 
   s16 adx = dx < 0 ? -dx : dx;
   s16 ady = dy < 0 ? -dy : dy;
