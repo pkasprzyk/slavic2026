@@ -121,9 +121,9 @@ void game_init(void) {
   NF_CreateTextLayer(SCR_CHAMBER, LAYER_CHAMBER_TEXT, 0, FONT_NORMAL);
   NF_CreateTextLayer(SCR_WORLD, LAYER_WORLD_TEXT, 0, FONT_NORMAL);
 
-  NF_WriteText(SCR_CHAMBER, LAYER_CHAMBER_TEXT, 2, 2, "CHILLING MECH");
+  /* NF_WriteText(SCR_CHAMBER, LAYER_CHAMBER_TEXT, 2, 2, "CHILLING MECH");
   NF_WriteText(SCR_CHAMBER, LAYER_CHAMBER_TEXT, 2, 4, "D-Pad moves the mech");
-  NF_UpdateTextLayers();
+  NF_UpdateTextLayers(); */
 
   srand(time(NULL));
   audio_init_SB();
@@ -134,14 +134,12 @@ void game_init(void) {
   title_init();
 }
 
-void restart_game()
-{
+void restart_game() {
 
   level_restart();
   chamber_restart();
 
   game_return_to_title();
-
 }
 
 void draw_ending() {
@@ -175,9 +173,9 @@ void end_state_update() {
   if (keysDown() & KEY_TOUCH) {
     touchPosition touch;
     touchRead(&touch);
-    if (touch_in_rect(touch.px, touch.py, 88, 134, 80, 16)){
+    if (touch_in_rect(touch.px, touch.py, 88, 134, 80, 16)) {
       // TODO: uncomment when restart is fixed
-      //restart_game();
+      // restart_game();
     }
   }
 }

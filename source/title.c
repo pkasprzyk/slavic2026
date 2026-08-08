@@ -62,12 +62,14 @@ static void draw_instructions(void) {
 static void draw_credits(void) {
   clear_all();
   load_instr_bg();
-  NF_WriteText(SCR_WORLD, LAYER_WORLD_TEXT, 2, 3, "Programmer 1");
-  NF_WriteText(SCR_WORLD, LAYER_WORLD_TEXT, 2, 5, "Programmer 2");
-  NF_WriteText(SCR_WORLD, LAYER_WORLD_TEXT, 2, 7, "Programmer 3");
-  NF_WriteText(SCR_WORLD, LAYER_WORLD_TEXT, 2, 9, "Programmer 4");
-  NF_WriteText(SCR_WORLD, LAYER_WORLD_TEXT, 2, 11, "Justi");
-  NF_WriteText(SCR_WORLD, LAYER_WORLD_TEXT, 2, 13, "Yreron");
+  NF_WriteText(SCR_WORLD, LAYER_WORLD_TEXT, 2, 3, "Lukasz \"Zephyr\" Sobczyk");
+  NF_WriteText(SCR_WORLD, LAYER_WORLD_TEXT, 2, 5,
+               "Mateusz \"Grafiszti\" Choinski");
+  NF_WriteText(SCR_WORLD, LAYER_WORLD_TEXT, 2, 7, "Szymon Rzosinski");
+  NF_WriteText(SCR_WORLD, LAYER_WORLD_TEXT, 2, 9, "Pikej");
+  NF_WriteText(SCR_WORLD, LAYER_WORLD_TEXT, 2, 11, "Justyna Kryscio-Rzosinska");
+  NF_WriteText(SCR_WORLD, LAYER_WORLD_TEXT, 2, 13,
+               "Kamila \"Yreron\" Chmielowiec");
   NF_WriteText(SCR_WORLD, LAYER_WORLD_TEXT, 9, 17, "[   BACK   ]");
   NF_UpdateTextLayers();
 }
@@ -81,9 +83,7 @@ void title_init(void) {
   draw_title();
 }
 
-void title_restart(void){
-
-}
+void title_restart(void) {}
 
 void title_update(void) {
   if (!(keysDown() & KEY_TOUCH))
