@@ -10,6 +10,10 @@
 #include "level.h"
 #include "sprites.h"
 
+#define TILE_FIRE1 1
+#define TILE_FIRE2 2
+#define TILE_BURNED 3
+
 typedef struct {
     int tx, ty;
     int burn_life;
@@ -69,6 +73,11 @@ void fire_init(void) {
                 NF_MoveSprite(SCR_WORLD, FIRE_OAM_BASE + ci, tx * 8, ty * 8);
             }
         }
+
+    // NF_SetTileOfMap(SCR_WORLD, LAYER_WORLD_FIRE, 1, 1, TILE_FIRE1);
+    // NF_SetTileOfMap(SCR_WORLD, LAYER_WORLD_FIRE, 2, 2, TILE_FIRE2);
+    // NF_SetTileOfMap(SCR_WORLD, LAYER_WORLD_FIRE, 3, 3, TILE_BURNED);
+    // NF_UpdateVramMap(SCR_WORLD, LAYER_WORLD_FIRE);
 }
 
 static const s8 dirs[4][2] = {{1, 0}, {-1, 0}, {0, 1}, {0, -1}};
@@ -82,6 +91,9 @@ void fire_update(void) {
 
         cells[i].burn_life--;
         if (cells[i].burn_life <= 0) {
+            NF_SetTileOfMap(SCR_WORLD, LAYER_WORLD_FIRE, cells[i].tx, cells[i].ty, TILE_BURNED);
+            NF_UpdateVramMap(SCR_WORLD, LAYER_WORLD_FIRE);
+
             grid_state[cells[i].ty][cells[i].tx] = 2;
             free_cell(i);
             continue;
@@ -112,6 +124,7 @@ void fire_update(void) {
         NF_MoveSprite(SCR_WORLD, FIRE_OAM_BASE + i, cells[i].tx * 8 - level_cam_x(), cells[i].ty * 8 - level_cam_y());
         NF_SpriteFrame(SCR_WORLD, FIRE_OAM_BASE + i, frame);
     }
+    NF_ScrollBg(SCR_WORLD, LAYER_WORLD_FIRE, level_cam_x(), level_cam_y());
 }
 
 int fire_is_burning(int tx, int ty) {

@@ -5,6 +5,7 @@
 #include <nf_lib.h>
 #include <stdbool.h>
 
+#include "ids.h"
 #include "level.h"
 #include "sprites.h"
 #include "mech.h"
@@ -41,7 +42,7 @@ void bunnies_init(void)
     for (u16 i = 0; i < bunnies_cnt; ++i)
     {
         NF_CreateSprite(SCREEN_BOT, bunnies[i].oam_id, SPRITE_INFOS[RABBITS].img_id, SPRITE_INFOS[RABBITS].pal_id, bunnies[i].x , bunnies[i].y);
-        //NF_SpriteLayer(SCREEN_BOT, 0, 3);
+        NF_SpriteLayer(SCREEN_BOT, bunnies[i].oam_id, LAYER_WORLD_BG);
     }
 }
 

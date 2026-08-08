@@ -18,6 +18,16 @@ void level_init(void)
     NF_LoadTiledBg(PATH_BG_FOREST, BG_FOREST, BG_W, BG_H);
     NF_CreateTiledBg(SCR_WORLD, LAYER_WORLD_BG, BG_FOREST);
 
+    NF_LoadTilesForBg(
+        "bg/fire_tileset",   // Reads tileset.img and tileset.pal
+        "dynamic_fire_map",   // Internal background name
+        BG_W,             // Map width in pixels
+        BG_H,             // Map height in pixels
+        0,               // First tile
+        3               // Last tile
+    );
+    NF_CreateTiledBg(SCR_WORLD, LAYER_WORLD_FIRE, "dynamic_fire_map");
+
     NF_InitCmapBuffers();
     NF_LoadCollisionMap(PATH_COLMAP, COLMAP_SLOT, LEVEL_W, LEVEL_H);
 

@@ -13,6 +13,7 @@ enum {
 enum {
   LAYER_CHAMBER_TEXT = 2,
   LAYER_WORLD_BG = 3,
+  LAYER_WORLD_FIRE = 2,
 };
 
 enum {
