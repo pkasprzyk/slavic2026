@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<tileset version="1.10" tiledversion="1.12.2-2-geb83ddb9" name="forest_tiles" tilewidth="8" tileheight="8" tilecount="110" columns="0">
+<tileset version="1.10" tiledversion="1.12.2" name="forest_tiles" tilewidth="24" tileheight="24" tilecount="112" columns="0">
+ <grid orientation="orthogonal" width="8" height="8"/>
  <tile id="0">
   <image source="tile_0000.png" width="8" height="8"/>
  </tile>
@@ -329,6 +330,12 @@
  </tile>
  <tile id="109">
   <image source="tile_0109.png" width="8" height="8"/>
+ </tile>
+ <tile id="110">
+  <image source="d2.png" width="24" height="24"/>
+ </tile>
+ <tile id="112">
+  <image source="d1.png" width="24" height="24"/>
  </tile>
  <wangsets>
   <wangset name="big_tree_1" type="mixed" tile="-1">

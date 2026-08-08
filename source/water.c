@@ -3,30 +3,36 @@
 #include <nf_lib.h>
 #include <stdio.h>
 
+#include "audio.h"
 #include "fire.h"
+#include "ids.h"
 #include "level.h"
 #include "sprites.h"
 #include "water.h"
+#include "reactor.h"
 
 #define WATER_STREAM_DEBUG 1
 
 #define WATER_SPRAY_DISTANCE 50
 #define WATER_SPRAY_INTERVAL 10
 #define WATER_DROP_LIFETIME 20
+#define WATER_LEAK_INTERVAL 30
 
 #define WATER_DROP_SIZE 16
 
 int water_spray_cooldown = 0;
 int water_drop_cooldown = 0;
+int water_leak_cooldown = 0;
 
 #define MAX_WATER 1000
 #define WATER_DROP_AMOUNT 10
-#define WATER_FILL_AMOUNT 3
+#define WATER_FILL_AMOUNT 20
 
 #define WATER_EXTINGUISH_AMOUNT 5
 
 static s16 water_remaining = 500;
-static u8 water_fill_timer = 0;
+static u8 pump_was_in = 0; // 1 - up, 2 - down, 0 - none
+static bool pump_active = true;
 
 /* Water drop particles */
 typedef struct {
@@ -46,7 +52,17 @@ void show_water_remaining(void) {
   const s32 MAX_SCROLL = 95;
   s32 pos = (MAX_SCROLL * (s32)water_remaining) / MAX_WATER;
   NF_ScrollBg(SCR_CHAMBER, LAYER_CHAMBER_WATER, 0, pos);
+}
 
+void water_pump_init(void) {
+  NF_CreateSprite(SCR_WORLD, PUMP_UP_OAM_ID, PUMP, DEFAULT_SPRITE_PALETTE, 192,
+                  32);
+  NF_CreateSprite(SCR_WORLD, PUMP_DOWN_OAM_ID, PUMP, DEFAULT_SPRITE_PALETTE,
+                  192, 32 + 64);
+  NF_SpriteFrame(SCR_WORLD, PUMP_DOWN_OAM_ID, 1);
+  NF_CreateSprite(SCR_WORLD, PUMP_HANDLE_OAM_ID, PUMP_HANDLE,
+                  DEFAULT_SPRITE_PALETTE, 192, 32 + 64 - 16);
+  water_hide_pump();
 }
 
 void water_drop_init(void) {
@@ -81,22 +97,31 @@ void water_drop_update(void) {
   }
 }
 
-void water_init(void) { water_drop_init(); }
+void water_init(void) {
+  water_drop_init();
+  water_pump_init();
+}
 
 void water_update(void) {
+
   water_drop_update();
   show_water_remaining();
   if (water_drop_cooldown > 0)
     water_drop_cooldown--;
   if (water_spray_cooldown > 0)
     water_spray_cooldown--;
+  if (water_leak_cooldown > 0)
+    water_leak_cooldown--;
+
+  if (water_leak_cooldown == 0 && water_leak_rate > 0 && water_remaining > 0) {
+    water_remaining -= water_leak_rate;
+    if (water_remaining < 0)
+      water_remaining = 0;
+    water_leak_cooldown = WATER_LEAK_INTERVAL;
+  }
 }
 
 void water_fill_update(void) {
-  water_fill_timer++;
-  water_fill_timer %= 2;
-  if (water_fill_timer == 1)
-    return;
   water_remaining += WATER_FILL_AMOUNT;
   if (water_remaining > MAX_WATER)
     water_remaining = MAX_WATER;
@@ -111,6 +136,49 @@ void water_drop_spawn(int x, int y, int frame_number) {
       water_drops[i].active = 1;
       water_drops[i].frame = frame_number;
       return;
+    }
+  }
+}
+
+void water_show_pump() {
+  if (pump_active)
+    return;
+  pump_active = true;
+  NF_ShowSprite(SCR_WORLD, PUMP_UP_OAM_ID, true);
+  NF_ShowSprite(SCR_WORLD, PUMP_DOWN_OAM_ID, true);
+  NF_ShowSprite(SCR_WORLD, PUMP_HANDLE_OAM_ID, true);
+  NF_MoveSprite(SCR_WORLD, PUMP_HANDLE_OAM_ID, 192, 32 + 64 - 16);
+  pump_was_in = 0;
+}
+
+void water_hide_pump() {
+  if (!pump_active)
+    return;
+  pump_active = false;
+  NF_ShowSprite(SCR_WORLD, PUMP_UP_OAM_ID, false);
+  NF_ShowSprite(SCR_WORLD, PUMP_DOWN_OAM_ID, false);
+  NF_ShowSprite(SCR_WORLD, PUMP_HANDLE_OAM_ID, false);
+}
+
+void water_operate_pump(int x, int y) {
+  u16 pump_upper_threshold = 96 - 30;
+  u16 pump_lower_threshold = 96 + 30;
+  if (y > 134)
+    y = 134;
+  else if (y < 58)
+    y = 58;
+  NF_MoveSprite(SCR_WORLD, PUMP_HANDLE_OAM_ID, 192, y - 16);
+  if (y <= pump_upper_threshold) {
+    if (pump_was_in != 1) {
+      audio_play_sfx(SFX_SFX_PUMP_UP, false, IGNORED_LEN, 210);
+      pump_was_in = 1;
+      water_fill_update();
+    }
+  } else if (y >= pump_lower_threshold) {
+    if (pump_was_in != 2) {
+      audio_play_sfx(SFX_SFX_PUMP_DOWN, false, IGNORED_LEN, 210);
+      pump_was_in = 2;
+      water_fill_update();
     }
   }
 }

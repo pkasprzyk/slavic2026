@@ -20,7 +20,7 @@
 #define REACTOR_MAX_TEMP 200
 
 #define BLOWING_THRESHOLD 10000
-#define BLOWING_DECREASE_AMOUNT 5
+#define BLOWING_DECREASE_AMOUNT 11
 
 // The sample rate used for the recording (samples per second)
 #define SAMPLE_RATE 8000
@@ -28,15 +28,23 @@
 #define BLOWING_FRAMES_REQUIRED 20
 
 #define REACTOR_THRESHOLD_1 50
+#define REACTOR_HEAT_2_SPEED_PENALTY 0
 #define REACTOR_THRESHOLD_2 100
+#define REACTOR_HEAT_3_SPEED_PENALTY 8
 #define REACTOR_THRESHOLD_3 150
+#define REACTOR_HEAT_4_SPEED_PENALTY 16
+#define REACTOR_HEAT_4_WATER_LEAK 25
 
-#define FIRE_HEAT_DISTANCE 32
+#define FIRE_HEAT_DISTANCE 24
+#define FIRE_HEAT_MULTIPLIER 100
+
 #define FIRE_HEAT_COOLDOWN 10
 
 int blowing_counter = 0;
 int reactor_temp;
 int fire_heat_cooldown;
+int heat_speed_penalty;
+int water_leak_rate;
 
 // This is the size of the temporary buffer that the ARM7 will use to record
 // audio. When the callback is called, you will get a pointer to some address
@@ -114,6 +122,8 @@ void reactor_init(void) {
   reactor_temp = 0;
   blowing_counter = 0;
   fire_heat_cooldown = 0;
+  heat_speed_penalty = 0;
+  water_leak_rate = 0;
 
   soundEnable();
 
@@ -198,11 +208,28 @@ void reactor_deinit(void) {
   soundMicOff();
 }
 
+void resolve_heat_penalties() {
+  if (reactor_temp > REACTOR_THRESHOLD_3) {
+    heat_speed_penalty = REACTOR_HEAT_4_SPEED_PENALTY;
+    water_leak_rate = REACTOR_HEAT_4_WATER_LEAK;
+  } else if (reactor_temp > REACTOR_THRESHOLD_2) {
+    heat_speed_penalty = REACTOR_HEAT_3_SPEED_PENALTY;
+    water_leak_rate = 0;
+  } else if (reactor_temp > REACTOR_THRESHOLD_1) {
+    heat_speed_penalty = REACTOR_HEAT_2_SPEED_PENALTY;
+    water_leak_rate = 0;
+  } else {
+    heat_speed_penalty = 0;
+    water_leak_rate = 0;
+  }
+}
+
 void reactor_increase_temp(int amount) {
   reactor_temp += amount;
   if (reactor_temp > REACTOR_MAX_TEMP) {
     reactor_temp = REACTOR_MAX_TEMP;
   }
+  resolve_heat_penalties();
 }
 
 void reactor_decrease_temp(int amount) {
@@ -210,17 +237,20 @@ void reactor_decrease_temp(int amount) {
   if (reactor_temp < REACTOR_MIN_TEMP) {
     reactor_temp = REACTOR_MIN_TEMP;
   }
+  resolve_heat_penalties();
 }
 
 void reactor_heat_from_fire(s32 distance_sq) {
   int heat_amount = 0;
   if (distance_sq < (FIRE_HEAT_DISTANCE * FIRE_HEAT_DISTANCE)) {
     // scales up to 10
-    heat_amount = (FIRE_HEAT_DISTANCE * FIRE_HEAT_DISTANCE - distance_sq) / 100;
-    if (heat_amount > 0) {
-      reactor_increase_temp(heat_amount);
-      fire_heat_cooldown = FIRE_HEAT_COOLDOWN;
+    heat_amount = (FIRE_HEAT_DISTANCE * FIRE_HEAT_DISTANCE - distance_sq) /
+                  FIRE_HEAT_MULTIPLIER;
+    if (heat_amount == 0) {
+      heat_amount = 1;
     }
+    reactor_increase_temp(heat_amount);
+    fire_heat_cooldown = FIRE_HEAT_COOLDOWN;
   }
 #if HEAT_DEBUG
   char buffer[128];
