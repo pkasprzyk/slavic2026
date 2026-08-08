@@ -126,6 +126,7 @@ static void collect(u16 bunnyId) {
 
 static void kill_bunny(u16 bunnyId) {
   audio_play_sfx(SFX_SFX_BUNNY_DEATH, false, IGNORED_LEN, 190);
+  NF_ShowSprite(SCR_WORLD, bunnies[bunnyId].indicator_oam_id, false);
   NF_DeleteSprite(SCR_WORLD, bunnies[bunnyId].oam_id);
   bunnies[bunnyId] = bunnies[bunnies_cnt - 1];
   --bunnies_cnt;
