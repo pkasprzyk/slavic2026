@@ -20,8 +20,8 @@ int water_spray_cooldown = 0;
 int water_drop_cooldown = 0;
 
 #define MAX_WATER 1000
-#define WATER_DROP_AMOUNT 20
-#define WATER_FILL_AMOUNT 1
+#define WATER_DROP_AMOUNT 15
+#define WATER_FILL_AMOUNT 3
 
 static s16 water_remaining = 500;
 static u8 water_fill_timer = 0;
@@ -109,7 +109,7 @@ void water_spray(int mech_cx, int mech_cy, int target_x, int target_y) {
     return;
   }
 
-  if (water_remaining > 0) {
+  if (water_remaining >= WATER_DROP_AMOUNT) {
     water_remaining -= WATER_DROP_AMOUNT;
     if (water_remaining < 0)
       water_remaining = 0;
@@ -155,5 +155,4 @@ void water_spray(int mech_cx, int mech_cy, int target_x, int target_y) {
     int spawn_y = mech_cy + (int)(dy * (i + 1));
     water_drop_spawn(spawn_x, spawn_y);
   }
-  
 }
