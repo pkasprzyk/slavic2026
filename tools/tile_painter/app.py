@@ -70,36 +70,6 @@ def solid_block(w, h):
     return img
 
 
-def detect_state(img):
-    px = np.asarray(img.convert("RGB"))
-    ph = px.shape[0] // TILE
-    pw = px.shape[1] // TILE
-    state = np.zeros((ph, pw), dtype=np.uint8)
-    for ty in range(ph):
-        for tx in range(pw):
-            block = px[ty * TILE:(ty + 1) * TILE, tx * TILE:(tx + 1) * TILE]
-            r = block[..., 0].astype(int)
-            g = block[..., 1].astype(int)
-            b = block[..., 2].astype(int)
-            nongrass = ~((np.abs(r - GRASS[0]) <= TOL) &
-                         (np.abs(g - GRASS[1]) <= TOL) &
-                         (np.abs(b - GRASS[2]) <= TOL))
-            if (b - r >= 30).mean() >= 0.5:
-                state[ty, tx] = DEEP_WATER
-            elif nongrass.mean() >= 0.5:
-                rm = r[nongrass].mean()
-                gm = g[nongrass].mean()
-                bm = b[nongrass].mean()
-                if gm > rm + 20 and gm > bm + 20:
-                    if gm < 100:
-                        state[ty, tx] = TREE
-                    else:
-                        state[ty, tx] = BUSH
-                else:
-                    state[ty, tx] = WALL
-    return state
-
-
 def prepare_canvas(art, w, h):
     img = art.convert("RGBA")
     note = []
@@ -313,9 +283,6 @@ def main():
     mode = st.sidebar.radio("Tool", [t[0] for t in TOOLS])
     paint_value = dict(TOOLS)[mode]
 
-    if st.sidebar.button("Detect (auto walls, trees, bushes, water)"):
-        st.session_state.grid = detect_state(canvas_img)
-        st.session_state.rev += 1
     if st.sidebar.button("Clear"):
         st.session_state.grid = new_grid(ph, pw, aw, ah)
         st.session_state.rev += 1
