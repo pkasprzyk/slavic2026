@@ -281,9 +281,7 @@ void updateChamberBunnies() {
 
     s16 si = chamber_bunny_slot[i];
     s16 baseY = chamberSlots[si].y;
-    s16 bob_scale = 0;
-    if (baseY > 85)
-      bob_scale = (baseY - 85) * 10 / 85;
+    s16 bob_scale = 4 + (baseY - 82) * 6 / 88;
     s16 bob = (bob_scale * phaseSin) >> 12;
     s16 x = chamberSlots[si].x;
     s16 y = baseY + bob;
