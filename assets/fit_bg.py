@@ -13,8 +13,8 @@
 #             fit_bg.py all [--outdir DIR] [--assets DIR] [--level PATH]
 #                           [--pad PAD]
 #
-# PAD is "solid" (solid-block wall pattern, or collision-solid in L-mode maps)
-# or a hex color like "D3CFB2".
+# PAD is "solid" (solid-block wall pattern with 8x8 tile grid, or
+# collision-solid in L-mode maps) or a hex color like "D3CFB2".
 
 import argparse
 import os
@@ -102,12 +102,6 @@ def cmd_all(args):
     return 0
 
 
-def add_pad(parser):
-    parser.add_argument("--pad", default="solid",
-                        help='padding: "solid" or hex color like "D3CFB2" '
-                             "(default: solid)")
-
-
 def main():
     parser = argparse.ArgumentParser(
         description="Crop/pad background images to a target size for GRIT.")
@@ -118,7 +112,9 @@ def main():
     p_fit.add_argument("dst")
     p_fit.add_argument("width", type=int)
     p_fit.add_argument("height", type=int)
-    add_pad(p_fit)
+    p_fit.add_argument("--pad", default="solid",
+                       help='padding: "solid" (8x8 tile grid) or hex color '
+                            '(default: solid)')
 
     p_all = sub.add_parser("all",
                            help="fit project assets from source/level.h")
@@ -126,7 +122,9 @@ def main():
                        help="output directory (default: assets/fitted)")
     p_all.add_argument("--assets", help="assets directory (default: script dir)")
     p_all.add_argument("--level", help="path to source/level.h")
-    add_pad(p_all)
+    p_all.add_argument("--pad", default="solid",
+                       help='padding: "solid" (8x8 tile grid) or hex color '
+                            '(default: solid)')
 
     args = parser.parse_args()
     if args.cmd == "fit":
