@@ -10,6 +10,7 @@
 #include "level.h"
 #include "mech.h"
 #include "sprites.h"
+#include "fire.h"
 
 
 typedef struct {
@@ -90,7 +91,15 @@ bool collides_with_mech(u16 i) {
 }
 
 bool bunny_in_fire(u16 i){
-  return true;
+  s16 tx = bunnies[i].x >> 3;
+  s16 ty = bunnies[i].y >> 3;
+
+  const s16 radius = 3;
+  for (s16 x = tx-radius; x < tx + radius; ++x)
+    for (s16 y = ty-radius; y < ty + radius; ++y)
+      if (fire_is_burning(x, y))
+        return true;
+  return false;
 }
 
 static void collect(u16 bunnyId) {
@@ -115,7 +124,9 @@ static void kill_bunny(u16 bunnyId) {
 
 static void compute_edge_indicator(s16 bunny_wx, s16 bunny_wy,
                                      s16 *out_x, s16 *out_y,
-                                     int *out_frame, bool *out_hflip, bool *out_vflip) {
+                                     int *out_frame, 
+                                     bool *out_hflip, 
+                                     bool *out_vflip) {
   s16 cx = mech_x - level_cam_x();
   s16 cy = mech_y - level_cam_y();
   s16 dx = bunny_wx - level_cam_x() - cx;
@@ -175,45 +186,61 @@ static void compute_edge_indicator(s16 bunny_wx, s16 bunny_wy,
   }
 }
 
+static void updateBunny(int i){
+  bool isHurt = false;
+  if (collides_with_mech(i)) {
+    collect(i);
+    return;
+  }
+  if (bunny_in_fire(i)){
+    bunnies[i].hp -= 1;
+    isHurt = true;
+    if (bunnies[i].hp <= 0){
+      bunnies[i].hp = 0;
+      kill_bunny(i);
+      return;
+    }
+  }
+  s16 phaseSin = sinLerp((frame_cnt - 60) * (32767 / 60)); // 4.12 fixed
+  s16 offset = (3 * phaseSin) >> 12;
+  if (isHurt)
+  {
+    offset = 0;
+  }
+  s16 x = bunnies[i].x - level_cam_x();
+  s16 y = bunnies[i].y - level_cam_y() + offset;
+  if (x < -16 || x > 256 || y < -16 || y > 192) // off screen
+  {
+    NF_ShowSprite(SCR_WORLD, bunnies[i].oam_id, false);
+
+    s16 ex, ey;
+    int frame;
+    bool hflip, vflip;
+    compute_edge_indicator(bunnies[i].x, bunnies[i].y,
+                            &ex, &ey, &frame, &hflip, &vflip);
+    NF_ShowSprite(SCR_WORLD, bunnies[i].indicator_oam_id, true);
+    NF_MoveSprite(SCR_WORLD, bunnies[i].indicator_oam_id, ex, ey);
+    NF_SpriteFrame(SCR_WORLD, bunnies[i].indicator_oam_id, frame);
+    NF_HflipSprite(SCR_WORLD, bunnies[i].indicator_oam_id, hflip);
+    NF_VflipSprite(SCR_WORLD, bunnies[i].indicator_oam_id, vflip);
+
+    return;
+  }
+  NF_ShowSprite(SCR_WORLD, bunnies[i].indicator_oam_id, false);
+
+  NF_ShowSprite(SCR_WORLD, bunnies[i].oam_id, true);
+  NF_MoveSprite(SCR_WORLD, bunnies[i].oam_id, x, y);
+  NF_SpriteFrame(SCR_WORLD, bunnies[i].oam_id, frame_cnt / 30);
+  NF_VflipSprite(SCR_WORLD, bunnies[i].oam_id, isHurt);
+
+
+}
+
 void bunnies_update(void) {
   ++frame_cnt;
   frame_cnt %= 60 * 2;
   for (s16 i = bunnies_cnt - 1; i >= 0; --i) {
-    if (collides_with_mech(i)) {
-      collect(i);
-      continue;
-    }
-    if (bunny_in_fire(i)){
-      bunnies[i].hp -= 1;
-      if (bunnies[i].hp <= 0){
-        bunnies[i].hp = 0;
-        kill_bunny(i);
-        continue;
-      }
-    }
-    s16 phaseSin = sinLerp((frame_cnt - 60) * (32767 / 60));
-    s16 offset = (3 * phaseSin) >> 12;
-    s16 x = bunnies[i].x - level_cam_x();
-    s16 y = bunnies[i].y - level_cam_y() + offset;
-    if (x < -16 || x > 256 || y < -16 || y > 192) {
-      NF_ShowSprite(SCR_WORLD, bunnies[i].oam_id, false);
-
-      s16 ex, ey;
-      int frame;
-      bool hflip, vflip;
-      compute_edge_indicator(bunnies[i].x, bunnies[i].y,
-                             &ex, &ey, &frame, &hflip, &vflip);
-      NF_ShowSprite(SCR_WORLD, bunnies[i].indicator_oam_id, true);
-      NF_MoveSprite(SCR_WORLD, bunnies[i].indicator_oam_id, ex, ey);
-      NF_SpriteFrame(SCR_WORLD, bunnies[i].indicator_oam_id, frame);
-      NF_HflipSprite(SCR_WORLD, bunnies[i].indicator_oam_id, hflip);
-      NF_VflipSprite(SCR_WORLD, bunnies[i].indicator_oam_id, vflip);
-      continue;
-    }
-    NF_ShowSprite(SCR_WORLD, bunnies[i].indicator_oam_id, false);
-    NF_ShowSprite(SCR_WORLD, bunnies[i].oam_id, true);
-    NF_MoveSprite(SCR_WORLD, bunnies[i].oam_id, x, y);
-    NF_SpriteFrame(SCR_WORLD, bunnies[i].oam_id, frame_cnt / 30);
+    updateBunny(i);
   }
   for (s16 i = 0 ; i < bunnies_collected; ++i) {
     s16 phaseSin = sinLerp((frame_cnt - 60) * (32767 / 60));
