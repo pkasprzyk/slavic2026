@@ -31,6 +31,7 @@ typedef struct {
   s16 x, y;
   u8 life;
   u8 active;
+  u8 frame;
 } water_drop_t;
 
 static water_drop_t water_drops[WATER_DROP_MAX];
@@ -44,6 +45,7 @@ void show_water_remaining(void) {
 void water_drop_init(void) {
   for (int i = 0; i < WATER_DROP_MAX; i++) {
     water_drops[i].active = 0;
+    water_drops[i].frame = 0;
     NF_CreateSprite(SCR_WORLD, WATER_DROP_OAM_BASE + i, WATER_DROPS,
                     DEFAULT_SPRITE_PALETTE, -WATER_DROP_SIZE, -WATER_DROP_SIZE);
     NF_SpriteLayer(SCR_WORLD, WATER_DROP_OAM_BASE + i, LAYER_WORLD_BG);
@@ -61,12 +63,14 @@ void water_drop_update(void) {
       water_drops[i].active = 0;
       NF_MoveSprite(SCR_WORLD, WATER_DROP_OAM_BASE + i, -WATER_DROP_SIZE,
                     -WATER_DROP_SIZE);
+      NF_SpriteFrame(SCR_WORLD, WATER_DROP_OAM_BASE + i, water_drops[i].frame);
       continue;
     }
 
     NF_MoveSprite(SCR_WORLD, WATER_DROP_OAM_BASE + i,
                   water_drops[i].x - level_cam_x(),
                   water_drops[i].y - level_cam_y());
+    NF_SpriteFrame(SCR_WORLD, WATER_DROP_OAM_BASE + i, water_drops[i].frame);
   }
 }
 
@@ -91,13 +95,14 @@ void water_fill_update(void) {
     water_remaining = MAX_WATER;
 }
 
-void water_drop_spawn(int x, int y) {
+void water_drop_spawn(int x, int y, int frame_number) {
   for (int i = 0; i < WATER_DROP_MAX; i++) {
     if (!water_drops[i].active) {
       water_drops[i].x = x - WATER_DROP_SIZE / 2;
       water_drops[i].y = y - WATER_DROP_SIZE / 2;
       water_drops[i].life = WATER_DROP_LIFETIME;
       water_drops[i].active = 1;
+      water_drops[i].frame = frame_number;
       return;
     }
   }
@@ -150,9 +155,12 @@ void water_spray(int mech_cx, int mech_cy, int target_x, int target_y) {
   int steps = (distance / WATER_DROP_SIZE) + 1;
   dx /= steps;
   dy /= steps;
-  for (int i = 0; i < steps; i++) {
-    int spawn_x = mech_cx + (int)(dx * (i + 1));
-    int spawn_y = mech_cy + (int)(dy * (i + 1));
-    water_drop_spawn(spawn_x, spawn_y);
+  int spawn_x = mech_cx + (int)dx;
+  int spawn_y = mech_cy + (int)dy;
+  for (int i = 0; i < steps - 1; i++) {
+    water_drop_spawn(spawn_x, spawn_y, 0);
+    spawn_x += (int)dx;
+    spawn_y += (int)dy;
   }
+  water_drop_spawn(spawn_x, spawn_y, 1);
 }
