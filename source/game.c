@@ -4,8 +4,8 @@
 #include <stdio.h>
 #include <time.h>
 
-#include <nf_lib.h>
 #include <nds.h>
+#include <nf_lib.h>
 
 #include "audio.h"
 #include "bunny.h"
@@ -22,7 +22,6 @@
 int game_state;
 static bool ending_drawn;
 
-
 // static void clear_row_world(int row) {
 //   NF_WriteText(SCR_WORLD, LAYER_WORLD_TEXT, 0, row,
 //                "                                ");
@@ -37,10 +36,10 @@ static void draw_bad_ending(void) {
   NF_LoadTiledBg("bg/bg_bad_ending", "bad_ending", 256, 256);
   NF_CreateTiledBg(SCR_WORLD, LAYER_ENDING_IMAGE, "bad_ending");
   // char buf[38];
-  //clear_all_world();
+  // clear_all_world();
   // NF_WriteText(SCR_WORLD, LAYER_WORLD_TEXT, 11, 5, "BAD ENDING");
-  // snprintf(buf, sizeof(buf), "You failed to save all %d bunnies...", bunnies_died);
-  // NF_WriteText(SCR_WORLD, LAYER_WORLD_TEXT, 1, 10, buf);
+  // snprintf(buf, sizeof(buf), "You failed to save all %d bunnies...",
+  // bunnies_died); NF_WriteText(SCR_WORLD, LAYER_WORLD_TEXT, 1, 10, buf);
   // NF_WriteText(SCR_WORLD, LAYER_WORLD_TEXT, 11, 17, "[  EXIT  ]");
   // NF_UpdateTextLayers();
   ending_drawn = 1;
@@ -50,21 +49,20 @@ static void draw_mid_ending(void) {
   NF_LoadTiledBg("bg/bg_mid_ending", "mid_ending", 256, 256);
   NF_CreateTiledBg(SCR_WORLD, LAYER_ENDING_IMAGE, "mid_ending");
   // char buf[38];
-  //clear_all_world();
+  // clear_all_world();
   // NF_WriteText(SCR_WORLD, LAYER_WORLD_TEXT, 11, 5, "BAD ENDING");
-  // snprintf(buf, sizeof(buf), "You rescued only %d bunnies...", bunnies_collected);
-  // NF_WriteText(SCR_WORLD, LAYER_WORLD_TEXT, 1, 10, buf);
+  // snprintf(buf, sizeof(buf), "You rescued only %d bunnies...",
+  // bunnies_collected); NF_WriteText(SCR_WORLD, LAYER_WORLD_TEXT, 1, 10, buf);
   // NF_WriteText(SCR_WORLD, LAYER_WORLD_TEXT, 11, 17, "[  EXIT  ]");
   // NF_UpdateTextLayers();
   ending_drawn = 1;
 }
 
-
 static void draw_good_ending(void) {
   NF_LoadTiledBg("bg/bg_good_ending", "good_ending", 256, 256);
   NF_CreateTiledBg(SCR_WORLD, LAYER_ENDING_IMAGE, "good_ending");
   // char buf[38];
-  //clear_all_world();
+  // clear_all_world();
   // NF_WriteText(SCR_WORLD, LAYER_WORLD_TEXT, 10, 5, "GOOD ENDING");
   // snprintf(buf, sizeof(buf), "All %d bunnies rescued!", bunnies_collected);
   // NF_WriteText(SCR_WORLD, LAYER_WORLD_TEXT, 4, 10, buf);
@@ -136,26 +134,30 @@ void game_init(void) {
   title_init();
 }
 
-void draw_ending(){
+void draw_ending() {
+  audio_close_wav();
   ending_drawn = true;
-  
+
   NF_DeleteTiledBg(SCR_WORLD, 0);
   NF_DeleteTiledBg(SCR_WORLD, 1);
   NF_DeleteTiledBg(SCR_WORLD, 2);
   NF_DeleteTiledBg(SCR_WORLD, 3);
 
   swiWaitForVBlank();
-
-  if (game_state == GAME_BAD_ENDING){
+  audio_init_wav("nitro:/audio/SGJ2026-Music-Win-Chill-22khz-loop.wav");
+  if (game_state == GAME_BAD_ENDING) {
     draw_bad_ending();
-  } else if (game_state == GAME_GOOD_ENDING){
+    audio_set_looped_volume(SFX_SFX_FIRE_LOOP, 200);
+  } else if (game_state == GAME_GOOD_ENDING) {
     draw_good_ending();
+    audio_stop_looped_sfx(SFX_SFX_FIRE_LOOP);
   } else {
     draw_mid_ending();
+    audio_stop_looped_sfx(SFX_SFX_FIRE_LOOP);
   }
 }
 
-void end_state_update(){
+void end_state_update() {
   if (!ending_drawn) {
     draw_ending();
   }
@@ -176,7 +178,8 @@ void game_update(void) {
     return;
   }
 
-  if (game_state == GAME_BAD_ENDING || game_state == GAME_GOOD_ENDING || game_state == GAME_MID_ENDING) {
+  if (game_state == GAME_BAD_ENDING || game_state == GAME_GOOD_ENDING ||
+      game_state == GAME_MID_ENDING) {
     end_state_update();
     return;
   }
@@ -189,17 +192,12 @@ void game_update(void) {
   NF_UpdateTextLayers();
 
   if (bunnies_cnt == 0) {
-    if (bunnies_collected == 0)
-    {
+    if (bunnies_collected == 0) {
       game_state = GAME_BAD_ENDING;
       game_state = GAME_MID_ENDING;
-    }
-    else if (bunnies_collected == bunnies_total)
-    {
+    } else if (bunnies_collected == bunnies_total) {
       game_state = GAME_GOOD_ENDING;
-    }
-    else
-    {
+    } else {
       game_state = GAME_MID_ENDING;
     }
   }
