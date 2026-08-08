@@ -129,7 +129,7 @@ static void kill_bunny(u16 bunnyId) {
 }
 
 void kill_all_bunnies(void) {
-  for (u16 i = bunnies_cnt - 1; i >= 0; i--) {
+  for (s16 i = bunnies_cnt - 1; i >= 0; i--) {
     kill_bunny(i);
   }
 }

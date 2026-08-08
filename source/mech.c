@@ -130,9 +130,6 @@ void mech_update(void) {
     timer_to_end--;
     if (timer_to_end <= 0) {
       timer_to_end = 0;
-      /* consoleDemoInit();
-      printf("Killing bunnies");
-      waitForever(); */
       kill_all_bunnies();
     }
   }
