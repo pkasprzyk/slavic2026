@@ -44,8 +44,8 @@ static const SpriteInfo SPRITE_INFOS[SPRITE_CNT] = {
                      DEFAULT_SPRITE_PALETTE, BOTTOM},
     [INDICATOR_ARROW] = {"spr/indicator_arrow", 8, 8, INDICATOR_ARROW,
                          DEFAULT_SPRITE_PALETTE, BOTTOM},
-    [PUMP] = {"spr/pomp", 64, 64, PUMP, DEFAULT_SPRITE_PALETTE, BOTTOM},
-    [PUMP_HANDLE] = {"spr/pomp_bar", 64, 32, PUMP_HANDLE,
+    [PUMP] = {"spr/pump_body", 64, 64, PUMP, DEFAULT_SPRITE_PALETTE, BOTTOM},
+    [PUMP_HANDLE] = {"spr/pump_handle", 64, 32, PUMP_HANDLE,
                      DEFAULT_SPRITE_PALETTE, BOTTOM},
 };
 

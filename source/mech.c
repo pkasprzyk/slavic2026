@@ -102,9 +102,9 @@ void mech_spray_water(void) {
 
   bool touching = touchscreen.px > 0 && touchscreen.py > 0;
   u16 pump_start_x = 192;
-  u16 pump_start_y = 16;
+  u16 pump_start_y = 60;
   u16 pump_end_x = 256;
-  u16 pump_end_y = 176;
+  u16 pump_end_y = 132;
 
   bool touching_pump = false;
   if (was_in_water) {
