@@ -33,9 +33,6 @@
 #define REACTOR_THRESHOLD_3 150
 
 
-char blowing_debug_str[160];
-
-
 int blowing_counter = 0;
 int reactor_temp;
 
@@ -55,13 +52,16 @@ int reactor_temp;
 
 #define SPRITE_ID 0
 
-uint16_t temporary_buffer[MICROPHONE_BUFFER_SIZE];
-int cnt = 0;
+static uint16_t temporary_buffer[MICROPHONE_BUFFER_SIZE];
+static int cnt = 0;
 
 #define BLOW_DEBUG 0
 
-int debug_callbacks_cnt;
+#if BLOW_DEBUG
 #define DEBUG_CALLBACKS_UPDATE_TEXT 60
+static int debug_callbacks_cnt = DEBUG_CALLBACKS_UPDATE_TEXT;
+static char blowing_debug_str[160];
+#endif
 
 void microphone_handler(void *completed_buffer, int length) {
     cnt = 0;
@@ -75,7 +75,7 @@ void microphone_handler(void *completed_buffer, int length) {
         }
     }
 
-#ifdef BLOW_DEBUG
+#if BLOW_DEBUG
     if (++debug_callbacks_cnt > DEBUG_CALLBACKS_UPDATE_TEXT){
         debug_callbacks_cnt = 0;
         s32 min = 0;
@@ -134,7 +134,7 @@ void reactor_update(void) {
     snprintf(buffer, sizeof(buffer), "TEMP: %03d", reactor_temp);
     NF_WriteText(SCR_CHAMBER, LAYER_CHAMBER_TEXT, 2, 6, buffer);
 
-#ifdef BLOW_DEBUG
+#if BLOW_DEBUG
     NF_WriteText(SCR_CHAMBER, LAYER_CHAMBER_TEXT, 0, 8, blowing_debug_str);
 #endif
 
