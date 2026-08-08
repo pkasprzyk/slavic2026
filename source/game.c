@@ -64,6 +64,7 @@ void game_init(void) {
   NF_UpdateTextLayers();
 
   srand(time(NULL));
+  audio_init_SB();
   audio_init_wav("nitro:/audio/SGJ2026-Music-22khz-loop.wav");
   audio_play_sfx(SFX_SFX_FIRE_LOOP, true, 180, 190);
 
@@ -73,10 +74,10 @@ void game_init(void) {
 }
 
 void game_update(void) {
+  audio_update_wav();
+  audio_update_loops();
   if (!playing) {
     title_update();
-    audio_update_wav();
-    audio_update_loops();
     return;
   }
 
@@ -86,8 +87,6 @@ void game_update(void) {
   bunnies_update();
   chamber_update();
   NF_UpdateTextLayers();
-  audio_update_wav();
-  audio_update_loops();
 }
 
 void game_deinit(void) { chamber_deinit(); }

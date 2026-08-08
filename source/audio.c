@@ -185,11 +185,6 @@ void audio_init_wav(char *path) {
   // Fill the buffer before we start doing anything
   streamingFillBuffer(true);
 
-  // We are not using a soundbank so we need to manually initialize
-  // mm_ds_system.
-  mmInitDefault("nitro:/soundbank.bin");
-  mmSelectMode(MM_MODE_B);
-
   // Open the stream
   mm_stream stream = {
       .sampling_rate = wavHeader.sampleRate,
@@ -215,6 +210,7 @@ void audio_close_wav(void) {
 
 void audio_init_SB(void) {
   mmInitDefault("nitro:/soundbank.bin");
+  mmSelectMode(MM_MODE_B);
   soundEnable();
 }
 void audio_play_sfx(mm_word sample_name, bool loop, u16 length, u8 volume) {
