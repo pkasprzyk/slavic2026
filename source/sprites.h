@@ -39,5 +39,8 @@ void InitSprites(void);
 #define BUNNIES_OAM_ID 1
 #define BUNNIES_MAX 10
 
+#define FIRE_OAM_BASE 11
+#define FIRE_CELLS_MAX 64
+
 
 #endif
