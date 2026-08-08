@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Generate forest.png, colmap.png and spawn_points.h from assets/tiles/project.tmx."""
+"""Generate forest.png, colmap.png and spawn.dat from assets/tiles/project.tmx."""
 
 import os
 import sys
@@ -72,38 +72,42 @@ def parse_spawns(tmx_path):
     root = tree.getroot()
     player = None
     bunnies = []
+
     for og_el in root.findall("objectgroup"):
-        if og_el.attrib.get("name") != "spawns":
-            continue
+        name = og_el.attrib.get("name", "")
         for obj_el in og_el.findall("object"):
             obj_type = obj_el.attrib.get("type", "")
             x = int(float(obj_el.attrib["x"]))
             y = int(float(obj_el.attrib["y"]))
-            if obj_type == "player":
+            if name == "player" and obj_type == "player":
                 player = (x, y)
             elif obj_type == "bunny":
                 bunnies.append((x, y))
+
     if player is None:
-        print("ERROR: no 'player' object found in spawns layer", file=sys.stderr)
+        for og_el in root.findall("objectgroup"):
+            for obj_el in og_el.findall("object"):
+                if obj_el.attrib.get("type", "") == "player":
+                    x = int(float(obj_el.attrib["x"]))
+                    y = int(float(obj_el.attrib["y"]))
+                    player = (x, y)
+                    break
+            if player is not None:
+                break
+
+    if player is None:
+        print("ERROR: no 'player' object found", file=sys.stderr)
         sys.exit(1)
     return player, bunnies
 
 
-def write_spawn_header(player, bunnies, out_path):
-    header = """#ifndef SPAWN_POINTS_H__
-#define SPAWN_POINTS_H__
-
-"""
-    header += f"#define PLAYER_SPAWN_X {player[0]}\n"
-    header += f"#define PLAYER_SPAWN_Y {player[1]}\n"
-    header += "\n"
-    header += f"#define BUNNY_COUNT {len(bunnies)}\n"
-    for i, (x, y) in enumerate(bunnies):
-        header += f"#define BUNNY_SPAWN_{i}_X {x}\n"
-        header += f"#define BUNNY_SPAWN_{i}_Y {y}\n"
-    header += "\n#endif\n"
-    with open(out_path, "w") as f:
-        f.write(header)
+def write_spawn_binary(player, bunnies, out_path):
+    import struct
+    with open(out_path, "wb") as f:
+        f.write(struct.pack("<HH", player[0], player[1]))
+        f.write(struct.pack("<B", len(bunnies)))
+        for x, y in bunnies:
+            f.write(struct.pack("<HH", x, y))
 
 
 def parse_tsx(tsx_path):
@@ -238,11 +242,11 @@ def main():
     tmx_path = os.path.join(script_dir, "tiles", "project.tmx")
     out_forest = os.path.join(script_dir, "forest.png")
     out_colmap = os.path.join(script_dir, "colmap.png")
-    out_spawn_h = os.path.join(script_dir, "..", "source", "spawn_points.h")
+    out_spawn = os.path.join(script_dir, "spawn.dat")
 
     player, bunnies = parse_spawns(tmx_path)
-    write_spawn_header(player, bunnies, out_spawn_h)
-    print(f"Wrote {out_spawn_h} (player=({player[0]},{player[1]}), {len(bunnies)} bunnies)")
+    write_spawn_binary(player, bunnies, out_spawn)
+    print(f"Wrote {out_spawn} (player=({player[0]},{player[1]}), {len(bunnies)} bunnies)")
 
     layers, map_w, map_h, firstgid, tsx_source = parse_tmx(tmx_path)
     tsx_path = os.path.join(os.path.dirname(tmx_path), tsx_source)

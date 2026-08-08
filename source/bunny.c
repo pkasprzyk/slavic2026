@@ -10,7 +10,7 @@
 #include "ids.h"
 #include "level.h"
 #include "mech.h"
-#include "spawn_points.h"
+#include "spawn.h"
 #include "sprites.h"
 
 static const bool DIE_FAST = false;
@@ -58,13 +58,9 @@ void add_bunny(int x, int y, s16 hp) {
 }
 
 void bunnies_init(void) {
-  add_bunny(BUNNY_SPAWN_0_X, BUNNY_SPAWN_0_Y, 500);
-  add_bunny(BUNNY_SPAWN_1_X, BUNNY_SPAWN_1_Y, 600);
-  add_bunny(BUNNY_SPAWN_2_X, BUNNY_SPAWN_2_Y, 700);
-  add_bunny(BUNNY_SPAWN_3_X, BUNNY_SPAWN_3_Y, 800);
-#if BUNNY_COUNT > 4
-  add_bunny(BUNNY_SPAWN_4_X, BUNNY_SPAWN_4_Y, 1000);
-#endif
+  u8 count = spawn_bunny_count();
+  for (u8 i = 0; i < count; i++)
+    add_bunny(spawn_bunny_x(i), spawn_bunny_y(i), 500);
   bunnies_total = bunnies_cnt;
   bunnies_died = 0;
   for (u16 i = 0; i < bunnies_cnt; ++i) {

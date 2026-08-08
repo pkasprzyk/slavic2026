@@ -15,6 +15,7 @@
 #include "ids.h"
 #include "level.h"
 #include "mech.h"
+#include "spawn.h"
 #include "sprites.h"
 #include "title.h"
 #include "water.h"
@@ -82,6 +83,7 @@ void game_start_play(void) {
   game_state = GAME_PLAYING;
   fire_init();
   water_init();
+  spawn_load();
   mech_init();
   bunnies_init();
   ending_drawn = 0;
@@ -133,7 +135,7 @@ void game_init(void) {
 void draw_ending() {
   audio_close_wav();
   ending_drawn = true;
-  
+
   NF_DeleteTiledBg(SCR_WORLD, 0);
   NF_DeleteTiledBg(SCR_WORLD, 1);
   NF_DeleteTiledBg(SCR_WORLD, 2);
