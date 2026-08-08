@@ -70,7 +70,7 @@ void game_init(void) {
 
   srand(time(NULL));
   audio_init_wav("nitro:/audio/SGJ2026-Music-22khz-loop.wav");
-  audio_play_sfx(SFX_SFX_FIRE_LOOP, true, 180);
+  audio_play_sfx(SFX_SFX_FIRE_LOOP, true, 180, 190);
 
   playing = false;
   game_state = GAME_TITLE;

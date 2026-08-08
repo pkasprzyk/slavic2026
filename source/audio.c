@@ -191,7 +191,7 @@ void audio_init_wav(char *path) {
   mmSelectMode(MM_MODE_B);
 
   // Open the stream
-  /* mm_stream stream = {
+  mm_stream stream = {
       .sampling_rate = wavHeader.sampleRate,
       .buffer_length = 2048,
       .callback = streamingCallback,
@@ -199,12 +199,10 @@ void audio_init_wav(char *path) {
       .timer = MM_TIMER0,
       .manual = false,
   };
-  mmStreamOpen(&stream); */
+  mmStreamOpen(&stream);
 }
 
-void audio_update_wav(void) {
-  // streamingFillBuffer(false);
-}
+void audio_update_wav(void) { streamingFillBuffer(false); }
 
 void audio_close_wav(void) {
   mmStreamClose();
@@ -219,7 +217,7 @@ void audio_init_SB(void) {
   mmInitDefault("nitro:/soundbank.bin");
   soundEnable();
 }
-void audio_play_sfx(mm_word sample_name, bool loop, u16 length) {
+void audio_play_sfx(mm_word sample_name, bool loop, u16 length, u8 volume) {
   mmLoadEffect(sample_name);
   mm_word handle = mmEffect(sample_name);
   if (handle == MM_SFXHAND_INVALID) {
@@ -230,9 +228,11 @@ void audio_play_sfx(mm_word sample_name, bool loop, u16 length) {
     lopped_names[current_size] = sample_name;
     looped_lengths[current_size] = length;
     looped_remaining[current_size] = length;
-    looped_volumes[current_size] = 255;
+    looped_volumes[current_size] = volume;
     looped_handles[current_size] = handle;
     current_size++;
+  } else {
+    mmEffectVolume(handle, volume);
   }
 }
 

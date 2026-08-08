@@ -135,12 +135,12 @@ void mech_update(void) {
   if (is_in_water(mech_x, mech_y)) {
     water_fill_update();
     if (!was_in_water) {
-      audio_set_looped_volume(SFX_SFX_FIRE_LOOP, 100);
+      audio_set_looped_volume(SFX_SFX_FIRE_LOOP, 90);
       was_in_water = true;
     }
   } else if (was_in_water) {
     was_in_water = false;
-    audio_set_looped_volume(SFX_SFX_FIRE_LOOP, 255);
+    audio_set_looped_volume(SFX_SFX_FIRE_LOOP, 190);
   }
 
   if (mech_x < 0)
