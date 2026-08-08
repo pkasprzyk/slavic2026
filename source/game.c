@@ -22,52 +22,48 @@
 int game_state;
 static bool ending_drawn;
 
-// static void clear_row_world(int row) {
-//   NF_WriteText(SCR_WORLD, LAYER_WORLD_TEXT, 0, row,
-//                "                                ");
-// }
-
-// static void clear_all_world(void) {
-//   for (int r = 0; r < 24; r++)
-//     clear_row_world(r);
-// }
-
 static void draw_bad_ending(void) {
   NF_LoadTiledBg("bg/bg_bad_ending", "bad_ending", 256, 256);
   NF_CreateTiledBg(SCR_WORLD, LAYER_ENDING_IMAGE, "bad_ending");
-  // char buf[38];
-  // clear_all_world();
-  // NF_WriteText(SCR_WORLD, LAYER_WORLD_TEXT, 11, 5, "BAD ENDING");
-  // snprintf(buf, sizeof(buf), "You failed to save all %d bunnies...",
-  // bunnies_died); NF_WriteText(SCR_WORLD, LAYER_WORLD_TEXT, 1, 10, buf);
+
+  char buf[50];
+  snprintf(buf, sizeof(buf), "You failed to save\n all %d bunnies...", bunnies_died);
+  NF_ClearTextLayer(SCR_CHAMBER, LAYER_CHAMBER_TEXT);
+  NF_WriteText(SCR_CHAMBER, LAYER_CHAMBER_TEXT, 11, 5, "BAD ENDING");
+  NF_WriteText(SCR_CHAMBER, LAYER_CHAMBER_TEXT, 1, 10, buf);
   // NF_WriteText(SCR_WORLD, LAYER_WORLD_TEXT, 11, 17, "[  EXIT  ]");
-  // NF_UpdateTextLayers();
+  NF_UpdateTextLayers();
+
   ending_drawn = 1;
 }
 
 static void draw_mid_ending(void) {
   NF_LoadTiledBg("bg/bg_mid_ending", "mid_ending", 256, 256);
   NF_CreateTiledBg(SCR_WORLD, LAYER_ENDING_IMAGE, "mid_ending");
-  // char buf[38];
-  // clear_all_world();
-  // NF_WriteText(SCR_WORLD, LAYER_WORLD_TEXT, 11, 5, "BAD ENDING");
-  // snprintf(buf, sizeof(buf), "You rescued only %d bunnies...",
-  // bunnies_collected); NF_WriteText(SCR_WORLD, LAYER_WORLD_TEXT, 1, 10, buf);
+
+  char buf[38];
+  snprintf(buf, sizeof(buf), "You rescued only\n %d bunnies...", bunnies_collected);
+  NF_ClearTextLayer(SCR_CHAMBER, LAYER_CHAMBER_TEXT);
+  NF_WriteText(SCR_CHAMBER, LAYER_CHAMBER_TEXT, 11, 5, "THE END");
+  NF_WriteText(SCR_CHAMBER, LAYER_CHAMBER_TEXT, 1, 10, buf);
   // NF_WriteText(SCR_WORLD, LAYER_WORLD_TEXT, 11, 17, "[  EXIT  ]");
-  // NF_UpdateTextLayers();
+  NF_UpdateTextLayers();
+
   ending_drawn = 1;
 }
 
 static void draw_good_ending(void) {
   NF_LoadTiledBg("bg/bg_good_ending", "good_ending", 256, 256);
   NF_CreateTiledBg(SCR_WORLD, LAYER_ENDING_IMAGE, "good_ending");
-  // char buf[38];
-  // clear_all_world();
-  // NF_WriteText(SCR_WORLD, LAYER_WORLD_TEXT, 10, 5, "GOOD ENDING");
-  // snprintf(buf, sizeof(buf), "All %d bunnies rescued!", bunnies_collected);
-  // NF_WriteText(SCR_WORLD, LAYER_WORLD_TEXT, 4, 10, buf);
+
+  char buf[38];
+  snprintf(buf, sizeof(buf), "All %d bunnies rescued!", bunnies_collected);
+  NF_ClearTextLayer(SCR_CHAMBER, LAYER_CHAMBER_TEXT);
+  NF_WriteText(SCR_CHAMBER, LAYER_CHAMBER_TEXT, 11, 5, "GOOD ENDING");
+  NF_WriteText(SCR_CHAMBER, LAYER_CHAMBER_TEXT, 1, 10, buf);
   // NF_WriteText(SCR_WORLD, LAYER_WORLD_TEXT, 11, 17, "[  EXIT  ]");
-  // NF_UpdateTextLayers();
+  NF_UpdateTextLayers();
+
   ending_drawn = 1;
 }
 
@@ -137,11 +133,12 @@ void game_init(void) {
 void draw_ending() {
   audio_close_wav();
   ending_drawn = true;
-
+  
   NF_DeleteTiledBg(SCR_WORLD, 0);
   NF_DeleteTiledBg(SCR_WORLD, 1);
   NF_DeleteTiledBg(SCR_WORLD, 2);
   NF_DeleteTiledBg(SCR_WORLD, 3);
+
 
   swiWaitForVBlank();
   audio_init_wav("nitro:/audio/SGJ2026-Music-Win-Chill-22khz-loop.wav");
@@ -161,6 +158,7 @@ void end_state_update() {
   if (!ending_drawn) {
     draw_ending();
   }
+  bunnies_end_screen_update();
   // if (keysDown() & KEY_TOUCH) {
   //   touchPosition touch;
   //   touchRead(&touch);

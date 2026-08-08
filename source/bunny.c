@@ -11,6 +11,7 @@
 #include "level.h"
 #include "mech.h"
 #include "sprites.h"
+
 static const bool DIE_FAST = false;
 
 typedef struct {
@@ -62,6 +63,7 @@ void bunnies_init(void) {
   add_bunny(16, 200, 800);
   add_bunny(224, 224, 1000);
   bunnies_total = bunnies_cnt;
+  bunnies_died = 0;
   for (u16 i = 0; i < bunnies_cnt; ++i) {
     NF_CreateSprite(SCR_WORLD, bunnies[i].oam_id, SPRITE_INFOS[RABBITS].img_id,
                     SPRITE_INFOS[RABBITS].pal_id, bunnies[i].x, bunnies[i].y);
@@ -247,12 +249,7 @@ static void updateBunny(int i) {
   NF_VflipSprite(SCR_WORLD, bunnies[i].oam_id, isHurt);
 }
 
-void bunnies_update(void) {
-  ++frame_cnt;
-  frame_cnt %= 60 * 2;
-  for (s16 i = bunnies_cnt - 1; i >= 0; --i) {
-    updateBunny(i);
-  }
+void updateChamberBunnies(){
   for (s16 i = 0; i < bunnies_collected; ++i) {
     s16 phaseSin = sinLerp((frame_cnt - 60) * (32767 / 60));
     s16 offset = (10 * phaseSin) >> 12;
@@ -262,4 +259,19 @@ void bunnies_update(void) {
     NF_MoveSprite(SCR_CHAMBER, i, x, y);
     NF_SpriteFrame(SCR_CHAMBER, i, frame_cnt / 30);
   }
+}
+
+void bunnies_update(void) {
+  ++frame_cnt;
+  frame_cnt %= 60 * 2;
+  for (s16 i = bunnies_cnt - 1; i >= 0; --i) {
+    updateBunny(i);
+  }
+  updateChamberBunnies();
+}
+
+void  bunnies_end_screen_update(){
+  ++frame_cnt;
+  frame_cnt %= 60 * 2;
+  updateChamberBunnies();
 }

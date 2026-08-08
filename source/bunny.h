@@ -1,12 +1,15 @@
 #ifndef BUNNY_H__
 #define BUNNY_H__
 
-extern int bunnies_cnt;
-extern int bunnies_total;
-extern int bunnies_collected;
-extern int bunnies_died;
+#include <nds.h>
+
+extern s16 bunnies_cnt;
+extern s16 bunnies_total;
+extern s16 bunnies_collected;
+extern s16 bunnies_died;
 
 void bunnies_init(void);
 void bunnies_update(void);
+void bunnies_end_screen_update();
 
 #endif
