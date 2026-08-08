@@ -9,10 +9,10 @@ ARM_NONE_EABI_PATH	?= $(WONDERFUL_TOOLCHAIN)/toolchain/gcc-arm-none-eabi/bin/
 # -----------
 
 NAME		:= slavic2026
-GAME_TITLE	:= Chilling Mech
+GAME_TITLE	:= Red Hot Chilling Bunnies
 GAME_SUBTITLE	:= Slavic Game Jam 2026
-GAME_AUTHOR	:= fisz
-GAME_ICON	:= $(BLOCKSDS)/sys/icon.bmp
+GAME_AUTHOR	:= Kombajn do zbierania królików po wioskach
+GAME_ICON	:= assets/Game_icon.bmp
 
 COMPDB = 1
 

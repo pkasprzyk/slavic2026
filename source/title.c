@@ -36,7 +36,7 @@ static void load_instr_bg(void) {
 static void draw_title(void) {
   clear_all();
   load_menu_bg();
-  NF_WriteText(SCR_WORLD, LAYER_WORLD_TEXT, 10, 2, "CHILLING MECH");
+  NF_WriteText(SCR_WORLD, LAYER_WORLD_TEXT, 5, 2, "Red Hot Chilling Bunnies");
   NF_WriteText(SCR_WORLD, LAYER_WORLD_TEXT, 10, 4, "A Slavic Game");
   NF_WriteText(SCR_WORLD, LAYER_WORLD_TEXT, 12, 5, "Jam 2026");
   NF_WriteText(SCR_WORLD, LAYER_WORLD_TEXT, 8, 9, "[    START    ]");
