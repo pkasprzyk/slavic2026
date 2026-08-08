@@ -21,8 +21,27 @@ typedef struct {
 static bunny_s bunnies[BUNNIES_MAX];
 
 static s16 bunnies_cnt = 0;
+static s16 bunnies_saved = 0;
 
-#define SCREEN_BOT 1
+typedef struct {
+  s16 x;
+  s16 y;
+} savedBunnySlot;
+
+static savedBunnySlot savedSlots [BUNNIES_MAX] = {
+  {28,156},
+  {68,159},
+  {160,160},
+  {205,145},
+  {113,4},
+
+  {50,100},
+  {60,100},
+  {70,100},
+  {80,100},
+  {90,100},
+};
+
 static u16 frame_cnt = 0;
 
 void add_bunny(int x, int y) {
@@ -39,9 +58,9 @@ void bunnies_init(void) {
   add_bunny(16, 200);
   add_bunny(224, 224);
   for (u16 i = 0; i < bunnies_cnt; ++i) {
-    NF_CreateSprite(SCREEN_BOT, bunnies[i].oam_id, SPRITE_INFOS[RABBITS].img_id,
+    NF_CreateSprite(SCR_WORLD, bunnies[i].oam_id, SPRITE_INFOS[RABBITS].img_id,
                     SPRITE_INFOS[RABBITS].pal_id, bunnies[i].x, bunnies[i].y);
-    NF_SpriteLayer(SCREEN_BOT, bunnies[i].oam_id, LAYER_WORLD_BG);
+    NF_SpriteLayer(SCR_WORLD, bunnies[i].oam_id, LAYER_WORLD_BG);
   }
 }
 
@@ -59,9 +78,14 @@ bool collides_with_mech(u16 i) {
 
 bool collect(u16 bunnyId) {
   audio_play_sfx(SFX_SFX_BUNNY_PICK_UP, false, IGNORED_LEN, DEFAULT_VOLUME);
-  NF_DeleteSprite(SCREEN_BOT, bunnies[bunnyId].oam_id);
+  NF_DeleteSprite(SCR_WORLD, bunnies[bunnyId].oam_id);
   bunnies[bunnyId] = bunnies[bunnies_cnt - 1];
   --bunnies_cnt;
+ 
+  NF_CreateSprite(SCR_CHAMBER, bunnies_saved, SPRITE_INFOS[RABBITS].img_id,
+                SPRITE_INFOS[RABBITS].pal_id, savedSlots[bunnies_saved].x, savedSlots[bunnies_saved].y);
+  ++bunnies_saved;
+
   return true;
 }
 
@@ -74,16 +98,25 @@ void bunnies_update(void) {
       continue;
     }
     s16 phaseSin = sinLerp((frame_cnt - 60) * (32767 / 60)); // 4.12 fixed
-    s16 offset = (5 * phaseSin) >> 12;
+    s16 offset = (3 * phaseSin) >> 12;
     s16 x = bunnies[i].x - level_cam_x();
     s16 y = bunnies[i].y - level_cam_y() + offset;
     if (x < -16 || x > 256 || y < -16 || y > 192) // off screen
     {
-      NF_ShowSprite(SCREEN_BOT, bunnies[i].oam_id, false);
+      NF_ShowSprite(SCR_WORLD, bunnies[i].oam_id, false);
       continue;
     }
-    NF_ShowSprite(SCREEN_BOT, bunnies[i].oam_id, true);
-    NF_MoveSprite(SCREEN_BOT, bunnies[i].oam_id, x, y);
-    NF_SpriteFrame(SCREEN_BOT, bunnies[i].oam_id, frame_cnt / 30);
+    NF_ShowSprite(SCR_WORLD, bunnies[i].oam_id, true);
+    NF_MoveSprite(SCR_WORLD, bunnies[i].oam_id, x, y);
+    NF_SpriteFrame(SCR_WORLD, bunnies[i].oam_id, frame_cnt / 30);
+  }
+  for (s16 i = 0 ; i < bunnies_saved; ++i) {
+    s16 phaseSin = sinLerp((frame_cnt - 60) * (32767 / 60)); // 4.12 fixed
+    s16 offset = (10 * phaseSin) >> 12;
+    s16 x = savedSlots[i].x;
+    s16 y = savedSlots[i].y + offset;
+    NF_ShowSprite(SCR_CHAMBER, i, true);
+    NF_MoveSprite(SCR_CHAMBER, i, x, y);
+    NF_SpriteFrame(SCR_CHAMBER, i, frame_cnt / 30);
   }
 }

@@ -15,9 +15,10 @@ void LoadPalette(const char *file, u16 palette_id) {
 void LoadGraphicImage(SpriteInfo info) {
   u16 imgId = info.img_id;
   NF_LoadSpriteGfx(info.path, imgId, info.width, info.height);
-  if (info.is_top_screen) {
+  if (info.screens & TOP) {
     NF_VramSpriteGfx(SCR_CHAMBER, imgId, imgId, false);
-  } else {
+  } 
+  if (info.screens & BOTTOM) {
     NF_VramSpriteGfx(SCR_WORLD, imgId, imgId, false);
   }
 }

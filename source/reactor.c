@@ -111,9 +111,6 @@ void microphone_handler(void *completed_buffer, int length) {
 }
 
 void reactor_init(void) {
-  NF_CreateSprite(SCR_CHAMBER, SPRITE_ID, REACTOR_CORE, DEFAULT_SPRITE_PALETTE,
-                  REACTOR_CORE_X, REACTOR_CORE_Y);
-  NF_SpriteLayer(SCR_CHAMBER, SPRITE_ID, LAYER_WORLD_BG);
   reactor_temp = 0;
   blowing_counter = 0;
   fire_heat_cooldown = 0;
