@@ -54,9 +54,10 @@ static void draw_instructions(void) {
   NF_WriteText(SCR_WORLD, LAYER_WORLD_TEXT, 2, 9,
                "Blow into mic: Cool reactor");
   NF_WriteText(SCR_WORLD, LAYER_WORLD_TEXT, 2, 11,
-               "Near water: pump up the jam to fill water tank");
-  NF_WriteText(SCR_WORLD, LAYER_WORLD_TEXT, 2, 13, "Rescue animals from the");
-  NF_WriteText(SCR_WORLD, LAYER_WORLD_TEXT, 2, 14, "burning forest!");
+               "Near water: pump up the jam");
+  NF_WriteText(SCR_WORLD, LAYER_WORLD_TEXT, 2, 12, "to fill water tank");
+  NF_WriteText(SCR_WORLD, LAYER_WORLD_TEXT, 2, 14, "Rescue animals from the");
+  NF_WriteText(SCR_WORLD, LAYER_WORLD_TEXT, 2, 15, "burning forest!");
   NF_WriteText(SCR_WORLD, LAYER_WORLD_TEXT, 9, 17, "[   BACK   ]");
   NF_UpdateTextLayers();
 }
