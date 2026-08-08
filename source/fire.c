@@ -88,6 +88,10 @@ void fire_init(void) {
   NF_UpdateVramMap(SCR_WORLD, LAYER_WORLD_FIRE);
 }
 
+void fire_restart(void){
+  
+}
+
 static const s8 dirs[4][2] = {{1, 0}, {-1, 0}, {0, 1}, {0, -1}};
 
 void fire_update(void) {

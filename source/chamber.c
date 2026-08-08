@@ -21,6 +21,11 @@ void chamber_init(void)
     reactor_init();
 }
 
+void chamber_restart()
+{
+    reactor_restart();
+}
+
 static s16 water_cnt;
 
 void chamber_update(void) {

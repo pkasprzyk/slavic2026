@@ -102,6 +102,10 @@ void water_init(void) {
   water_pump_init();
 }
 
+void water_restart(void){
+
+}
+
 void water_update(void) {
 
   water_drop_update();

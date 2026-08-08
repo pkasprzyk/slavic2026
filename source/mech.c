@@ -59,6 +59,11 @@ void mech_init(void) {
   NF_SpriteLayer(SCR_WORLD, SPRITE_ID, LAYER_WORLD_BG);
 }
 
+void mech_restart(void){
+  
+}
+
+
 static int mech_blocked(s32 x, s32 y) {
   s32 x0 = x >> (3 + PRECISION_BITS);
   // only collide on feet

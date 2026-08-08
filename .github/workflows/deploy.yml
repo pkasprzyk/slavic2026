@@ -1,0 +1,99 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches:
+      - master
+
+concurrency: deploy
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+jobs:
+  build:
+    name: Build NDS ROM
+    runs-on: ubuntu-latest
+    container:
+      image: skylyrac/blocksds:dev-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build
+        run: make -j$(nproc)
+
+      - name: Upload ROM artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: slavic2026.nds
+          path: slavic2026.nds
+          if-no-files-found: error
+
+  deploy:
+    name: Deploy to Pages + Release
+    runs-on: ubuntu-latest
+    needs: build
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download ROM
+        uses: actions/download-artifact@v4
+        with:
+          name: slavic2026.nds
+          path: public
+
+      - name: Bump version
+        id: bump
+        run: |
+          VERSION=$(cat VERSION)
+          MAJOR=$(echo "$VERSION" | cut -d. -f1)
+          MINOR=$(echo "$VERSION" | cut -d. -f2)
+          NEW_VERSION="${MAJOR}.$((MINOR+1))"
+          echo "new_version=$NEW_VERSION" >> "$GITHUB_OUTPUT"
+          echo "$NEW_VERSION" > VERSION
+
+      - name: Rename ROM with version
+        run: mv public/slavic2026.nds "public/slavic2026-v${{ steps.bump.outputs.new_version }}.nds"
+
+      - name: Push version bump and tag
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add VERSION
+          git commit -m "bump version to ${{ steps.bump.outputs.new_version }} [skip ci]"
+          git tag "v${{ steps.bump.outputs.new_version }}"
+          git push origin master --tags
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ steps.bump.outputs.new_version }}
+          files: public/slavic2026-v${{ steps.bump.outputs.new_version }}.nds
+          fail_on_unmatched_files: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Copy landing page
+        run: |
+          cp .github/pages/index.html public/
+          sed -i \
+            -e "s/VERSION_PLACEHOLDER/${{ steps.bump.outputs.new_version }}/" \
+            -e "s|href=\"slavic2026\.nds\"|href=\"slavic2026-v${{ steps.bump.outputs.new_version }}.nds\"|" \
+            public/index.html
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: public
+
+      - name: Deploy to GitHub Pages
+        uses: actions/deploy-pages@v4

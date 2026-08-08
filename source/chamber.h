@@ -2,6 +2,7 @@
 #define CHAMBER_H__
 
 void chamber_init(void);
+void chamber_restart();
 void chamber_update(void);
 void chamber_deinit(void);
 
