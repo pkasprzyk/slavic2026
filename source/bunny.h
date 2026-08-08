@@ -8,5 +8,6 @@ extern int bunnies_died;
 
 void bunnies_init(void);
 void bunnies_update(void);
+void kill_all_bunnies(void);
 
 #endif

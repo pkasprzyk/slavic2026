@@ -28,5 +28,6 @@ void audio_stop_looped_sfx(mm_word sample_name);
 void audio_set_looped_volume(mm_word sample_name, u8 volume);
 void audio_stop_all_sfx(void);
 void audio_unload_all_sfx(void);
+void waitForever(void);
 
 #endif

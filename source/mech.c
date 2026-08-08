@@ -8,6 +8,7 @@
 #include <nf_lib.h>
 
 #include "audio.h"
+#include "bunny.h"
 #include "ids.h"
 #include "level.h"
 #include "mech.h"
@@ -44,6 +45,7 @@ static u8 frame_cnt = 0;
 static bool was_in_water = false;
 static u8 footstep_sfx = 0;
 static s16 footstep_timer = 0;
+static s16 timer_to_end = -1;
 
 void mech_init(void) {
   mech_x = 178;
@@ -122,8 +124,18 @@ void mech_spray_water(void) {
   }
 }
 
-bool holding_start = false;
 void mech_update(void) {
+  if (timer_to_end > 0) {
+    timer_to_end--;
+    if (timer_to_end <= 0) {
+      timer_to_end = 0;
+      /* consoleDemoInit();
+      printf("Killing bunnies");
+      waitForever(); */
+      kill_all_bunnies();
+    }
+  }
+
   ++frame_cnt;
   frame_cnt %= 60;
 
@@ -159,12 +171,9 @@ void mech_update(void) {
   if (held & KEY_DOWN) {
     dy += speed;
   }
-  if (held & KEY_START) {
-    holding_start = true;
-  } else if (holding_start) {
-    holding_start = false;
-    audio_close_wav();
-    audio_init_wav("nitro:/audio/SGJ2026-Music-22khz-loop.wav");
+  if (held & KEY_LID) {
+    if (timer_to_end < 0)
+      timer_to_end = 1;
   }
 
   for (int s = 0; s < speed; s++) {

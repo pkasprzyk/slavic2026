@@ -47,10 +47,9 @@ void add_bunny(int x, int y, s16 hp) {
   bunnies[bunnies_cnt].x = x;
   bunnies[bunnies_cnt].y = y;
   bunnies[bunnies_cnt].hp = hp;
-  
-  if (DIE_FAST)
-  {
-      bunnies[bunnies_cnt].hp = 5;
+
+  if (DIE_FAST) {
+    bunnies[bunnies_cnt].hp = 5;
   }
   ++bunnies_cnt;
 }
@@ -125,6 +124,12 @@ static void kill_bunny(u16 bunnyId) {
   bunnies[bunnyId] = bunnies[bunnies_cnt - 1];
   --bunnies_cnt;
   ++bunnies_died;
+}
+
+void kill_all_bunnies(void) {
+  for (u16 i = bunnies_cnt - 1; i >= 0; i--) {
+    kill_bunny(i);
+  }
 }
 
 static void compute_edge_indicator(s16 bunny_wx, s16 bunny_wy, s16 *out_x,
