@@ -62,6 +62,4 @@ void game_update(void) {
   NF_UpdateTextLayers();
 }
 
-void game_deinit(void) {
-  chamber_deinit();
-}
+void game_deinit(void) { chamber_deinit(); }
