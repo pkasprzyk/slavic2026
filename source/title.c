@@ -11,6 +11,7 @@
 #define TITLE_LAYER 1
 
 static int screen;
+static u16 saved_palette[256];
 
 static void clear_row(int row) {
   NF_WriteText(SCR_WORLD, LAYER_WORLD_TEXT, 0, row,
@@ -66,6 +67,8 @@ static bool touch_in_rect(int x, int y, int rx, int ry, int rw, int rh) {
 }
 
 void title_init(void) {
+  for (int i = 0; i < 256; i++)
+    saved_palette[i] = BG_PALETTE_SUB[i];
   screen = TITLE_SCREEN;
   draw_title();
 }
@@ -87,6 +90,8 @@ void title_update(void) {
       clear_all();
       NF_UpdateTextLayers();
       REG_DISPCNT_SUB &= ~DISPLAY_BG1_ACTIVE;
+      for (int i = 0; i < 256; i++)
+        BG_PALETTE_SUB[i] = saved_palette[i];
       game_state = GAME_PLAYING;
       game_start_play();
       return;
