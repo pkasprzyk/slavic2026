@@ -90,6 +90,7 @@ void title_update(void) {
       clear_all();
       NF_UpdateTextLayers();
       REG_DISPCNT_SUB &= ~DISPLAY_BG1_ACTIVE;
+      swiWaitForVBlank();
       for (int i = 0; i < 256; i++)
         BG_PALETTE_SUB[i] = saved_palette[i];
       game_state = GAME_PLAYING;

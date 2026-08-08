@@ -41,8 +41,9 @@ void show_water_remaining(void) {
   snprintf(buffer, sizeof(buffer), "WATER: %04d", water_remaining);
   NF_WriteText(SCR_CHAMBER, LAYER_CHAMBER_TEXT, 3, 15, buffer);
 
-  const s16 MAX_SCROLL = 95;
-  NF_ScrollBg(SCR_CHAMBER, LAYER_CHAMBER_WATER, 0, MAX_SCROLL * water_remaining/MAX_WATER);
+  const s32 MAX_SCROLL = 95;
+  s32 pos = (MAX_SCROLL * (s32)water_remaining) / MAX_WATER;
+  NF_ScrollBg(SCR_CHAMBER, LAYER_CHAMBER_WATER, 0, pos);
 
 }
 
@@ -113,58 +114,56 @@ void water_drop_spawn(int x, int y, int frame_number) {
 }
 
 void water_spray(int mech_cx, int mech_cy, int target_x, int target_y) {
-  // control damage done
-  if (water_spray_cooldown > 0) {
+  if (water_spray_cooldown > 0)
     return;
-  }
-
-  if (water_remaining >= WATER_DROP_AMOUNT) {
-    water_remaining -= WATER_DROP_AMOUNT;
-    if (water_remaining < 0)
-      water_remaining = 0;
-  } else {
+  if (water_remaining < WATER_DROP_AMOUNT)
     return;
-  }
-
+  water_remaining -= WATER_DROP_AMOUNT;
   water_spray_cooldown = WATER_SPRAY_INTERVAL;
 
-  // calculate actual stream hit point based on range
-  float dx = target_x - mech_cx;
-  float dy = target_y - mech_cy;
-  s32 distance = hw_sqrtf(dx * dx + dy * dy);
-  if (distance > WATER_SPRAY_DISTANCE) {
-    float scale = (float)WATER_SPRAY_DISTANCE / distance;
-    distance = WATER_SPRAY_DISTANCE;
-    dx = (float)(dx * scale);
-    dy = (float)(dy * scale);
-    target_x = mech_cx + dx;
-    target_y = mech_cy + dy;
+  s32 dx = target_x - mech_cx;
+  s32 dy = target_y - mech_cy;
+  s32 dist_sq = dx * dx + dy * dy;
+  s32 max_dist_sq = WATER_SPRAY_DISTANCE * WATER_SPRAY_DISTANCE;
+  s32 hit_x = target_x;
+  s32 hit_y = target_y;
+  s32 dist;
+
+  if (dist_sq > max_dist_sq) {
+    s32 fp_dist = sqrtf32(dist_sq << 12);
+    dist = fp_dist >> 12;
+    s32 scale = (WATER_SPRAY_DISTANCE << 12) / dist;
+    dx = (dx * scale) >> 12;
+    dy = (dy * scale) >> 12;
+    hit_x = mech_cx + dx;
+    hit_y = mech_cy + dy;
+  } else {
+    if (dist_sq > 0)
+      dist = sqrtf32(dist_sq << 12) >> 12;
+    else
+      dist = 1;
   }
 
-  // resolve tile coordinates of the hit point
-  int tile_tx = target_x >> 3;
-  int tile_ty = target_y >> 3;
-  if (fire_is_burning(tile_tx, tile_ty)) {
+  int tile_tx = hit_x >> 3;
+  int tile_ty = hit_y >> 3;
+  if (fire_is_burning(tile_tx, tile_ty))
     fire_partial_extinguish(tile_tx, tile_ty, 1);
-  }
 
-  // control animation speed
-  if (water_drop_cooldown > 0) {
+  if (water_drop_cooldown > 0)
     return;
-  }
-
   water_drop_cooldown = WATER_DROP_LIFETIME;
 
-  // spawn water particles on the way
-  int steps = (distance / WATER_DROP_SIZE) + 1;
-  dx /= steps;
-  dy /= steps;
-  int spawn_x = mech_cx + (int)dx;
-  int spawn_y = mech_cy + (int)dy;
+  int steps = dist / WATER_DROP_SIZE + 1;
+  s32 step_dx = (dx << 8) / steps;
+  s32 step_dy = (dy << 8) / steps;
+  s32 sx = mech_cx << 8;
+  s32 sy = mech_cy << 8;
   for (int i = 0; i < steps - 1; i++) {
-    water_drop_spawn(spawn_x, spawn_y, 0);
-    spawn_x += (int)dx;
-    spawn_y += (int)dy;
+    sx += step_dx;
+    sy += step_dy;
+    water_drop_spawn(sx >> 8, sy >> 8, 0);
   }
-  water_drop_spawn(spawn_x, spawn_y, 1);
+  sx += step_dx;
+  sy += step_dy;
+  water_drop_spawn(sx >> 8, sy >> 8, 1);
 }
