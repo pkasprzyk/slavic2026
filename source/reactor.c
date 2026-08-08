@@ -33,6 +33,7 @@
 #define REACTOR_HEAT_3_SPEED_PENALTY 8
 #define REACTOR_THRESHOLD_3 150
 #define REACTOR_HEAT_4_SPEED_PENALTY 16
+#define REACTOR_HEAT_4_WATER_LEAK 25
 
 #define FIRE_HEAT_DISTANCE 24
 #define FIRE_HEAT_MULTIPLIER 100
@@ -43,6 +44,7 @@ int blowing_counter = 0;
 int reactor_temp;
 int fire_heat_cooldown;
 int heat_speed_penalty;
+int water_leak_rate;
 
 // This is the size of the temporary buffer that the ARM7 will use to record
 // audio. When the callback is called, you will get a pointer to some address
@@ -121,6 +123,7 @@ void reactor_init(void) {
   blowing_counter = 0;
   fire_heat_cooldown = 0;
   heat_speed_penalty = 0;
+  water_leak_rate = 0;
 
   soundEnable();
 
@@ -205,15 +208,19 @@ void reactor_deinit(void) {
   soundMicOff();
 }
 
-void resolve_speed_penalty() {
+void resolve_heat_penalties() {
   if (reactor_temp > REACTOR_THRESHOLD_3) {
     heat_speed_penalty = REACTOR_HEAT_4_SPEED_PENALTY;
+    water_leak_rate = REACTOR_HEAT_4_WATER_LEAK;
   } else if (reactor_temp > REACTOR_THRESHOLD_2) {
     heat_speed_penalty = REACTOR_HEAT_3_SPEED_PENALTY;
+    water_leak_rate = 0;
   } else if (reactor_temp > REACTOR_THRESHOLD_1) {
     heat_speed_penalty = REACTOR_HEAT_2_SPEED_PENALTY;
+    water_leak_rate = 0;
   } else {
     heat_speed_penalty = 0;
+    water_leak_rate = 0;
   }
 }
 
@@ -222,7 +229,7 @@ void reactor_increase_temp(int amount) {
   if (reactor_temp > REACTOR_MAX_TEMP) {
     reactor_temp = REACTOR_MAX_TEMP;
   }
-  resolve_speed_penalty();
+  resolve_heat_penalties();
 }
 
 void reactor_decrease_temp(int amount) {
@@ -230,7 +237,7 @@ void reactor_decrease_temp(int amount) {
   if (reactor_temp < REACTOR_MIN_TEMP) {
     reactor_temp = REACTOR_MIN_TEMP;
   }
-  resolve_speed_penalty();
+  resolve_heat_penalties();
 }
 
 void reactor_heat_from_fire(s32 distance_sq) {
