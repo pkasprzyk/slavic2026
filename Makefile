@@ -115,7 +115,7 @@ ifneq ($(SOURCES_AUDIO),)
 endif
 
 # Asset conversion: regenerate nitrofiles/ from assets/ via GRIT
-NITROFS_ASSETS	:= $(shell find -L assets -name "*.png") assets/convert.sh source/level.h
+NITROFS_ASSETS	:= $(shell find -L assets -name "*.png") assets/convert.sh assets/tiles/project.tmx assets/generate_from_tmx.py source/level.h
 
 $(NITROFSDIR)/.converted: $(NITROFS_ASSETS)
 	@echo "  CONVERT assets -> nitrofiles"

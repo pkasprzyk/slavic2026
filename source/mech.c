@@ -14,6 +14,7 @@
 #include "mech.h"
 #include "reactor.h"
 #include "soundbank.h"
+#include "spawn.h"
 #include "sprites.h"
 #include "water.h"
 
@@ -48,8 +49,8 @@ static s16 footstep_timer = 0;
 static s16 timer_to_end = -1;
 
 void mech_init(void) {
-  mech_x = 178;
-  mech_y = 128;
+  mech_x = spawn_player_x();
+  mech_y = spawn_player_y();
   mech_precise_x = mech_x << PRECISION_BITS;
   mech_precise_y = mech_y << PRECISION_BITS;
 

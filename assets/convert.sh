@@ -3,7 +3,11 @@
 BLOCKSDS="${BLOCKSDS:-/opt/wonderful/thirdparty/blocksds/core/}"
 GRIT=$BLOCKSDS/tools/grit/grit
 
-mkdir -p ../nitrofiles/spr ../nitrofiles/bg ../nitrofiles/fnt ../nitrofiles/maps ../nitrofiles/audio
+mkdir -p ../nitrofiles/spr ../nitrofiles/bg ../nitrofiles/fnt ../nitrofiles/maps ../nitrofiles/audio ../nitrofiles/data
+
+# =========== GENERATE BG + COLMAP FROM TMX
+
+python3 generate_from_tmx.py
 
 # =========== SPRITES
 
@@ -79,3 +83,7 @@ mv *.map ../nitrofiles/maps
 # =========== RAW AUDIO
 
 cp *.wav ../nitrofiles/audio
+
+# =========== SPAWN DATA
+
+cp spawn.dat ../nitrofiles/data

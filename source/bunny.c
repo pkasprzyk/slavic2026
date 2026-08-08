@@ -10,7 +10,9 @@
 #include "ids.h"
 #include "level.h"
 #include "mech.h"
+#include "spawn.h"
 #include "sprites.h"
+
 static const bool DIE_FAST = false;
 
 typedef struct {
@@ -55,12 +57,11 @@ void add_bunny(int x, int y, s16 hp) {
 }
 
 void bunnies_init(void) {
-  add_bunny(8, 8, 500);
-  add_bunny(224, 24, 600);
-  add_bunny(80, 132, 700);
-  add_bunny(16, 200, 800);
-  add_bunny(224, 224, 1000);
+  u8 count = spawn_bunny_count();
+  for (u8 i = 0; i < count; i++)
+    add_bunny(spawn_bunny_x(i), spawn_bunny_y(i), 500);
   bunnies_total = bunnies_cnt;
+  bunnies_died = 0;
   for (u16 i = 0; i < bunnies_cnt; ++i) {
     NF_CreateSprite(SCR_WORLD, bunnies[i].oam_id, SPRITE_INFOS[RABBITS].img_id,
                     SPRITE_INFOS[RABBITS].pal_id, bunnies[i].x, bunnies[i].y);
@@ -120,6 +121,7 @@ static void collect(u16 bunnyId) {
 
 static void kill_bunny(u16 bunnyId) {
   audio_play_sfx(SFX_SFX_BUNNY_DEATH, false, IGNORED_LEN, 190);
+  NF_ShowSprite(SCR_WORLD, bunnies[bunnyId].indicator_oam_id, false);
   NF_DeleteSprite(SCR_WORLD, bunnies[bunnyId].oam_id);
   bunnies[bunnyId] = bunnies[bunnies_cnt - 1];
   --bunnies_cnt;
@@ -252,12 +254,7 @@ static void updateBunny(int i) {
   NF_VflipSprite(SCR_WORLD, bunnies[i].oam_id, isHurt);
 }
 
-void bunnies_update(void) {
-  ++frame_cnt;
-  frame_cnt %= 60 * 2;
-  for (s16 i = bunnies_cnt - 1; i >= 0; --i) {
-    updateBunny(i);
-  }
+void updateChamberBunnies(){
   for (s16 i = 0; i < bunnies_collected; ++i) {
     s16 phaseSin = sinLerp((frame_cnt - 60) * (32767 / 60));
     s16 offset = (10 * phaseSin) >> 12;
@@ -267,4 +264,19 @@ void bunnies_update(void) {
     NF_MoveSprite(SCR_CHAMBER, i, x, y);
     NF_SpriteFrame(SCR_CHAMBER, i, frame_cnt / 30);
   }
+}
+
+void bunnies_update(void) {
+  ++frame_cnt;
+  frame_cnt %= 60 * 2;
+  for (s16 i = bunnies_cnt - 1; i >= 0; --i) {
+    updateBunny(i);
+  }
+  updateChamberBunnies();
+}
+
+void  bunnies_end_screen_update(){
+  ++frame_cnt;
+  frame_cnt %= 60 * 2;
+  updateChamberBunnies();
 }
