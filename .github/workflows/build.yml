@@ -34,12 +34,8 @@ jobs:
       - name: Create release
         if: github.event_name == 'push' && github.ref == 'refs/heads/master'
         run: |
-          mkdir -p release
-          cp slavic2026.nds release/
-          git archive -o release/source.zip HEAD
           gh release create "build-${{ github.run_number }}" \
-            release/slavic2026.nds \
-            release/source.zip \
+            slavic2026.nds \
             --title "Build #${{ github.run_number }}" \
             --notes "$(git log -1 --format='%h %s')"
         env:
