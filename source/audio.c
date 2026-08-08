@@ -37,6 +37,8 @@ char stream_buffer[BUFFER_LENGTH];
 int stream_buffer_in;
 int stream_buffer_out;
 
+bool wav_started = false;
+
 mm_word streamingCallback(mm_word length, mm_addr dest,
                           mm_stream_formats format) {
   size_t multiplier = 0;
@@ -195,11 +197,17 @@ void audio_init_wav(char *path) {
       .manual = false,
   };
   mmStreamOpen(&stream);
+  wav_started = true;
 }
 
-void audio_update_wav(void) { streamingFillBuffer(false); }
+void audio_update_wav(void) {
+  if (!wav_started)
+    return;
+  streamingFillBuffer(false);
+}
 
 void audio_close_wav(void) {
+  wav_started = false;
   mmStreamClose();
 
   if (fclose(wavFile) != 0) {
