@@ -99,6 +99,7 @@ void mech_spray_water(void) {
   }
 }
 
+bool holding_start = false;
 void mech_update(void) {
   ++frame_cnt;
   frame_cnt %= 60;
@@ -119,6 +120,13 @@ void mech_update(void) {
   }
   if (held & KEY_DOWN) {
     dy += MECH_SPEED;
+  }
+  if (held & KEY_START) {
+    holding_start = true;
+  } else if (holding_start) {
+    holding_start = false;
+    audio_close_wav();
+    audio_init_wav("nitro:/audio/SGJ2026-Music-22khz-loop.wav");
   }
 
   for (int s = 0; s < MECH_SPEED; s++) {
