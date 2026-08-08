@@ -296,6 +296,8 @@ def main():
         st.session_state.world_size = (0, 0)
     if "rev" not in st.session_state:
         st.session_state.rev = 0
+    if "show_overlay" not in st.session_state:
+        st.session_state.show_overlay = True
     if colmap_loaded:
         st.session_state.world_size = (world_w, world_h)
     elif st.session_state.world_size != (world_w, world_h):
@@ -317,6 +319,8 @@ def main():
     if st.sidebar.button("Clear"):
         st.session_state.grid = new_grid(ph, pw, aw, ah)
         st.session_state.rev += 1
+    show = st.sidebar.toggle("Show overlay", value=st.session_state.show_overlay)
+    st.session_state.show_overlay = show
 
     result = tile_canvas(
         background=grid_background(canvas_img, scale),
@@ -340,8 +344,9 @@ def main():
     colmap = build_colmap(grid, world_w, world_h)
 
     preview = grid_background(canvas_img, scale)
-    preview = Image.alpha_composite(preview,
-                                    Image.fromarray(state_to_mask(grid, scale)))
+    if st.session_state.show_overlay:
+        preview = Image.alpha_composite(preview,
+                                        Image.fromarray(state_to_mask(grid, scale)))
 
     c1, c2 = st.columns(2)
     c1.write("Painted: wall %d | tree %d | bush %d | shallow %d | deep %d | fire %d" %
