@@ -40,6 +40,11 @@ void show_water_remaining(void) {
   char buffer[64];
   snprintf(buffer, sizeof(buffer), "WATER: %04d", water_remaining);
   NF_WriteText(SCR_CHAMBER, LAYER_CHAMBER_TEXT, 3, 15, buffer);
+
+  const s16 MAX_SCROLL = 95;
+  const s16 MAX_TANK = 500;
+  NF_ScrollBg(SCR_CHAMBER, LAYER_CHAMBER_WATER, 0, MAX_SCROLL * water_remaining/MAX_TANK);
+
 }
 
 void water_drop_init(void) {

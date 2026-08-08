@@ -11,7 +11,11 @@ enum {
 };
 
 enum {
-  LAYER_CHAMBER_TEXT = 2,
+  LAYER_CHAMBER_REACTOR = 0,
+  LAYER_CHAMBER_TEXT = 1,
+  LAYER_CHAMBER_BG = 2,
+  LAYER_CHAMBER_WATER = 3,
+  
   LAYER_WORLD_TEXT = 0,
   LAYER_WORLD_BG = 3,
   LAYER_WORLD_FIRE = 2,
@@ -33,5 +37,8 @@ enum {
 
 #define BG_FOREST "forest"
 #define FONT_NORMAL "normal"
+
+#define BG_CHAMBER "chamber"
+
 
 #endif

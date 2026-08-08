@@ -21,6 +21,16 @@ mv *.pal *.img ../nitrofiles/fnt
 # =========== BG
 
 $GRIT fire_tileset.png -ftB -fh! -gTFF00FF -gt -gB8 -m!
+
+$GRIT UI_background.png -ftB -fh! -gTFF00FF -gt -gB8 -mR8 -mLs
+$GRIT UI_reactor1.png -ftB -fh! -gTFF00FF -gt -gB8 -mR8 -mLs
+$GRIT UI_reactor2.png -ftB -fh! -gTFF00FF -gt -gB8 -mR8 -mLs
+$GRIT UI_reactor3.png -ftB -fh! -gTFF00FF -gt -gB8 -mR8 -mLs
+$GRIT UI_reactor4.png -ftB -fh! -gTFF00FF -gt -gB8 -mR8 -mLs
+$GRIT UI_water_level.png -ftB -fh! -gTFF00FF -gt -gB8 -mR8 -mLs
+
+$GRIT fire_tileset.png -ftB -fh! -gTFF00FF -gt -gB8 -m!
+
 mv *.pal *.img ../nitrofiles/bg
 
 FIT_OK=0
