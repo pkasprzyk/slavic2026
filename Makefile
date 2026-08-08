@@ -187,6 +187,6 @@ $(SOURCES_S) $(SOURCES_C): $(HEADERS_ASSETS)
 
 -include $(DEPS)
 
-run: $(ROM)
+run: all
 	@echo "  RUN $(ROM)"
-	melonDS $<
+	melonDS $(ROM)
