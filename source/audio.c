@@ -3,55 +3,12 @@
 #include <stdio.h>
 
 #include "audio.h"
+#include "mm_types.h"
 
 mm_word lopped_names[] = {0, 0, 0, 0, 0, 0};
 u16 looped_lengths[] = {0, 0, 0, 0, 0, 0};
 u16 looped_remaining[] = {0, 0, 0, 0, 0, 0};
 u8 current_size = 0;
-
-void audio_init_SB(void) { mmInitDefault("nitro:/soundbank.bin"); }
-void audio_play_sfx(mm_word sample_name, bool loop, u16 length) {
-  mmEffect(sample_name);
-  if (loop) {
-    lopped_names[current_size] = sample_name;
-    looped_lengths[current_size] = length;
-    looped_remaining[current_size] = length;
-    current_size++;
-  }
-}
-
-void audio_update_loops(void) {
-  for (u8 i = 0; i < current_size; ++i) {
-    if (looped_remaining[i] > 0) {
-      looped_remaining[i]--;
-      if (looped_remaining[i] <= 0) {
-        mmEffect(lopped_names[i]);
-        looped_remaining[i] = looped_lengths[i];
-      }
-    }
-  }
-}
-
-void audio_stop_looped_sfx(mm_word sample_name) {
-  int found_index = -1;
-  for (u8 i = 0; i < current_size; ++i) {
-    if (lopped_names[i] == sample_name) {
-      found_index = i;
-      lopped_names[i] = 0;
-      looped_lengths[i] = 0;
-      looped_remaining[i] = 0;
-      break;
-    }
-  }
-  if (found_index != -1) {
-    if (found_index < current_size - 1) {
-      lopped_names[found_index] = lopped_names[current_size - 1];
-      looped_lengths[found_index] = looped_lengths[current_size - 1];
-      looped_remaining[found_index] = looped_remaining[current_size - 1];
-    }
-    current_size--;
-  }
-}
 
 typedef struct WAVHeader {
   // "RIFF" chunk descriptor
@@ -254,5 +211,57 @@ void audio_close_wav(void) {
   if (fclose(wavFile) != 0) {
     perror("fclose");
     waitForever();
+  }
+}
+
+void audio_init_SB(void) {
+  soundEnable();
+  mmInitDefault("nitro:/soundbank.bin");
+}
+void audio_play_sfx(mm_word sample_name, bool loop, u16 length) {
+  mmLoadEffect(sample_name);
+  if (mmEffect(sample_name) == MM_SFXHAND_INVALID) {
+    printf("Failed to play sample");
+    waitForever();
+  }
+  if (loop) {
+    lopped_names[current_size] = sample_name;
+    looped_lengths[current_size] = length;
+    looped_remaining[current_size] = length;
+    current_size++;
+  }
+}
+
+void audio_update_loops(void) {
+  for (u8 i = 0; i < current_size; ++i) {
+    if (looped_remaining[i] > 0) {
+      looped_remaining[i]--;
+      if (looped_remaining[i] <= 0) {
+        mmEffect(lopped_names[i]);
+        looped_remaining[i] = looped_lengths[i];
+      }
+    }
+  }
+}
+
+void audio_stop_looped_sfx(mm_word sample_name) {
+  int found_index = -1;
+  for (u8 i = 0; i < current_size; ++i) {
+    if (lopped_names[i] == sample_name) {
+      found_index = i;
+      lopped_names[i] = 0;
+      looped_lengths[i] = 0;
+      looped_remaining[i] = 0;
+      break;
+    }
+  }
+  mmUnloadEffect(sample_name);
+  if (found_index != -1) {
+    if (found_index < current_size - 1) {
+      lopped_names[found_index] = lopped_names[current_size - 1];
+      looped_lengths[found_index] = looped_lengths[current_size - 1];
+      looped_remaining[found_index] = looped_remaining[current_size - 1];
+    }
+    current_size--;
   }
 }

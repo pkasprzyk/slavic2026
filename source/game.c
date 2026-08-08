@@ -50,8 +50,10 @@ void game_init(void) {
   NF_UpdateTextLayers();
 
   srand(time(NULL));
+  audio_init_SB();
   // consoleDemoInit();
   // audio_init_wav("nitro:/audio/sample3.wav");
+  // audio_play_sfx(SFX_SFX_FIRE_LOOP, true, 1198);
 }
 
 void game_update(void) {
@@ -60,6 +62,7 @@ void game_update(void) {
   bunnies_update();
   chamber_update();
   NF_UpdateTextLayers();
+  audio_update_loops();
 }
 
 void game_deinit(void) { chamber_deinit(); }

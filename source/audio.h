@@ -14,6 +14,7 @@
 #include <maxmod9.h>
 #include <nds.h>
 #include <nds/arm9/dldi.h>
+#include <soundbank.h>
 
 void audio_init_SB(void);
 void audio_init_wav(char *path);
