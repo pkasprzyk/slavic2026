@@ -1,5 +1,7 @@
 // SPDX-License-Identifier: CC0-1.0
 
+#include <stdlib.h>
+
 #include <nds.h>
 
 #include <nf_lib.h>
@@ -33,13 +35,15 @@ s16 bunnies_died = 0;
 typedef struct {
   s16 x;
   s16 y;
-} savedBunnySlot;
+} chamberSlot;
 
-static savedBunnySlot savedSlots[BUNNIES_MAX] = {
-    {28, 156}, {68, 159}, {160, 160}, {205, 145}, {113, 4},
-
-    {50, 100}, {60, 100}, {70, 100},  {80, 100},  {90, 100},
+static const chamberSlot chamberSlots[BUNNIES_MAX] = {
+    {128, 82},  {141, 90},  {161, 112}, {161, 140}, {141, 162},
+    {128, 170}, {115, 162}, {95, 140},  {95, 112},  {115, 90},
 };
+
+static bool chamber_occupied[BUNNIES_MAX];
+static s16 chamber_bunny_slot[BUNNIES_MAX];
 
 static u16 frame_cnt = 0;
 
@@ -59,9 +63,12 @@ void add_bunny(int x, int y, s16 hp) {
 void bunnies_init(void) {
   u8 count = spawn_bunny_count();
   for (u8 i = 0; i < count; i++)
-    add_bunny(spawn_bunny_x(i), spawn_bunny_y(i), 500);
+    add_bunny(spawn_bunny_x(i), spawn_bunny_y(i), 2500);
   bunnies_total = bunnies_cnt;
   bunnies_died = 0;
+  bunnies_collected = 0;
+  for (s16 s = 0; s < BUNNIES_MAX; s++)
+    chamber_occupied[s] = false;
   for (u16 i = 0; i < bunnies_cnt; ++i) {
     NF_CreateSprite(SCR_WORLD, bunnies[i].oam_id, SPRITE_INFOS[RABBITS].img_id,
                     SPRITE_INFOS[RABBITS].pal_id, bunnies[i].x, bunnies[i].y);
@@ -115,9 +122,20 @@ static void collect(u16 bunnyId) {
   bunnies[bunnyId] = bunnies[bunnies_cnt - 1];
   --bunnies_cnt;
 
+  s16 free_slots[BUNNIES_MAX];
+  s16 free_cnt = 0;
+  for (s16 s = 0; s < BUNNIES_MAX; s++)
+    if (!chamber_occupied[s])
+      free_slots[free_cnt++] = s;
+  s16 slot = free_slots[rand() % free_cnt];
+  chamber_occupied[slot] = true;
+  chamber_bunny_slot[bunnies_collected] = slot;
+
   NF_CreateSprite(SCR_CHAMBER, bunnies_collected, SPRITE_INFOS[RABBITS].img_id,
-                  SPRITE_INFOS[RABBITS].pal_id, savedSlots[bunnies_collected].x,
-                  savedSlots[bunnies_collected].y);
+                  SPRITE_INFOS[RABBITS].pal_id, chamberSlots[slot].x,
+                  chamberSlots[slot].y);
+  NF_EnableSpriteRotScale(SCR_CHAMBER, bunnies_collected, bunnies_collected,
+                           false);
   ++bunnies_collected;
 }
 
@@ -260,12 +278,22 @@ static void updateBunny(int i) {
 void updateChamberBunnies() {
   for (s16 i = 0; i < bunnies_collected; ++i) {
     s16 phaseSin = sinLerp((frame_cnt - 60) * (32767 / 60));
-    s16 offset = (10 * phaseSin) >> 12;
-    s16 x = savedSlots[i].x;
-    s16 y = savedSlots[i].y + offset;
+
+    s16 si = chamber_bunny_slot[i];
+    s16 baseY = chamberSlots[si].y;
+    s16 bob_scale = 0;
+    if (baseY > 85)
+      bob_scale = (baseY - 85) * 10 / 85;
+    s16 bob = (bob_scale * phaseSin) >> 12;
+    s16 x = chamberSlots[si].x;
+    s16 y = baseY + bob;
+
+    s32 scale = 256 + ((y - 126) * 64) / 96;
+
     NF_ShowSprite(SCR_CHAMBER, i, true);
     NF_MoveSprite(SCR_CHAMBER, i, x, y);
     NF_SpriteFrame(SCR_CHAMBER, i, frame_cnt / 30);
+    NF_SpriteRotScale(SCR_CHAMBER, i, 0, scale, scale);
   }
 }
 

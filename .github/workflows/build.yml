@@ -25,8 +25,32 @@ jobs:
       - name: Build
         run: make
 
-      - name: Upload ROM
+      - name: Upload ROM artifact
         uses: actions/upload-artifact@v4
         with:
           name: slavic2026.nds
           path: slavic2026.nds
+
+      - name: Create release
+        if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+        run: |
+          mkdir -p release
+          cp slavic2026.nds release/
+          git archive -o release/source.zip HEAD
+          gh release create "build-${{ github.run_number }}" \
+            release/slavic2026.nds \
+            release/source.zip \
+            --title "Build #${{ github.run_number }}" \
+            --notes "$(git log -1 --format='%h %s')"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Cleanup old releases (keep 10)
+        if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+        run: |
+          gh release list --limit 999 --json tagName --jq '.[].tagName' | \
+            tail -n +11 | while read tag; do
+            gh release delete "$tag" --yes --cleanup-tag
+          done
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
