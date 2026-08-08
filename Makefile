@@ -150,6 +150,7 @@ dump: $(DUMP)
 clean:
 	@echo "  CLEAN"
 	$(V)$(RM) $(ROM) $(DUMP) build compile_commands.json
+	$(V)$(RM) -fr $(NITROFSDIR)
 
 ifeq ($(COMPDB),1)
 $(BUILDDIR)/compile_commands.json: $(OBJS)
