@@ -20,7 +20,9 @@ typedef struct {
 
 static bunny_s bunnies[BUNNIES_MAX];
 
-static s16 bunnies_cnt = 0;
+s16 bunnies_cnt = 0;
+int bunnies_total = 0;
+int bunnies_collected = 0;
 
 #define SCREEN_BOT 1
 static u16 frame_cnt = 0;
@@ -33,11 +35,13 @@ void add_bunny(int x, int y) {
 }
 
 void bunnies_init(void) {
+  bunnies_collected = 0;
   add_bunny(8, 8);
   add_bunny(224, 24);
   add_bunny(80, 132);
   add_bunny(16, 200);
   add_bunny(224, 224);
+  bunnies_total = bunnies_cnt;
   for (u16 i = 0; i < bunnies_cnt; ++i) {
     NF_CreateSprite(SCREEN_BOT, bunnies[i].oam_id, SPRITE_INFOS[RABBITS].img_id,
                     SPRITE_INFOS[RABBITS].pal_id, bunnies[i].x, bunnies[i].y);
@@ -62,6 +66,7 @@ bool collect(u16 bunnyId) {
   NF_DeleteSprite(SCREEN_BOT, bunnies[bunnyId].oam_id);
   bunnies[bunnyId] = bunnies[bunnies_cnt - 1];
   --bunnies_cnt;
+  ++bunnies_collected;
   return true;
 }
 
