@@ -33,7 +33,7 @@
 #define REACTOR_THRESHOLD_3 150
 
 
-char blowing_debug[160];
+char blowing_debug_str[160];
 
 
 int blowing_counter = 0;
@@ -58,6 +58,11 @@ int reactor_temp;
 uint16_t temporary_buffer[MICROPHONE_BUFFER_SIZE];
 int cnt = 0;
 
+#define BLOW_DEBUG 0
+
+int debug_callbacks_cnt;
+#define DEBUG_CALLBACKS_UPDATE_TEXT 60
+
 void microphone_handler(void *completed_buffer, int length) {
     cnt = 0;
     s16 *wave_buf = memUncached(completed_buffer);
@@ -69,6 +74,20 @@ void microphone_handler(void *completed_buffer, int length) {
             blowing_samples++;
         }
     }
+
+#ifdef BLOW_DEBUG
+    if (++debug_callbacks_cnt > DEBUG_CALLBACKS_UPDATE_TEXT){
+        debug_callbacks_cnt = 0;
+        s32 min = 0;
+        s32 max = 0;
+        for (int i = 0; i < length; i++) {
+            s32 s = wave_buf[i];
+            if (s < min) min = s;
+            if (s > max) max = s;
+        }
+        sprintf(blowing_debug_str, "SAMPLES %08d\nBLOW SP %08d\n PCT: %03d\nMIN: %016ld\nMAX: %016ld",length, blowing_samples, blowing_samples*100/length,min, max);
+    }
+#endif
 
     if (blowing_samples < 0.4 * length) {
         // not blowing enough, reset the counter
@@ -114,7 +133,10 @@ void reactor_update(void) {
     char buffer[64];
     snprintf(buffer, sizeof(buffer), "TEMP: %03d", reactor_temp);
     NF_WriteText(SCR_CHAMBER, LAYER_CHAMBER_TEXT, 2, 6, buffer);
-    NF_WriteText(SCR_CHAMBER, LAYER_CHAMBER_TEXT, 2, 8, blowing_debug);
+
+#ifdef BLOW_DEBUG
+    NF_WriteText(SCR_CHAMBER, LAYER_CHAMBER_TEXT, 0, 8, blowing_debug_str);
+#endif
 
     if (reactor_temp < REACTOR_THRESHOLD_1) {
         NF_SpriteFrame(SCR_CHAMBER, SPRITE_ID, 0);
