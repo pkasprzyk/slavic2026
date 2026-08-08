@@ -58,6 +58,9 @@ jobs:
           echo "new_version=$NEW_VERSION" >> "$GITHUB_OUTPUT"
           echo "$NEW_VERSION" > VERSION
 
+      - name: Rename ROM with version
+        run: mv public/slavic2026.nds "public/slavic2026-v${{ steps.bump.outputs.new_version }}.nds"
+
       - name: Push version bump and tag
         run: |
           git config user.name "github-actions[bot]"
@@ -71,7 +74,7 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           tag_name: v${{ steps.bump.outputs.new_version }}
-          files: public/slavic2026.nds
+          files: public/slavic2026-v${{ steps.bump.outputs.new_version }}.nds
           fail_on_unmatched_files: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -79,7 +82,10 @@ jobs:
       - name: Copy landing page
         run: |
           cp .github/pages/index.html public/
-          sed -i "s/VERSION_PLACEHOLDER/${{ steps.bump.outputs.new_version }}/" public/index.html
+          sed -i \
+            -e "s/VERSION_PLACEHOLDER/${{ steps.bump.outputs.new_version }}/" \
+            -e "s|href=\"slavic2026\.nds\"|href=\"slavic2026-v${{ steps.bump.outputs.new_version }}.nds\"|" \
+            public/index.html
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
