@@ -250,8 +250,7 @@ static void updateBunny(int i) {
   }
   s16 x = bunnies[i].x - level_cam_x();
   s16 y = bunnies[i].y - level_cam_y() + offset;
-  if (x < -16 || x > 256 || y < -16 || y > 192) // off screen
-  {
+  if (x < -16 || x > 256 || y < -16 || y > 192) { // off screen
     NF_ShowSprite(SCR_WORLD, bunnies[i].oam_id, false);
 
     s16 ex, ey;
