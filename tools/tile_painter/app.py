@@ -181,6 +181,24 @@ def build_colmap(state, w, h):
     return buf.getvalue()
 
 
+def colmap_to_state(colmap_img, world_w, world_h):
+    """Decode a colmap.png image back into a state grid."""
+    px = np.asarray(colmap_img.convert("L"))
+    ph = world_h // TILE
+    pw = world_w // TILE
+    state = np.zeros((ph, pw), dtype=np.uint8)
+    value_map = {255: WALL, 210: TREE, 170: BUSH,
+                 130: SHALLOW_WATER, 85: DEEP_WATER, 40: FIRE}
+    for ty in range(ph):
+        for tx in range(pw):
+            y0 = (ty + 1) * TILE
+            if y0 + TILE > px.shape[0]:
+                break
+            tile_val = int(px[y0, tx * TILE])
+            state[ty, tx] = value_map.get(tile_val, 0)
+    return state
+
+
 def sync_level_h(w, h):
     path = os.path.join(repo_root(), "source", "level.h")
     try:
@@ -250,6 +268,24 @@ def main():
     scale = canvas_scale(world_w, world_h)
     st.sidebar.write("World: %dx%d px = %dx%d tiles" % (world_w, world_h, pw,
                                                         ph))
+    # Try loading an existing colmap.png to restore state
+    colmap_path = os.path.join(repo_root(), "assets", "colmap.png")
+    colmap_loaded = False
+    try:
+        if os.path.exists(colmap_path):
+            with open(colmap_path, "rb") as f:
+                colmap_data = f.read()
+            if colmap_data:
+                colmap_img = Image.open(io.BytesIO(colmap_data))
+                loaded_state = colmap_to_state(colmap_img, world_w, world_h)
+                if loaded_state.shape == (ph, pw):
+                    st.session_state.grid = loaded_state
+                    colmap_loaded = True
+    except Exception:
+        pass
+
+    if colmap_loaded:
+        st.sidebar.caption("Loaded from assets/colmap.png")
     if (bg_w, bg_h) != (world_w, world_h):
         st.sidebar.caption("DS bg padded to %dx%d (multiple of 256)" %
                            (bg_w, bg_h))
@@ -260,14 +296,17 @@ def main():
         st.session_state.world_size = (0, 0)
     if "rev" not in st.session_state:
         st.session_state.rev = 0
-    if st.session_state.world_size != (world_w, world_h):
+    if colmap_loaded:
+        st.session_state.world_size = (world_w, world_h)
+    elif st.session_state.world_size != (world_w, world_h):
         st.session_state.grid = new_grid(ph, pw, aw, ah)
         st.session_state.world_size = (world_w, world_h)
         st.session_state.rev += 1
     if (st.session_state.grid is None
             or st.session_state.grid.shape != (ph, pw)):
-        st.session_state.grid = new_grid(ph, pw, aw, ah)
-        st.session_state.rev += 1
+        if not colmap_loaded:
+            st.session_state.grid = new_grid(ph, pw, aw, ah)
+            st.session_state.rev += 1
 
     mode = st.sidebar.radio("Tool", [t[0] for t in TOOLS])
     paint_value = dict(TOOLS)[mode]
