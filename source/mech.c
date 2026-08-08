@@ -19,19 +19,15 @@
 #define MECH_H 24
 #define MECH_FEET_H 8
 
-#define MECH_MAX_WATER 200
-
 #define SPRITE_ID MECH_OAM_ID
 
 #define WATER_SPRAY_DISTANCE 50
 #define FIRE_EXTINGUISH_FRAMES 30
 
-
 s16 mech_x;
 s16 mech_y;
 static s16 last_mech_x;
 static s16 last_mech_y;
-static u8 mech_water_remaining = 0;
 static u8 frame_cnt = 0;
 static bool flipped;
 static u16 extinguish_frame_cnt = 0;
@@ -39,11 +35,9 @@ static bool extinguish_target_active = false;
 static s16 extinguish_tx = -1;
 static s16 extinguish_ty = -1;
 
-
 void mech_init(void) {
   mech_x = 178;
   mech_y = 128;
-  mech_water_remaining = MECH_MAX_WATER;
 
   NF_CreateSprite(SCR_WORLD, SPRITE_ID, MECH, DEFAULT_SPRITE_PALETTE, mech_x,
                   mech_y);
@@ -64,6 +58,22 @@ static int mech_blocked(s32 x, s32 y) {
         return 1;
     }
   return 0;
+}
+
+static bool is_in_water(s32 x, s32 y) {
+  s32 x0 = x >> 3;
+  // only check on feet
+  s32 y0 = (y + MECH_H - MECH_FEET_H) >> 3;
+  s32 x1 = (x + MECH_W - 1) >> 3;
+  s32 y1 = (y + MECH_H - 1) >> 3;
+
+  for (s32 ty = y0; ty <= y1; ty++)
+    for (s32 tx = x0; tx <= x1; tx++) {
+      int t = NF_GetTile(COLMAP_SLOT, tx << 3, ty << 3);
+      if (t == TILE_SHALLOW_WATER)
+        return true;
+    }
+  return false;
 }
 
 s32 mech_fire_distance_sq(s16 fire_tx, s16 fire_ty) {
@@ -173,6 +183,9 @@ void mech_update(void) {
     if (dy < 0 && !mech_blocked(mech_x, mech_y - 1))
       mech_y--;
   }
+
+  if (is_in_water(mech_x, mech_y))
+    water_fill_update();
 
   if (mech_x < 0)
     mech_x = 0;

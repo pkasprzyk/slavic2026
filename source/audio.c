@@ -185,11 +185,7 @@ void audio_init_wav(char *path) {
 
   // We are not using a soundbank so we need to manually initialize
   // mm_ds_system.
-  mm_ds_system mmSys = {.mod_count = 0,
-                        .samp_count = 0,
-                        .mem_bank = 0,
-                        .fifo_channel = FIFO_MAXMOD};
-  mmInit(&mmSys);
+  mmInitDefault("nitro:/soundbank.bin");
 
   // Open the stream
   mm_stream stream = {
@@ -215,8 +211,8 @@ void audio_close_wav(void) {
 }
 
 void audio_init_SB(void) {
-  soundEnable();
   mmInitDefault("nitro:/soundbank.bin");
+  soundEnable();
 }
 void audio_play_sfx(mm_word sample_name, bool loop, u16 length) {
   mmLoadEffect(sample_name);
