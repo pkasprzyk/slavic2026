@@ -4,6 +4,7 @@
 #include <stdio.h>
 
 #include "fire.h"
+#include "ids.h"
 #include "level.h"
 #include "sprites.h"
 #include "water.h"
@@ -25,6 +26,7 @@ int water_drop_cooldown = 0;
 
 static s16 water_remaining = 500;
 static u8 water_fill_timer = 0;
+static u8 pump_was_in = 0; // 1 - up, 2 - down, 0 - none
 
 /* Water drop particles */
 typedef struct {
@@ -44,7 +46,17 @@ void show_water_remaining(void) {
   const s32 MAX_SCROLL = 95;
   s32 pos = (MAX_SCROLL * (s32)water_remaining) / MAX_WATER;
   NF_ScrollBg(SCR_CHAMBER, LAYER_CHAMBER_WATER, 0, pos);
+}
 
+void water_pump_init(void) {
+  NF_CreateSprite(SCR_WORLD, PUMP_UP_OAM_ID, PUMP, DEFAULT_SPRITE_PALETTE, 192,
+                  16);
+  NF_CreateSprite(SCR_WORLD, PUMP_DOWN_OAM_ID, PUMP, DEFAULT_SPRITE_PALETTE,
+                  192, 16 + 64);
+  NF_SpriteFrame(SCR_WORLD, PUMP_DOWN_OAM_ID, 1);
+  NF_CreateSprite(SCR_WORLD, PUMP_HANDLE_OAM_ID, PUMP_HANDLE,
+                  DEFAULT_SPRITE_PALETTE, 192, 16 + 32);
+  water_hide_pump();
 }
 
 void water_drop_init(void) {
@@ -79,7 +91,10 @@ void water_drop_update(void) {
   }
 }
 
-void water_init(void) { water_drop_init(); }
+void water_init(void) {
+  water_drop_init();
+  water_pump_init();
+}
 
 void water_update(void) {
   water_drop_update();
@@ -111,6 +126,24 @@ void water_drop_spawn(int x, int y, int frame_number) {
       return;
     }
   }
+}
+
+void water_show_pump() {
+  NF_ShowSprite(SCR_WORLD, PUMP_UP_OAM_ID, true);
+  NF_ShowSprite(SCR_WORLD, PUMP_DOWN_OAM_ID, true);
+  NF_ShowSprite(SCR_WORLD, PUMP_HANDLE_OAM_ID, true);
+}
+
+void water_hide_pump() {
+  NF_ShowSprite(SCR_WORLD, PUMP_UP_OAM_ID, false);
+  NF_ShowSprite(SCR_WORLD, PUMP_DOWN_OAM_ID, false);
+  NF_ShowSprite(SCR_WORLD, PUMP_HANDLE_OAM_ID, false);
+}
+
+void water_operate_pump(int x, int y) {
+  u16 pump_upper_threshold = 48;
+  u16 pump_lower_threshold = 144;
+  NF_MoveSprite(SCR_WORLD, PUMP_HANDLE_OAM_ID, 192, y - 16);
 }
 
 void water_spray(int mech_cx, int mech_cy, int target_x, int target_y) {

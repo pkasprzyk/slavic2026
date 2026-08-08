@@ -101,14 +101,26 @@ void mech_spray_water(void) {
   touchRead(&touchscreen);
 
   bool touching = touchscreen.px > 0 && touchscreen.py > 0;
+  u16 pump_start_x = 192;
+  u16 pump_start_y = 16;
+  u16 pump_end_x = 256;
+  u16 pump_end_y = 176;
 
-  /* Convert screen touch coords to world tile coords */
-  s16 mech_cx = mech_x + MECH_W / 2;
-  s16 mech_cy = mech_y + MECH_H / 2;
+  bool touching_pump = false;
+  if (was_in_water) {
+    touching_pump =
+        touchscreen.px >= pump_start_x && touchscreen.px <= pump_end_x &&
+        touchscreen.py >= pump_start_y && touchscreen.py <= pump_end_y;
+  }
 
-  if (touching) {
+  if (touching && !touching_pump) {
+    /* Convert screen touch coords to world tile coords */
+    s16 mech_cx = mech_x + MECH_W / 2;
+    s16 mech_cy = mech_y + MECH_H / 2;
     water_spray(mech_cx, mech_cy, touchscreen.px + level_cam_x(),
                 touchscreen.py + level_cam_y());
+  } else if (touching_pump) {
+    water_operate_pump(touchscreen.px, touchscreen.py);
   }
 }
 
@@ -163,12 +175,13 @@ void mech_update(void) {
   }
 
   if (is_in_water(mech_precise_x, mech_precise_y)) {
-    water_fill_update();
+    water_show_pump();
     if (!was_in_water) {
       audio_set_looped_volume(SFX_SFX_FIRE_LOOP, 80);
       was_in_water = true;
     }
   } else if (was_in_water) {
+    water_hide_pump();
     was_in_water = false;
     audio_set_looped_volume(SFX_SFX_FIRE_LOOP, 170);
   }
