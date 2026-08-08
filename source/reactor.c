@@ -3,6 +3,7 @@
 #include <nds.h>
 #include <nf_lib.h>
 
+#include "ids.h"
 #include "reactor.h"
 #include "sprites.h"
 
@@ -133,6 +134,33 @@ void reactor_init(void) {
                  SAMPLE_RATE, microphone_handler);
 }
 
+
+static u16 last_frame = 0;
+
+void UpdateReactorImg()
+{
+  u16 frame = 0;
+  if (reactor_temp < REACTOR_THRESHOLD_1) {
+    frame = 0;
+  } else if (reactor_temp < REACTOR_THRESHOLD_2) {
+    frame = 1;
+  } else if (reactor_temp < REACTOR_THRESHOLD_3) {
+    frame = 2;
+  } else {
+    frame = 3;
+  }
+
+  if (frame == last_frame){
+    return;
+  }
+  last_frame = frame;
+
+  NF_DeleteTiledBg(SCR_CHAMBER, LAYER_CHAMBER_REACTOR);
+  NF_UnloadTiledBg(REACTOR_BG_NAME);
+  NF_LoadTiledBg(REACTOR_LEVEL_IMG_FILE[frame], REACTOR_BG_NAME, 256, 256);
+  NF_CreateTiledBg(SCR_CHAMBER, LAYER_CHAMBER_REACTOR, REACTOR_BG_NAME);
+}
+
 void reactor_update(void) {
   char buffer[64];
   snprintf(buffer, sizeof(buffer), "TEMP: %03d", reactor_temp);
@@ -142,20 +170,13 @@ void reactor_update(void) {
   NF_WriteText(SCR_CHAMBER, LAYER_CHAMBER_TEXT, 0, 8, blowing_debug_str);
 #endif
 
-  if (reactor_temp < REACTOR_THRESHOLD_1) {
-    NF_SpriteFrame(SCR_CHAMBER, SPRITE_ID, 0);
-  } else if (reactor_temp < REACTOR_THRESHOLD_2) {
-    NF_SpriteFrame(SCR_CHAMBER, SPRITE_ID, 1);
-  } else if (reactor_temp < REACTOR_THRESHOLD_3) {
-    NF_SpriteFrame(SCR_CHAMBER, SPRITE_ID, 2);
-  } else {
-    NF_SpriteFrame(SCR_CHAMBER, SPRITE_ID, 3);
-  }
-
+  UpdateReactorImg();
+  
   if (fire_heat_cooldown > 0) {
     fire_heat_cooldown--;
   }
 }
+
 
 void reactor_deinit(void) {
   // Turn off the microphone when you're done.

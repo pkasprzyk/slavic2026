@@ -31,6 +31,10 @@ enum {
     TILE_FIRE = 6,
 };
 
+#define REACTOR_BG_NAME "reactor"
+
+extern const char* REACTOR_LEVEL_IMG_FILE [4];
+
 #define PATH_BG_FOREST "bg/forest"
 #define PATH_COLMAP "maps/colmap"
 #define PATH_FONT "fnt/default"

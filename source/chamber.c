@@ -7,8 +7,8 @@
 
 void chamber_init(void)
 {
-    NF_LoadTiledBg("bg/UI_reactor1", "reactor", 256, 256);
-    NF_CreateTiledBg(SCR_CHAMBER, LAYER_CHAMBER_REACTOR, "reactor");
+    NF_LoadTiledBg(REACTOR_LEVEL_IMG_FILE[0], REACTOR_BG_NAME, 256, 256);
+    NF_CreateTiledBg(SCR_CHAMBER, LAYER_CHAMBER_REACTOR, REACTOR_BG_NAME);
 
     NF_LoadTiledBg("bg/UI_background", "chamber_bg", 256, 256);
     NF_CreateTiledBg(SCR_CHAMBER, LAYER_CHAMBER_BG, "chamber_bg");
