@@ -43,12 +43,12 @@ static void draw_bad_ending(void) {
   NF_LoadTiledBg("bg/bg_bad_ending", "bad_ending", 256, 256);
   NF_CreateTiledBg(SCR_WORLD, LAYER_ENDING_IMAGE, "bad_ending");
 
-  char buf[50];
-  snprintf(buf, sizeof(buf), "You failed to save\n all %d bunnies...",
-           bunnies_died);
+  char buf[80];
+  snprintf(buf, sizeof(buf), "You failed to save\n\n    any of the %d bunnies...",  bunnies_died);
   NF_ClearTextLayer(SCR_CHAMBER, LAYER_CHAMBER_TEXT);
-  NF_WriteText(SCR_CHAMBER, LAYER_CHAMBER_TEXT, 11, 5, "BAD ENDING");
-  NF_WriteText(SCR_CHAMBER, LAYER_CHAMBER_TEXT, 1, 10, buf);
+
+  NF_WriteText(SCR_CHAMBER, LAYER_CHAMBER_TEXT, 16-5, 5, "SO SAD");
+  NF_WriteText(SCR_CHAMBER, LAYER_CHAMBER_TEXT, 16-9, 10, buf);
   // NF_WriteText(SCR_WORLD, LAYER_WORLD_TEXT, 11, 17, "[  EXIT  ]");
   NF_UpdateTextLayers();
 
@@ -59,12 +59,23 @@ static void draw_mid_ending(void) {
   NF_LoadTiledBg("bg/bg_mid_ending", "mid_ending", 256, 256);
   NF_CreateTiledBg(SCR_WORLD, LAYER_ENDING_IMAGE, "mid_ending");
 
-  char buf[38];
-  snprintf(buf, sizeof(buf), "You rescued only\n %d bunnies...",
-           bunnies_collected);
+  char buf[50];
+  if (bunnies_collected == 1){
+    snprintf(buf, sizeof(buf), "  You rescued 1 bunny...");
+  } else {
+    snprintf(buf, sizeof(buf), "You rescued %d bunnies...", bunnies_collected);
+  }
+  char buf2[50];
+  if (bunnies_died == 1){
+    snprintf(buf2, sizeof(buf2), "But %d bunnies didnt make it :(", bunnies_died);
+  } else {
+    snprintf(buf2, sizeof(buf2), "  But 1 bunny didnt make it :(");
+  }
   NF_ClearTextLayer(SCR_CHAMBER, LAYER_CHAMBER_TEXT);
-  NF_WriteText(SCR_CHAMBER, LAYER_CHAMBER_TEXT, 11, 5, "THE END");
-  NF_WriteText(SCR_CHAMBER, LAYER_CHAMBER_TEXT, 1, 10, buf);
+
+  NF_WriteText(SCR_CHAMBER, LAYER_CHAMBER_TEXT, 16-4, 5, "THE END");
+  NF_WriteText(SCR_CHAMBER, LAYER_CHAMBER_TEXT, 16-12, 10, buf);
+  NF_WriteText(SCR_CHAMBER, LAYER_CHAMBER_TEXT, 16-15, 12, buf2);
   // NF_WriteText(SCR_WORLD, LAYER_WORLD_TEXT, 11, 17, "[  EXIT  ]");
   NF_UpdateTextLayers();
 
@@ -75,11 +86,12 @@ static void draw_good_ending(void) {
   NF_LoadTiledBg("bg/bg_good_ending", "good_ending", 256, 256);
   NF_CreateTiledBg(SCR_WORLD, LAYER_ENDING_IMAGE, "good_ending");
 
-  char buf[38];
+  char buf[50];
   snprintf(buf, sizeof(buf), "All %d bunnies rescued!", bunnies_collected);
   NF_ClearTextLayer(SCR_CHAMBER, LAYER_CHAMBER_TEXT);
-  NF_WriteText(SCR_CHAMBER, LAYER_CHAMBER_TEXT, 11, 5, "GOOD ENDING");
-  NF_WriteText(SCR_CHAMBER, LAYER_CHAMBER_TEXT, 1, 10, buf);
+
+  NF_WriteText(SCR_CHAMBER, LAYER_CHAMBER_TEXT, 16-5, 5, "GOOD ENDING");
+  NF_WriteText(SCR_CHAMBER, LAYER_CHAMBER_TEXT, 16-12, 10, buf);
   // NF_WriteText(SCR_WORLD, LAYER_WORLD_TEXT, 11, 17, "[  EXIT  ]");
   NF_UpdateTextLayers();
 
@@ -89,6 +101,12 @@ static void draw_good_ending(void) {
 void draw_ending() {
   audio_close_wav();
   ending_drawn = true;
+
+  //NF_DeleteTiledBg(SCR_CHAMBER, 0); keep text
+  NF_DeleteTiledBg(SCR_CHAMBER, 1);
+  NF_DeleteTiledBg(SCR_CHAMBER, 2);
+  NF_DeleteTiledBg(SCR_CHAMBER, 3);
+
 
   NF_DeleteTiledBg(SCR_WORLD, 0);
   NF_DeleteTiledBg(SCR_WORLD, 1);
