@@ -65,12 +65,12 @@ static void draw_instructions(void) {
 static void draw_credits(void) {
   clear_all();
   load_instr_bg();
-  NF_WriteText(SCR_WORLD, LAYER_WORLD_TEXT, 2, 3, "Lukasz \"Zephyr\" Sobczyk");
+  NF_WriteText(SCR_WORLD, LAYER_WORLD_TEXT, 2, 3, "\xbf""ukasz \"Zephyr\" Sobczyk");
   NF_WriteText(SCR_WORLD, LAYER_WORLD_TEXT, 2, 5,
-               "Mateusz \"Grafiszti\" Choinski");
-  NF_WriteText(SCR_WORLD, LAYER_WORLD_TEXT, 2, 7, "Szymon Rzosinski");
-  NF_WriteText(SCR_WORLD, LAYER_WORLD_TEXT, 2, 9, "Pikej");
-  NF_WriteText(SCR_WORLD, LAYER_WORLD_TEXT, 2, 11, "Justyna Kryscio-Rzosinska");
+               "Mateusz \"Grafiszti\" Choi\xfc""ski");
+  NF_WriteText(SCR_WORLD, LAYER_WORLD_TEXT, 2, 7, "Szymon Rzosi\xfc""ski");
+  NF_WriteText(SCR_WORLD, LAYER_WORLD_TEXT, 2, 9, "Piotrek \"Pikej\" Kasprzyk");
+  NF_WriteText(SCR_WORLD, LAYER_WORLD_TEXT, 2, 11, "Justyna Kry\xa1""cio-Rzosi\xfc""ska");
   NF_WriteText(SCR_WORLD, LAYER_WORLD_TEXT, 2, 13,
                "Kamila \"Yreron\" Chmielowiec");
   NF_WriteText(SCR_WORLD, LAYER_WORLD_TEXT, 9, 17, "[   BACK   ]");
