@@ -25,23 +25,53 @@ jobs:
           git config --global --add safe.directory '*'
 
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Bump version
+        id: version
+        if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+        run: |
+          VER=$(cat VERSION)
+          MAJOR=$(echo "$VER" | cut -d. -f1)
+          MINOR=$(echo "$VER" | cut -d. -f2)
+          PATCH=$(( $(echo "$VER" | cut -d. -f3) + 1 ))
+          NEW="${MAJOR}.${MINOR}.${PATCH}"
+          echo "$NEW" > VERSION
+          echo "version=v${NEW}" >> $GITHUB_OUTPUT
 
       - name: Build
         run: make
 
+      - name: Rename ROM with version
+        if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+        run: cp slavic2026.nds "slavic2026-${{ steps.version.outputs.version }}.nds"
+
       - name: Upload ROM artifact
         uses: actions/upload-artifact@v4
         with:
-          name: slavic2026.nds
-          path: slavic2026.nds
+          name: slavic2026${{ steps.version.outputs.version || '' }}
+          path: slavic2026*.nds
+
+      - name: Tag and push version bump
+        if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git pull --rebase origin master
+          git add VERSION
+          git commit -m "bump version to ${{ steps.version.outputs.version }} [skip ci]"
+          git tag "${{ steps.version.outputs.version }}"
+          git push origin master --tags
 
       - name: Create release
         if: github.event_name == 'push' && github.ref == 'refs/heads/master'
         run: |
-          gh release create "build-${{ github.run_number }}" \
+          gh release create "${{ steps.version.outputs.version }}" \
+            "slavic2026-${{ steps.version.outputs.version }}.nds" \
             slavic2026.nds \
-            --title "Build #${{ github.run_number }}" \
-            --notes "$(git log -1 --format='%h %s')"
+            --title "${{ steps.version.outputs.version }}" \
+            --notes "$(git log -1 --format='%h %s' | head -1)"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
