@@ -10,6 +10,7 @@ enum GameState {
 };
 
 extern int game_state;
+extern bool left_handed_mode;
 
 void game_init(void);
 void game_update(void);

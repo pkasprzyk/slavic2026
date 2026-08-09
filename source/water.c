@@ -5,6 +5,7 @@
 
 #include "audio.h"
 #include "fire.h"
+#include "game.h"
 #include "ids.h"
 #include "level.h"
 #include "reactor.h"
@@ -56,14 +57,19 @@ void show_water_remaining(void) {
   NF_ScrollBg(SCR_CHAMBER, LAYER_CHAMBER_WATER, 0, pos);
 }
 
+static int pump_x(void) {
+  return left_handed_mode ? 0 : 192;
+}
+
 void water_pump_init(void) {
-  NF_CreateSprite(SCR_WORLD, PUMP_UP_OAM_ID, PUMP, DEFAULT_SPRITE_PALETTE, 192,
-                  32);
+  int px = pump_x();
+  NF_CreateSprite(SCR_WORLD, PUMP_UP_OAM_ID, PUMP, DEFAULT_SPRITE_PALETTE, px,
+                   32);
   NF_CreateSprite(SCR_WORLD, PUMP_DOWN_OAM_ID, PUMP, DEFAULT_SPRITE_PALETTE,
-                  192, 32 + 64);
+                   px, 32 + 64);
   NF_SpriteFrame(SCR_WORLD, PUMP_DOWN_OAM_ID, 1);
   NF_CreateSprite(SCR_WORLD, PUMP_HANDLE_OAM_ID, PUMP_HANDLE,
-                  DEFAULT_SPRITE_PALETTE, 192, 32 + 64 - 16);
+                   DEFAULT_SPRITE_PALETTE, px, 32 + 64 - 16);
   water_hide_pump();
 }
 
@@ -153,7 +159,7 @@ void water_show_pump() {
   NF_ShowSprite(SCR_WORLD, PUMP_UP_OAM_ID, true);
   NF_ShowSprite(SCR_WORLD, PUMP_DOWN_OAM_ID, true);
   NF_ShowSprite(SCR_WORLD, PUMP_HANDLE_OAM_ID, true);
-  NF_MoveSprite(SCR_WORLD, PUMP_HANDLE_OAM_ID, 192, 32 + 64 - 16);
+  NF_MoveSprite(SCR_WORLD, PUMP_HANDLE_OAM_ID, pump_x(), 32 + 64 - 16);
   pump_was_in = 0;
 }
 
@@ -173,7 +179,7 @@ void water_operate_pump(int x, int y) {
     y = 134;
   else if (y < 58)
     y = 58;
-  NF_MoveSprite(SCR_WORLD, PUMP_HANDLE_OAM_ID, 192, y - 16);
+  NF_MoveSprite(SCR_WORLD, PUMP_HANDLE_OAM_ID, pump_x(), y - 16);
   if (y <= pump_upper_threshold) {
     if (pump_was_in != 1) {
       audio_play_sfx(SFX_SFX_PUMP_UP, false, IGNORED_LEN, 210);

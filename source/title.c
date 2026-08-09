@@ -42,6 +42,10 @@ static void draw_title(void) {
   NF_WriteText(SCR_WORLD, LAYER_WORLD_TEXT, 8, 9, "[    START    ]");
   NF_WriteText(SCR_WORLD, LAYER_WORLD_TEXT, 8, 13, "[ HOW TO PLAY ]");
   NF_WriteText(SCR_WORLD, LAYER_WORLD_TEXT, 8, 17, "[   CREDITS   ]");
+  if (left_handed_mode)
+    NF_WriteText(SCR_WORLD, LAYER_WORLD_TEXT, 8, 21, "[  HAND: L  ]");
+  else
+    NF_WriteText(SCR_WORLD, LAYER_WORLD_TEXT, 8, 21, "[  HAND: R  ]");
   NF_WriteText(SCR_WORLD, LAYER_WORLD_TEXT, 24, 22, "v." GAME_VERSION);
   NF_UpdateTextLayers();
 }
@@ -50,7 +54,11 @@ static void draw_instructions(void) {
   clear_all();
   load_instr_bg();
   NF_WriteText(SCR_WORLD, LAYER_WORLD_TEXT, 10, 2, "HOW TO PLAY");
-  NF_WriteText(SCR_WORLD, LAYER_WORLD_TEXT, 2, 5, "D-Pad: Move the robot");
+  if (left_handed_mode)
+    NF_WriteText(SCR_WORLD, LAYER_WORLD_TEXT, 2, 5,
+                 "A/B/X/Y: Move the robot");
+  else
+    NF_WriteText(SCR_WORLD, LAYER_WORLD_TEXT, 2, 5, "D-Pad: Move the robot");
   NF_WriteText(SCR_WORLD, LAYER_WORLD_TEXT, 2, 7, "Touch/Stylus: Water stream");
   NF_WriteText(SCR_WORLD, LAYER_WORLD_TEXT, 2, 9,
                "Blow the Mic: Cool reactor");
@@ -111,6 +119,11 @@ void title_update(void) {
       clear_all();
       NF_UpdateTextLayers();
       game_start_play();
+      return;
+    }
+    if (touch_in_rect(touch.px, touch.py, 64, 166, 120, 16)) {
+      left_handed_mode = !left_handed_mode;
+      draw_title();
       return;
     }
   } else if (screen == INSTRUCTIONS_SCREEN) {

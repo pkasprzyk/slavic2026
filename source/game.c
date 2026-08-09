@@ -22,6 +22,7 @@
 #include "water.h"
 
 int game_state;
+bool left_handed_mode = false;
 s16 frames_in_end_state;
 bool nitroFS_inited = false;
 

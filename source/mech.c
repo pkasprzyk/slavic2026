@@ -10,6 +10,7 @@
 #include "audio.h"
 #include "bunny.h"
 #include "fire.h"
+#include "game.h"
 #include "ids.h"
 #include "level.h"
 #include "mech.h"
@@ -123,11 +124,13 @@ void mech_spray_water(void) {
   touchRead(&touchscreen);
 
   bool touching = touchscreen.px > 0 && touchscreen.py > 0;
-  u16 pump_start_x = 192;
-
   bool touching_pump = false;
+
   if (was_in_water) {
-    touching_pump = touchscreen.px >= pump_start_x;
+    if (left_handed_mode)
+      touching_pump = touchscreen.px < 64;
+    else
+      touching_pump = touchscreen.px >= 192;
   }
 
   if (touching && !touching_pump) {
@@ -176,17 +179,24 @@ void mech_update(void) {
   snprintf(buffer, sizeof(buffer), "SPEEED: %03d", speed);
   NF_WriteText(SCR_CHAMBER, LAYER_CHAMBER_TEXT, 0, 8, buffer); */
 
-  if (held & KEY_LEFT) {
-    dx -= speed;
-  }
-  if (held & KEY_RIGHT) {
-    dx += speed;
-  }
-  if (held & KEY_UP) {
-    dy -= speed;
-  }
-  if (held & KEY_DOWN) {
-    dy += speed;
+  if (left_handed_mode) {
+    if (held & KEY_Y)
+      dx -= speed;
+    if (held & KEY_A)
+      dx += speed;
+    if (held & KEY_X)
+      dy -= speed;
+    if (held & KEY_B)
+      dy += speed;
+  } else {
+    if (held & KEY_LEFT)
+      dx -= speed;
+    if (held & KEY_RIGHT)
+      dx += speed;
+    if (held & KEY_UP)
+      dy -= speed;
+    if (held & KEY_DOWN)
+      dy += speed;
   }
   if (held & KEY_LID) {
     if (timer_to_end >= -1)
