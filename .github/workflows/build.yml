@@ -38,7 +38,7 @@ jobs:
         if: github.event_name == 'push' && github.ref == 'refs/heads/master'
         run: git pull --rebase origin master
 
-      - name: Bump version
+      - name: Read + bump version
         id: version
         if: github.event_name == 'push' && github.ref == 'refs/heads/master'
         run: |
@@ -46,7 +46,6 @@ jobs:
           MAJOR=$(echo "$VER" | cut -d. -f1)
           MINOR=$(echo "$VER" | cut -d. -f2)
           PATCH=$(( $(echo "$VER" | cut -d. -f3) + 1 ))
-          echo "$MAJOR.$MINOR.$PATCH" > VERSION
           echo "version=v$MAJOR.$MINOR.$PATCH" >> $GITHUB_OUTPUT
 
       - name: Build
@@ -75,6 +74,7 @@ jobs:
             echo "skip=true" >> $GITHUB_OUTPUT
             exit 0
           fi
+          echo "${TAG#v}" > VERSION
           git add VERSION
           git commit -m "bump version to $TAG [skip ci]"
           git tag "$TAG"
