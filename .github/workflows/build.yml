@@ -1,4 +1,4 @@
-name: Build ROM
+name: Build + Deploy
 
 on:
   push:
@@ -8,6 +8,12 @@ on:
 
 permissions:
   contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: build-deploy
+  cancel-in-progress: false
 
 jobs:
   build:
@@ -15,7 +21,7 @@ jobs:
     container:
       image: skylyrac/blocksds:slim-latest
     steps:
-      - name: Install deps (NFLib, python3, Pillow, gh)
+      - name: Install deps
         run: |
           wf-pacman -S --noconfirm blocksds-nflib && \
           wf-config clean-caches --all && \
@@ -56,7 +62,8 @@ jobs:
           name: slavic2026${{ steps.version.outputs.version || '' }}
           path: slavic2026*.nds
 
-      - name: Tag and push version bump
+      - name: Push tag
+        id: push
         if: github.event_name == 'push' && github.ref == 'refs/heads/master'
         run: |
           git config user.name "github-actions[bot]"
@@ -64,18 +71,17 @@ jobs:
           git pull --rebase origin master
           TAG="${{ steps.version.outputs.version }}"
           if git ls-remote --tags origin "$TAG" | grep -q "$TAG"; then
-            echo "Tag $TAG already exists, skipping push"
-            echo "skip_release=true" >> $GITHUB_OUTPUT
+            echo "Tag $TAG exists, skipping"
+            echo "skip=true" >> $GITHUB_OUTPUT
             exit 0
           fi
           git add VERSION
           git commit -m "bump version to $TAG [skip ci]"
           git tag "$TAG"
           git push origin master --tags
-        id: push
 
       - name: Create release
-        if: github.event_name == 'push' && github.ref == 'refs/heads/master' && steps.push.outputs.skip_release != 'true'
+        if: github.event_name == 'push' && github.ref == 'refs/heads/master' && steps.push.outputs.skip != 'true'
         run: |
           gh release create "${{ steps.version.outputs.version }}" \
             "slavic2026-${{ steps.version.outputs.version }}.nds" \
@@ -94,3 +100,26 @@ jobs:
           done
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Prepare Pages
+        if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+        run: |
+          mkdir pages
+          cp slavic2026*.nds pages/
+          cat > pages/index.html << 'EOF'
+          <!DOCTYPE html><html><head><meta charset="utf-8"><title>Chilling Mech</title>
+          <style>body{font-family:monospace;max-width:600px;margin:40px auto;padding:0 20px;background:#111;color:#eee}a{color:#5af}</style>
+          </head><body>
+          <h1>Chilling Mech</h1>
+          <p><a href="slavic2026.nds">Download latest build</a></p>
+          <p><small>${{ steps.version.outputs.version }} &mdash; $(git log -1 --format='%h %s' | head -1)</small></p>
+          </body></html>
+          EOF
+
+      - name: Deploy to GitHub Pages
+        if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: pages
+          enable_jekyll: false
