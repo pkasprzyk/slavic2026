@@ -91,6 +91,52 @@ void restart_game() {
   game_init();
 }
 
+#define PALETTE_COLORS 256
+#define FADE_STEPS     16
+#define LAYERS         4
+static u8 palSnapshot[LAYERS][PALETTE_COLORS][3];
+
+void startFadeOut()
+{
+    for (int layer = 0; layer < LAYERS; layer++){
+      for (int i = 0; i < PALETTE_COLORS; i++)
+      {
+          NF_BgGetPalColor(SCR_CHAMBER, layer, i,&palSnapshot[layer][i][0], &palSnapshot[layer][i][1], &palSnapshot[layer][i][2]);
+      }
+    }
+}
+
+void fadeOutTo(s16 step)
+{
+  for (int layer = 0; layer < LAYERS; layer++){
+    for (int i = 0; i < PALETTE_COLORS; i++)
+    {
+        u8 r = (palSnapshot[layer][i][0] * (FADE_STEPS - step)) / FADE_STEPS;
+        u8 g = (palSnapshot[layer][i][1] * (FADE_STEPS - step)) / FADE_STEPS;
+        u8 b = (palSnapshot[layer][i][2] * (FADE_STEPS - step)) / FADE_STEPS;
+
+        NF_BgEditPalColor(SCR_CHAMBER, layer, i, r, g, b);
+    }
+    NF_BgUpdatePalette(SCR_CHAMBER, layer);
+  }
+}
+
+void restoreTextPal()
+{
+  s16 layer = LAYER_CHAMBER_TEXT;
+  s16 step = 0;
+  for (int i = 0; i < PALETTE_COLORS; i++)
+  {
+      u8 r = (palSnapshot[layer][i][0] * (FADE_STEPS - step)) / FADE_STEPS;
+      u8 g = (palSnapshot[layer][i][1] * (FADE_STEPS - step)) / FADE_STEPS;
+      u8 b = (palSnapshot[layer][i][2] * (FADE_STEPS - step)) / FADE_STEPS;
+
+      NF_BgEditPalColor(SCR_CHAMBER, layer, i, r, g, b);
+  }
+  NF_BgUpdatePalette(SCR_CHAMBER, layer);
+}
+
+
 void game_update(void) {
   audio_update_wav();
   audio_update_loops();
@@ -113,8 +159,13 @@ void game_update(void) {
   NF_UpdateTextLayers();
 
   if (bunnies_cnt == 0) {
+    if (frames_in_end_state == 0){
+      startFadeOut();
+    }
     ++frames_in_end_state;
+    fadeOutTo(FADE_STEPS * (frames_in_end_state-1) / (60 * 2));
     if (frames_in_end_state > 60 * 2){
+      restoreTextPal();
       frames_in_end_state = 0;
       game_state = GAME_OVER;
       game_over_on_enter();
