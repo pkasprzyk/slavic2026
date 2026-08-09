@@ -64,6 +64,7 @@ void game_init(void) {
   InitSprites();
   level_init();
   chamber_init();
+  social_init_gfx();
 
   NF_LoadTextFont(PATH_FONT, FONT_NORMAL, 256, 256, 0);
   NF_CreateTextLayer(SCR_CHAMBER, LAYER_CHAMBER_TEXT, 0, FONT_NORMAL);

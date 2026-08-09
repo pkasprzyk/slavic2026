@@ -3,7 +3,8 @@
 
 #include <nds.h>
 
-void social_init(void);
+void social_init_hw(void);
+void social_init_gfx(void);
 void social_update(void);
 void social_hide_info(void);
 

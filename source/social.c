@@ -107,12 +107,8 @@ void updateNetworkState() {
   }
 }
 
-void social_init() {
+void social_init_hw() {
   Wifi_InitDefault(INIT_ONLY | WIFI_LOCAL_ONLY);
-  NF_CreateSprite(SCR_WORLD, SPRITE_ID, GUARDIAN_ICON, DEFAULT_SPRITE_PALETTE,
-                  210, 154);
-  NF_ShowSprite(SCR_WORLD, SPRITE_ID, false);
-  NF_SpriteLayer(SCR_WORLD, SPRITE_ID, LAYER_WORLD_TEXT);
 
   // enterHost();
   //  enterClient();
@@ -124,6 +120,14 @@ void social_init() {
   }
 }
 
+void social_init_gfx() {
+  NF_CreateSprite(SCR_WORLD, SPRITE_ID, GUARDIAN_ICON, DEFAULT_SPRITE_PALETTE,
+                  210, 154);
+  NF_ShowSprite(SCR_WORLD, SPRITE_ID, false);
+  NF_SpriteLayer(SCR_WORLD, SPRITE_ID, LAYER_WORLD_TEXT);
+}
+
+
 void social_hide_info() {
   NF_WriteText(SCR_WORLD, LAYER_WORLD_TEXT, 26, 20, "   ");
   NF_ShowSprite(SCR_WORLD, SPRITE_ID, false);
@@ -132,6 +136,8 @@ void social_hide_info() {
 
 void social_update() {
   updateNetworkState();
+
+//   found_others = rand() % 5;
 
   char buffer[3];
   if (found_others > 0) {
