@@ -37,7 +37,7 @@ static void draw_title(void) {
   clear_all();
   load_menu_bg();
   NF_WriteText(SCR_WORLD, LAYER_WORLD_TEXT, 5, 2, "Red Hot Chilling Bunnies");
-  NF_WriteText(SCR_WORLD, LAYER_WORLD_TEXT, 10, 4, "A Slavic Game");
+  NF_WriteText(SCR_WORLD, LAYER_WORLD_TEXT, 10, 4, "Slavic Game");
   NF_WriteText(SCR_WORLD, LAYER_WORLD_TEXT, 12, 5, "Jam 2026");
   NF_WriteText(SCR_WORLD, LAYER_WORLD_TEXT, 8, 9, "[    START    ]");
   NF_WriteText(SCR_WORLD, LAYER_WORLD_TEXT, 8, 13, "[ HOW TO PLAY ]");
@@ -50,14 +50,14 @@ static void draw_instructions(void) {
   clear_all();
   load_instr_bg();
   NF_WriteText(SCR_WORLD, LAYER_WORLD_TEXT, 10, 2, "HOW TO PLAY");
-  NF_WriteText(SCR_WORLD, LAYER_WORLD_TEXT, 2, 5, "D-Pad: Move the mech");
-  NF_WriteText(SCR_WORLD, LAYER_WORLD_TEXT, 2, 7, "Touch: Spray water on fire");
+  NF_WriteText(SCR_WORLD, LAYER_WORLD_TEXT, 2, 5, "D-Pad: Move the robot");
+  NF_WriteText(SCR_WORLD, LAYER_WORLD_TEXT, 2, 7, "Touch/Stylus: Water stream");
   NF_WriteText(SCR_WORLD, LAYER_WORLD_TEXT, 2, 9,
-               "Blow into mic: Cool reactor");
+               "Blow the Mic: Cool reactor");
   NF_WriteText(SCR_WORLD, LAYER_WORLD_TEXT, 2, 11,
-               "Near water: pump up the jam");
+               "Water Pump: Pump up the jam");
   NF_WriteText(SCR_WORLD, LAYER_WORLD_TEXT, 2, 12, "to fill water tank");
-  NF_WriteText(SCR_WORLD, LAYER_WORLD_TEXT, 2, 14, "Rescue animals from the");
+  NF_WriteText(SCR_WORLD, LAYER_WORLD_TEXT, 2, 14, "Rescue bunnies from the");
   NF_WriteText(SCR_WORLD, LAYER_WORLD_TEXT, 2, 15, "burning forest!");
   NF_WriteText(SCR_WORLD, LAYER_WORLD_TEXT, 9, 17, "[   BACK   ]");
   NF_UpdateTextLayers();
