@@ -166,7 +166,7 @@ endif
 $(BUILDDIR)/source/title.c.o : source/title.c VERSION
 	@echo "  CC      $<"
 	@$(MKDIR) -p $(@D)
-	$(V)$(CC) $(CFLAGS) -D_BUILD_VERSION='"$(GAME_VERSION)"' \-MMD -MP -MJ $(patsubst %.o,%.cc.json,$@) -c -o $@ $<
+	$(V)$(CC) $(CFLAGS) -D_BUILD_VERSION='"$(GAME_VERSION)"' -MMD -MP -MJ $(patsubst %.o,%.cc.json,$@) -c -o $@ $<
 
 $(BUILDDIR)/%.s.o : %.s
 	@echo "  AS      $<"
