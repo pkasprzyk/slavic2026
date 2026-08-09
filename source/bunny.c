@@ -38,8 +38,8 @@ typedef struct {
 } chamberSlot;
 
 static const chamberSlot chamberSlots[BUNNIES_MAX] = {
-    {128, 82},  {141, 90},  {161, 112}, {161, 140}, {141, 162},
-    {128, 170}, {115, 162}, {95, 140},  {95, 112},  {115, 90},
+    {120, 82},  {133, 90},  {153, 112}, {153, 140}, {133, 162},
+    {120, 170}, {107, 162}, {87, 140},  {87, 112},  {107, 90},
 };
 
 static bool chamber_occupied[BUNNIES_MAX];
