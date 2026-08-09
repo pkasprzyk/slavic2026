@@ -23,6 +23,9 @@
 
 #define MECH_W 24
 #define MECH_H 24
+
+#define MECH_COLLISION_W 12
+#define MECH_COLLISION_OFFSET 6
 #define MECH_FEET_H 8
 
 #define PRECISION_BITS 5
@@ -63,10 +66,10 @@ void mech_init(void) {
 void mech_restart(void) {}
 
 static int mech_blocked(s32 x, s32 y) {
-  s32 x0 = x >> (3 + PRECISION_BITS);
+  s32 x0 = ((x >> PRECISION_BITS) + MECH_COLLISION_OFFSET) >> 3;
   // only collide on feet
   s32 y0 = ((y >> PRECISION_BITS) + MECH_H - MECH_FEET_H) >> 3;
-  s32 x1 = ((x >> PRECISION_BITS) + MECH_W - 1) >> 3;
+  s32 x1 = ((x >> PRECISION_BITS) + MECH_COLLISION_OFFSET + MECH_COLLISION_W - 1) >> 3;
   s32 y1 = ((y >> PRECISION_BITS) + MECH_H - 1) >> 3;
 
   for (s32 ty = y0; ty <= y1; ty++)
@@ -79,10 +82,10 @@ static int mech_blocked(s32 x, s32 y) {
 }
 
 static bool is_in_water(s32 x, s32 y) {
-  s32 x0 = x >> (3 + PRECISION_BITS);
+  s32 x0 = ((x >> PRECISION_BITS) + MECH_COLLISION_OFFSET) >> 3;
   // only check on feet
   s32 y0 = ((y >> PRECISION_BITS) + MECH_H - MECH_FEET_H) >> 3;
-  s32 x1 = ((x >> PRECISION_BITS) + MECH_W - 1) >> 3;
+  s32 x1 = ((x >> PRECISION_BITS) + MECH_COLLISION_OFFSET + MECH_COLLISION_W - 1) >> 3;
   s32 y1 = ((y >> PRECISION_BITS) + MECH_H - 1) >> 3;
 
   for (s32 ty = y0; ty <= y1; ty++)
