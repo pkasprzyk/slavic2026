@@ -26,6 +26,7 @@ typedef struct {
 } bunny_s;
 
 static bunny_s bunnies[BUNNIES_MAX];
+static bunny_s dead_bunnies[BUNNIES_MAX];
 
 s16 bunnies_cnt = 0;
 int bunnies_total = 0;
@@ -148,6 +149,7 @@ static void kill_bunny(u16 bunnyId, bool silent) {
   NF_SpriteFrame(SCR_WORLD, bunnies[bunnyId].oam_id, 4);
   NF_VflipSprite(SCR_WORLD, bunnies[bunnyId].oam_id, false);
 
+  dead_bunnies[bunnies_died] = bunnies[bunnyId];
   bunnies[bunnyId] = bunnies[bunnies_cnt - 1];
   --bunnies_cnt;
   ++bunnies_died;
@@ -306,6 +308,17 @@ void updateChamberBunnies() {
 }
 
 void bunnies_update(void) {
+  for (s16 i = 0; i < bunnies_died; ++i) {
+    s16 x = dead_bunnies[i].x - level_cam_x();
+    s16 y = dead_bunnies[i].y - level_cam_y();
+    if (x < -16 || x > 256 || y < -16 || y > 192) { // off screen
+      NF_ShowSprite(SCR_WORLD, dead_bunnies[i].oam_id, false);
+      continue;
+    }
+    NF_ShowSprite(SCR_WORLD, dead_bunnies[i].oam_id, true);
+    NF_MoveSprite(SCR_WORLD, dead_bunnies[i].oam_id, x, y);
+  }
+
   if (bunnies_cnt <= 0)
     return;
   ++frame_cnt;
