@@ -67,7 +67,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git pull --rebase origin master
+          git pull --rebase --autostash origin master
           TAG="${{ steps.version.outputs.version }}"
           if git ls-remote --tags origin "$TAG" | grep -q "$TAG"; then
             echo "Tag $TAG exists, skipping"
