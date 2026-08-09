@@ -20,12 +20,12 @@
 #define REACTOR_MAX_TEMP 200
 
 #define BLOWING_THRESHOLD 10000
-#define BLOWING_DECREASE_AMOUNT 10
+#define BLOWING_DECREASE_AMOUNT 12
 
 // The sample rate used for the recording (samples per second)
 #define SAMPLE_RATE 8000
 
-#define BLOWING_FRAMES_REQUIRED 8
+#define BLOWING_FRAMES_REQUIRED 14
 
 #define REACTOR_THRESHOLD_1 50
 #define REACTOR_HEAT_2_SPEED_PENALTY 0
