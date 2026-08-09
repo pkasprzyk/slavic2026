@@ -22,7 +22,7 @@
 #include "water.h"
 
 int game_state;
-
+s16 frames_in_end_state;
 
 void game_start_play(void) {
   REG_DISPCNT_SUB &= ~DISPLAY_BG1_ACTIVE;
@@ -113,8 +113,12 @@ void game_update(void) {
   NF_UpdateTextLayers();
 
   if (bunnies_cnt == 0) {
-    game_state = GAME_OVER;
-    game_over_on_enter();
+    ++frames_in_end_state;
+    if (frames_in_end_state > 60 * 2){
+      frames_in_end_state = 0;
+      game_state = GAME_OVER;
+      game_over_on_enter();
+    }
   }
 }
 
