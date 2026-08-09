@@ -63,7 +63,7 @@ void add_bunny(int x, int y, s16 hp) {
 void bunnies_init(void) {
   u8 count = spawn_bunny_count();
   for (u8 i = 0; i < count; i++)
-    add_bunny(spawn_bunny_x(i), spawn_bunny_y(i), 2500);
+    add_bunny(spawn_bunny_x(i), spawn_bunny_y(i), 2700);
   bunnies_total = bunnies_cnt;
   bunnies_died = 0;
   bunnies_collected = 0;
@@ -135,7 +135,7 @@ static void collect(u16 bunnyId) {
                   SPRITE_INFOS[RABBITS].pal_id, chamberSlots[slot].x,
                   chamberSlots[slot].y);
   NF_EnableSpriteRotScale(SCR_CHAMBER, bunnies_collected, bunnies_collected,
-                           false);
+                          false);
   ++bunnies_collected;
 }
 
@@ -250,8 +250,7 @@ static void updateBunny(int i) {
   }
   s16 x = bunnies[i].x - level_cam_x();
   s16 y = bunnies[i].y - level_cam_y() + offset;
-  if (x < -16 || x > 256 || y < -16 || y > 192) // off screen
-  {
+  if (x < -16 || x > 256 || y < -16 || y > 192) { // off screen
     NF_ShowSprite(SCR_WORLD, bunnies[i].oam_id, false);
 
     s16 ex, ey;
@@ -281,9 +280,7 @@ void updateChamberBunnies() {
 
     s16 si = chamber_bunny_slot[i];
     s16 baseY = chamberSlots[si].y;
-    s16 bob_scale = 0;
-    if (baseY > 85)
-      bob_scale = (baseY - 85) * 10 / 85;
+    s16 bob_scale = 4 + (baseY - 82) * 6 / 88;
     s16 bob = (bob_scale * phaseSin) >> 12;
     s16 x = chamberSlots[si].x;
     s16 y = baseY + bob;
