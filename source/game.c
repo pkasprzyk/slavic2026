@@ -23,6 +23,7 @@
 
 int game_state;
 s16 frames_in_end_state;
+bool nitroFS_inited = false;
 
 void game_start_play(void) {
   REG_DISPCNT_SUB &= ~DISPLAY_BG1_ACTIVE;
@@ -36,10 +37,12 @@ void game_start_play(void) {
 
 void game_init(void) {
   consoleDemoInit();
-  if (!nitroFSInit(NULL)) {
-    perror("nitroFSInit()");
-    while (1)
-      swiWaitForVBlank();
+  if (!nitroFS_inited) {
+    if (!nitroFSInit(NULL)) {
+      perror("nitroFSInit()");
+      while (1)
+        swiWaitForVBlank();
+    }
   }
   NF_SetRootFolder("NITROFS");
 
@@ -70,6 +73,7 @@ void game_init(void) {
 
   srand(time(NULL));
   audio_init_SB();
+  soundEnable();
   audio_init_wav("nitro:/audio/SGJ2026-Music-22khz-loop.wav");
   audio_play_sfx(SFX_SFX_FIRE_LOOP, true, 180, 170);
 
@@ -83,59 +87,55 @@ void restart_game() {
   bunnies_restart();
   mech_restart();
   water_restart();
+  audio_close_wav();
+  audio_unload_all_sfx();
 
   NF_ResetSpriteBuffers();
   NF_InitSpriteSys(0);
   NF_InitSpriteSys(1);
-  
+
   game_init();
 }
 
 #define PALETTE_COLORS 256
-#define FADE_STEPS     16
-#define LAYERS         4
+#define FADE_STEPS 16
+#define LAYERS 4
 static u8 palSnapshot[LAYERS][PALETTE_COLORS][3];
 
-void startFadeOut()
-{
-    for (int layer = 0; layer < LAYERS; layer++){
-      for (int i = 0; i < PALETTE_COLORS; i++)
-      {
-          NF_BgGetPalColor(SCR_CHAMBER, layer, i,&palSnapshot[layer][i][0], &palSnapshot[layer][i][1], &palSnapshot[layer][i][2]);
-      }
+void startFadeOut() {
+  for (int layer = 0; layer < LAYERS; layer++) {
+    for (int i = 0; i < PALETTE_COLORS; i++) {
+      NF_BgGetPalColor(SCR_CHAMBER, layer, i, &palSnapshot[layer][i][0],
+                       &palSnapshot[layer][i][1], &palSnapshot[layer][i][2]);
     }
-}
-
-void fadeOutTo(s16 step)
-{
-  for (int layer = 0; layer < LAYERS; layer++){
-    for (int i = 0; i < PALETTE_COLORS; i++)
-    {
-        u8 r = (palSnapshot[layer][i][0] * (FADE_STEPS - step)) / FADE_STEPS;
-        u8 g = (palSnapshot[layer][i][1] * (FADE_STEPS - step)) / FADE_STEPS;
-        u8 b = (palSnapshot[layer][i][2] * (FADE_STEPS - step)) / FADE_STEPS;
-
-        NF_BgEditPalColor(SCR_CHAMBER, layer, i, r, g, b);
-    }
-    NF_BgUpdatePalette(SCR_CHAMBER, layer);
   }
 }
 
-void restoreTextPal()
-{
-  s16 layer = LAYER_CHAMBER_TEXT;
-  s16 step = 0;
-  for (int i = 0; i < PALETTE_COLORS; i++)
-  {
+void fadeOutTo(s16 step) {
+  for (int layer = 0; layer < LAYERS; layer++) {
+    for (int i = 0; i < PALETTE_COLORS; i++) {
       u8 r = (palSnapshot[layer][i][0] * (FADE_STEPS - step)) / FADE_STEPS;
       u8 g = (palSnapshot[layer][i][1] * (FADE_STEPS - step)) / FADE_STEPS;
       u8 b = (palSnapshot[layer][i][2] * (FADE_STEPS - step)) / FADE_STEPS;
 
       NF_BgEditPalColor(SCR_CHAMBER, layer, i, r, g, b);
+    }
+    NF_BgUpdatePalette(SCR_CHAMBER, layer);
+  }
+}
+
+void restoreTextPal() {
+  s16 layer = LAYER_CHAMBER_TEXT;
+  s16 step = 0;
+  for (int i = 0; i < PALETTE_COLORS; i++) {
+    u8 r = (palSnapshot[layer][i][0] * (FADE_STEPS - step)) / FADE_STEPS;
+    u8 g = (palSnapshot[layer][i][1] * (FADE_STEPS - step)) / FADE_STEPS;
+    u8 b = (palSnapshot[layer][i][2] * (FADE_STEPS - step)) / FADE_STEPS;
+
+    NF_BgEditPalColor(SCR_CHAMBER, layer, i, r, g, b);
   }
   NF_BgUpdatePalette(SCR_CHAMBER, layer);
 }
-
 
 void game_update(void) {
   audio_update_wav();
@@ -159,12 +159,12 @@ void game_update(void) {
   NF_UpdateTextLayers();
 
   if (bunnies_cnt == 0) {
-    if (frames_in_end_state == 0){
+    if (frames_in_end_state == 0) {
       startFadeOut();
     }
     ++frames_in_end_state;
-    fadeOutTo(FADE_STEPS * (frames_in_end_state-1) / (60 * 2));
-    if (frames_in_end_state > 60 * 2){
+    fadeOutTo(FADE_STEPS * (frames_in_end_state - 1) / (60 * 2));
+    if (frames_in_end_state > 60 * 2) {
       restoreTextPal();
       frames_in_end_state = 0;
       game_state = GAME_OVER;
@@ -174,4 +174,3 @@ void game_update(void) {
 }
 
 void game_deinit(void) { chamber_deinit(); }
-

@@ -38,7 +38,6 @@ int stream_buffer_in;
 int stream_buffer_out;
 
 bool wav_started = false;
-bool initialized = false;
 
 mm_word streamingCallback(mm_word length, mm_addr dest,
                           mm_stream_formats format) {
@@ -218,9 +217,6 @@ void audio_close_wav(void) {
 }
 
 void audio_init_SB(void) {
-  if (initialized)
-    return;
-  initialized = true;
   mmInitDefault("nitro:/soundbank.bin");
   mmSelectMode(MM_MODE_B);
   soundEnable();
