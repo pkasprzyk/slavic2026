@@ -46,7 +46,7 @@ static void draw_title(void) {
     NF_WriteText(SCR_WORLD, LAYER_WORLD_TEXT, 8, 21, "[   HAND: L   ]");
   else
     NF_WriteText(SCR_WORLD, LAYER_WORLD_TEXT, 8, 21, "[   HAND: R   ]");
-  NF_WriteText(SCR_WORLD, LAYER_WORLD_TEXT, 24, 22, "v." GAME_VERSION);
+  NF_WriteText(SCR_WORLD, LAYER_WORLD_TEXT, 24, 22, "v." _BUILD_VERSION);
   NF_UpdateTextLayers();
 }
 

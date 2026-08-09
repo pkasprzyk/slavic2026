@@ -82,8 +82,7 @@ ASFLAGS		+= -x assembler-with-cpp $(INCLUDEFLAGS) $(ARCH) \
 
 CFLAGS		+= -std=gnu17 $(WARNFLAGS) $(INCLUDEFLAGS) $(ARCH) \
 		   -O2 -ffunction-sections -fdata-sections \
-		   -specs=$(SPECS) \
-		   -DGAME_VERSION='"$(GAME_VERSION)"'
+		   -specs=$(SPECS)
 
 LDFLAGS		:= $(ARCH) $(LIBDIRSFLAGS) -Wl,-Map,$(MAP) \
 		   -Wl,--start-group $(LIBS) -Wl,--end-group -specs=$(SPECS)
@@ -163,6 +162,11 @@ endif
 
 # Rules
 # -----
+
+$(BUILDDIR)/source/title.c.o : source/title.c VERSION
+	@echo "  CC      $<"
+	@$(MKDIR) -p $(@D)
+	$(V)$(CC) $(CFLAGS) -D_BUILD_VERSION='"$(GAME_VERSION)"' \-MMD -MP -MJ $(patsubst %.o,%.cc.json,$@) -c -o $@ $<
 
 $(BUILDDIR)/%.s.o : %.s
 	@echo "  AS      $<"
