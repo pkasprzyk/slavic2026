@@ -61,7 +61,7 @@ void mech_init(void) {
 
   NF_CreateSprite(SCR_WORLD, SPRITE_ID, MECH, DEFAULT_SPRITE_PALETTE, mech_x,
                   mech_y);
-  NF_SpriteLayer(SCR_WORLD, SPRITE_ID, LAYER_WORLD_BG);
+  NF_SpriteLayer(SCR_WORLD, SPRITE_ID, LAYER_WORLD_FIRE);
 }
 
 void mech_restart(void) {}
