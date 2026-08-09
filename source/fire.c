@@ -177,6 +177,17 @@ void fire_extinguish(int tx, int ty) {
   }
 }
 
+void extinguish_all_flames(){
+  for (s16 x = 0 ; x < MAX_GRID_X; ++x){
+    for(s16 y=0; y < MAX_GRID_Y; ++y){
+      if (grid_state[y][x] == 1)
+      {
+        fire_extinguish(x, y);
+      }
+    }
+  }
+}
+
 void fire_partial_extinguish(int tx, int ty, int value) {
   if (tx < 0 || tx >= MAX_GRID_X || ty < 0 || ty >= MAX_GRID_Y)
     return;

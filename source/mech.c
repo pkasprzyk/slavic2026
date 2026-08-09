@@ -145,8 +145,10 @@ void mech_update(void) {
   if (timer_to_end > 0) {
     timer_to_end--;
     if (timer_to_end <= 0) {
+      // LID easter egg
       timer_to_end = 0;
       kill_all_bunnies();
+      extinguish_all_flames();
     }
   }
 
