@@ -92,7 +92,7 @@ void readFile(char *buffer, size_t size) {
       size -= res;
       buffer += res;
 
-      printf("Restarting...\n");
+      // printf("Restarting...\n");
     }
   }
 }
