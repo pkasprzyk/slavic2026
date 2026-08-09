@@ -88,7 +88,7 @@ void restart_game() {
   NF_InitSpriteSys(0);
   NF_InitSpriteSys(1);
   
-  game_init(); // TODO: fix reset pump sprite
+  game_init();
 }
 
 void game_update(void) {

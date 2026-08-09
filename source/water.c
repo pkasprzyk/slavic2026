@@ -26,12 +26,13 @@ int water_drop_cooldown = 0;
 int water_leak_cooldown = 0;
 
 #define MAX_WATER 1000
+#define START_WATER 500
 #define WATER_DROP_AMOUNT 10
 #define WATER_FILL_AMOUNT 20
 
 #define WATER_EXTINGUISH_AMOUNT 5
 
-static s16 water_remaining = 500;
+static s16 water_remaining = START_WATER;
 static u8 pump_was_in = 0; // 1 - up, 2 - down, 0 - none
 static bool pump_active = true;
 
@@ -67,6 +68,8 @@ void water_pump_init(void) {
 }
 
 void water_drop_init(void) {
+  water_remaining = START_WATER;
+  pump_active = true;
   for (int i = 0; i < WATER_DROP_MAX; i++) {
     water_drops[i].active = 0;
     water_drops[i].frame = 0;
