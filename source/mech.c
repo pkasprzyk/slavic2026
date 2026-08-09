@@ -149,6 +149,7 @@ void mech_update(void) {
       timer_to_end = 0;
       kill_all_bunnies();
       extinguish_all_flames();
+      audio_play_sfx(SFX_SFX_BUNNY_DEATH, false, IGNORED_LEN, 190);
     }
   }
 
@@ -189,7 +190,7 @@ void mech_update(void) {
   }
   if (held & KEY_LID) {
     if (timer_to_end >= -1)
-      timer_to_end = 2;
+      timer_to_end = 20;
   }
 
   if ((held & KEY_L) && (held & KEY_R) && (held & KEY_Y))
