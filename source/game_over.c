@@ -103,16 +103,10 @@ void draw_ending() {
   audio_close_wav();
   ending_drawn = true;
 
-  //NF_DeleteTiledBg(SCR_CHAMBER, 0); keep text
-  NF_DeleteTiledBg(SCR_CHAMBER, 1);
-  NF_DeleteTiledBg(SCR_CHAMBER, 2);
-  NF_DeleteTiledBg(SCR_CHAMBER, 3);
-
-
-  NF_DeleteTiledBg(SCR_WORLD, 0);
-  NF_DeleteTiledBg(SCR_WORLD, 1);
-  NF_DeleteTiledBg(SCR_WORLD, 2);
-  NF_DeleteTiledBg(SCR_WORLD, 3);
+  NF_InitTiledBgSys(SCR_CHAMBER);
+  NF_InitTiledBgSys(SCR_WORLD);
+  NF_LoadTextFont(PATH_FONT, FONT_NORMAL, 256, 256, 0);
+  NF_CreateTextLayer(SCR_CHAMBER, LAYER_CHAMBER_TEXT, 0, FONT_NORMAL);
 
   swiWaitForVBlank();
   audio_init_wav("nitro:/audio/SGJ2026-Music-Win-Chill-22khz-loop.wav");
