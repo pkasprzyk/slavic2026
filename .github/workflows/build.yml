@@ -106,13 +106,14 @@ jobs:
         run: |
           mkdir pages
           cp slavic2026*.nds pages/
-          cat > pages/index.html << 'EOF'
+          COMMIT_MSG="$(git log -1 --format='%h %s')"
+          cat > pages/index.html << EOF
           <!DOCTYPE html><html><head><meta charset="utf-8"><title>Chilling Mech</title>
           <style>body{font-family:monospace;max-width:600px;margin:40px auto;padding:0 20px;background:#111;color:#eee}a{color:#5af}</style>
           </head><body>
           <h1>Chilling Mech</h1>
           <p><a href="slavic2026.nds">Download latest build</a></p>
-          <p><small>${{ steps.version.outputs.version }} &mdash; $(git log -1 --format='%h %s' | head -1)</small></p>
+          <p><small>${{ steps.version.outputs.version }} &mdash; ${COMMIT_MSG}</small></p>
           </body></html>
           EOF
 

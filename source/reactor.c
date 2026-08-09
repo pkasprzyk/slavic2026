@@ -20,12 +20,12 @@
 #define REACTOR_MAX_TEMP 200
 
 #define BLOWING_THRESHOLD 10000
-#define BLOWING_DECREASE_AMOUNT 20
+#define BLOWING_DECREASE_AMOUNT 12
 
 // The sample rate used for the recording (samples per second)
 #define SAMPLE_RATE 8000
 
-#define BLOWING_FRAMES_REQUIRED 20
+#define BLOWING_FRAMES_REQUIRED 14
 
 #define REACTOR_THRESHOLD_1 50
 #define REACTOR_HEAT_2_SPEED_PENALTY 0
@@ -256,8 +256,8 @@ void reactor_heat_from_fire(s32 distance_sq) {
   }
 #if HEAT_DEBUG
   char buffer[128];
-  snprintf(buffer, sizeof(buffer), "HEAT: %03d  DIST: %010d COOLDN: %03d",
-           heat_amount, distance_sq, fire_heat_cooldown);
+  snprintf(buffer, sizeof(buffer), "HEAT: %03d  DIST: %010ld TEMP: %03d",
+           heat_amount, distance_sq, reactor_temp);
   NF_WriteText(SCR_CHAMBER, LAYER_CHAMBER_TEXT, 0, 8, buffer);
 #endif
 }
