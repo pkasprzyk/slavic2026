@@ -43,9 +43,9 @@ static void draw_title(void) {
   NF_WriteText(SCR_WORLD, LAYER_WORLD_TEXT, 8, 13, "[ HOW TO PLAY ]");
   NF_WriteText(SCR_WORLD, LAYER_WORLD_TEXT, 8, 17, "[   CREDITS   ]");
   if (left_handed_mode)
-    NF_WriteText(SCR_WORLD, LAYER_WORLD_TEXT, 8, 21, "[  HAND: L  ]");
+    NF_WriteText(SCR_WORLD, LAYER_WORLD_TEXT, 8, 21, "[   HAND: L   ]");
   else
-    NF_WriteText(SCR_WORLD, LAYER_WORLD_TEXT, 8, 21, "[  HAND: R  ]");
+    NF_WriteText(SCR_WORLD, LAYER_WORLD_TEXT, 8, 21, "[   HAND: R   ]");
   NF_WriteText(SCR_WORLD, LAYER_WORLD_TEXT, 24, 22, "v." GAME_VERSION);
   NF_UpdateTextLayers();
 }
@@ -123,7 +123,12 @@ void title_update(void) {
     }
     if (touch_in_rect(touch.px, touch.py, 64, 166, 120, 16)) {
       left_handed_mode = !left_handed_mode;
-      draw_title();
+      clear_row(21);
+      if (left_handed_mode)
+        NF_WriteText(SCR_WORLD, LAYER_WORLD_TEXT, 8, 21, "[   HAND: L   ]");
+      else
+        NF_WriteText(SCR_WORLD, LAYER_WORLD_TEXT, 8, 21, "[   HAND: R   ]");
+      NF_UpdateTextLayers();
       return;
     }
   } else if (screen == INSTRUCTIONS_SCREEN) {
