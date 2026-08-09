@@ -45,8 +45,8 @@ jobs:
           VER=$(cat VERSION)
           MAJOR=$(echo "$VER" | cut -d. -f1)
           MINOR=$(echo "$VER" | cut -d. -f2)
-          PATCH=$(( $(echo "$VER" | cut -d. -f3) + 1 ))
-          echo "version=v$MAJOR.$MINOR.$PATCH" >> $GITHUB_OUTPUT
+          MINOR=$((MINOR + 1))
+          echo "version=v$MAJOR.$MINOR" >> $GITHUB_OUTPUT
 
       - name: Build
         run: make
