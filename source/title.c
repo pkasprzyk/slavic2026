@@ -1,6 +1,7 @@
 #include <nds.h>
 #include <nf_lib.h>
 
+#include "chamber.h"
 #include "game.h"
 #include "ids.h"
 #include "title.h"
@@ -52,16 +53,18 @@ static void draw_title(void) {
 
 static void draw_instructions(void) {
   clear_all();
+  NF_DeleteTiledBg(SCR_CHAMBER, LAYER_CHAMBER_TEXT);
+  NF_DeleteTiledBg(SCR_CHAMBER, LAYER_CHAMBER_REACTOR);
+  NF_DeleteTiledBg(SCR_CHAMBER, LAYER_CHAMBER_BG);
+  NF_DeleteTiledBg(SCR_CHAMBER, LAYER_CHAMBER_WATER);
   load_instr_bg();
   NF_WriteText(SCR_WORLD, LAYER_WORLD_TEXT, 10, 2, "HOW TO PLAY");
   if (left_handed_mode)
-    NF_WriteText(SCR_WORLD, LAYER_WORLD_TEXT, 2, 5,
-                 "A/B/X/Y: Move the robot");
+    NF_WriteText(SCR_WORLD, LAYER_WORLD_TEXT, 2, 5, "A/B/X/Y: Move the robot");
   else
     NF_WriteText(SCR_WORLD, LAYER_WORLD_TEXT, 2, 5, "D-Pad: Move the robot");
   NF_WriteText(SCR_WORLD, LAYER_WORLD_TEXT, 2, 7, "Touch/Stylus: Water stream");
-  NF_WriteText(SCR_WORLD, LAYER_WORLD_TEXT, 2, 9,
-               "Blow the Mic: Cool reactor");
+  NF_WriteText(SCR_WORLD, LAYER_WORLD_TEXT, 2, 9, "Blow the Mic: Cool reactor");
   NF_WriteText(SCR_WORLD, LAYER_WORLD_TEXT, 2, 11,
                "Water Pump: Pump up the jam");
   NF_WriteText(SCR_WORLD, LAYER_WORLD_TEXT, 2, 12, "to fill water tank");
@@ -69,17 +72,27 @@ static void draw_instructions(void) {
   NF_WriteText(SCR_WORLD, LAYER_WORLD_TEXT, 2, 15, "burning forest!");
   NF_WriteText(SCR_WORLD, LAYER_WORLD_TEXT, 9, 17, "[   BACK   ]");
   NF_UpdateTextLayers();
+  NF_LoadTiledBg("bg/how_to_play", HOW_TO_PLAY_GB, 256, 256);
+  NF_CreateTiledBg(SCR_CHAMBER, LAYER_CHAMBER_TEXT, HOW_TO_PLAY_GB);
 }
 
 static void draw_credits(void) {
   clear_all();
   load_instr_bg();
-  NF_WriteText(SCR_WORLD, LAYER_WORLD_TEXT, 2, 3, "\xbf""ukasz \"Zephyr\" Sobczyk");
+  NF_WriteText(SCR_WORLD, LAYER_WORLD_TEXT, 2, 3,
+               "\xbf"
+               "ukasz \"Zephyr\" Sobczyk");
   NF_WriteText(SCR_WORLD, LAYER_WORLD_TEXT, 2, 5,
-               "Mateusz \"Grafiszti\" Choi\xfc""ski");
-  NF_WriteText(SCR_WORLD, LAYER_WORLD_TEXT, 2, 7, "Szymon Rzosi\xfc""ski");
+               "Mateusz \"Grafiszti\" Choi\xfc"
+               "ski");
+  NF_WriteText(SCR_WORLD, LAYER_WORLD_TEXT, 2, 7,
+               "Szymon Rzosi\xfc"
+               "ski");
   NF_WriteText(SCR_WORLD, LAYER_WORLD_TEXT, 2, 9, "Piotrek \"Pikej\" Kasprzyk");
-  NF_WriteText(SCR_WORLD, LAYER_WORLD_TEXT, 2, 11, "Justyna Kry\xa1""cio-Rzosi\xfc""ska");
+  NF_WriteText(SCR_WORLD, LAYER_WORLD_TEXT, 2, 11,
+               "Justyna Kry\xa1"
+               "cio-Rzosi\xfc"
+               "ska");
   NF_WriteText(SCR_WORLD, LAYER_WORLD_TEXT, 2, 13,
                "Kamila \"Yreron\" Chmielowiec");
   NF_WriteText(SCR_WORLD, LAYER_WORLD_TEXT, 9, 17, "[   BACK   ]");
@@ -134,7 +147,9 @@ void title_update(void) {
   } else if (screen == INSTRUCTIONS_SCREEN) {
     if (touch_in_rect(touch.px, touch.py, 72, 134, 104, 16)) {
       screen = TITLE_SCREEN;
-      draw_title();
+      NF_DeleteTiledBg(SCR_CHAMBER, LAYER_CHAMBER_TEXT);
+      NF_UnloadTiledBg(HOW_TO_PLAY_GB);
+      restart_game();
       return;
     }
   } else if (screen == CREDITS_SCREEN) {

@@ -31,6 +31,7 @@ $GRIT UI_reactor2.png -ftB -fh! -gTFF00FF -gt -gB8 -mR8 -mLs
 $GRIT UI_reactor3.png -ftB -fh! -gTFF00FF -gt -gB8 -mR8 -mLs
 $GRIT UI_reactor4.png -ftB -fh! -gTFF00FF -gt -gB8 -mR8 -mLs
 $GRIT UI_water_level.png -ftB -fh! -gTFF00FF -gt -gB8 -mR8 -mLs
+$GRIT how_to_play.png -ftB -fh! -gTFF00FF -gt -gB8 -mR8 -mLs
 
 $GRIT fire_tileset.png -ftB -fh! -gTFF00FF -gt -gB8 -m!
 

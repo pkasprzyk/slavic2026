@@ -151,11 +151,13 @@ void game_update(void) {
     return;
   }
 
-  mech_update();
-  fire_update();
-  water_update();
-  bunnies_update();
-  chamber_update();
+  if (game_state == GAME_PLAYING) {
+    mech_update();
+    fire_update();
+    water_update();
+    bunnies_update();
+    chamber_update();
+  }
   NF_UpdateTextLayers();
 
   if (bunnies_cnt == 0) {
