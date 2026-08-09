@@ -13,6 +13,7 @@ GAME_TITLE	:= Red Hot Chilling Bunnies
 GAME_SUBTITLE	:= Slavic Game Jam 2026
 GAME_AUTHOR	:= Kombajn do Zbierania Królików po Wioskach
 GAME_ICON	:= assets/Game_icon.bmp
+GAME_VERSION	:= $(shell cat VERSION)
 
 COMPDB = 1
 
@@ -81,7 +82,8 @@ ASFLAGS		+= -x assembler-with-cpp $(INCLUDEFLAGS) $(ARCH) \
 
 CFLAGS		+= -std=gnu17 $(WARNFLAGS) $(INCLUDEFLAGS) $(ARCH) \
 		   -O2 -ffunction-sections -fdata-sections \
-		   -specs=$(SPECS)
+		   -specs=$(SPECS) \
+		   -DGAME_VERSION='"$(GAME_VERSION)"'
 
 LDFLAGS		:= $(ARCH) $(LIBDIRSFLAGS) -Wl,-Map,$(MAP) \
 		   -Wl,--start-group $(LIBS) -Wl,--end-group -specs=$(SPECS)

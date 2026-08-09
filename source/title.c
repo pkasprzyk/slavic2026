@@ -42,6 +42,7 @@ static void draw_title(void) {
   NF_WriteText(SCR_WORLD, LAYER_WORLD_TEXT, 8, 9, "[    START    ]");
   NF_WriteText(SCR_WORLD, LAYER_WORLD_TEXT, 8, 13, "[ HOW TO PLAY ]");
   NF_WriteText(SCR_WORLD, LAYER_WORLD_TEXT, 8, 17, "[   CREDITS   ]");
+  NF_WriteText(SCR_WORLD, LAYER_WORLD_TEXT, 24, 22, "v." GAME_VERSION);
   NF_UpdateTextLayers();
 }
 
