@@ -149,8 +149,11 @@ void collect_all_bunnies()
 static void kill_bunny(u16 bunnyId, bool silent) {
   if (!silent)
     audio_play_sfx(SFX_SFX_BUNNY_DEATH, false, IGNORED_LEN, 190);
-  NF_ShowSprite(SCR_WORLD, bunnies[bunnyId].indicator_oam_id, false);
-  NF_DeleteSprite(SCR_WORLD, bunnies[bunnyId].oam_id);
+  // NF_ShowSprite(SCR_WORLD, bunnies[bunnyId].indicator_oam_id, false);
+  // NF_DeleteSprite(SCR_WORLD, bunnies[bunnyId].oam_id);
+  NF_SpriteFrame(SCR_WORLD, bunnies[bunnyId].oam_id, 4);
+  NF_VflipSprite(SCR_WORLD, bunnies[bunnyId].oam_id, false);
+
   bunnies[bunnyId] = bunnies[bunnies_cnt - 1];
   --bunnies_cnt;
   ++bunnies_died;
@@ -302,6 +305,8 @@ void updateChamberBunnies() {
 }
 
 void bunnies_update(void) {
+  if (bunnies_cnt <= 0)
+    return;
   ++frame_cnt;
   frame_cnt %= 60 * 2;
   for (s16 i = bunnies_cnt - 1; i >= 0; --i) {
