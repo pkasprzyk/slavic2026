@@ -28,6 +28,10 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Pull latest
+        if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+        run: git pull --rebase origin master
+
       - name: Bump version
         id: version
         if: github.event_name == 'push' && github.ref == 'refs/heads/master'
@@ -58,7 +62,6 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git pull --rebase origin master
           git add VERSION
           git commit -m "bump version to ${{ steps.version.outputs.version }} [skip ci]"
           git tag "${{ steps.version.outputs.version }}"
