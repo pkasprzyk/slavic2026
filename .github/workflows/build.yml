@@ -40,9 +40,8 @@ jobs:
           MAJOR=$(echo "$VER" | cut -d. -f1)
           MINOR=$(echo "$VER" | cut -d. -f2)
           PATCH=$(( $(echo "$VER" | cut -d. -f3) + 1 ))
-          NEW="${MAJOR}.${MINOR}.${PATCH}"
-          echo "$NEW" > VERSION
-          echo "version=v${NEW}" >> $GITHUB_OUTPUT
+          echo "$MAJOR.$MINOR.$PATCH" > VERSION
+          echo "version=v$MAJOR.$MINOR.$PATCH" >> $GITHUB_OUTPUT
 
       - name: Build
         run: make
@@ -62,13 +61,21 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
+          git pull --rebase origin master
+          TAG="${{ steps.version.outputs.version }}"
+          if git ls-remote --tags origin "$TAG" | grep -q "$TAG"; then
+            echo "Tag $TAG already exists, skipping push"
+            echo "skip_release=true" >> $GITHUB_OUTPUT
+            exit 0
+          fi
           git add VERSION
-          git commit -m "bump version to ${{ steps.version.outputs.version }} [skip ci]"
-          git tag "${{ steps.version.outputs.version }}"
+          git commit -m "bump version to $TAG [skip ci]"
+          git tag "$TAG"
           git push origin master --tags
+        id: push
 
       - name: Create release
-        if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+        if: github.event_name == 'push' && github.ref == 'refs/heads/master' && steps.push.outputs.skip_release != 'true'
         run: |
           gh release create "${{ steps.version.outputs.version }}" \
             "slavic2026-${{ steps.version.outputs.version }}.nds" \
