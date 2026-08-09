@@ -139,6 +139,13 @@ static void collect(u16 bunnyId) {
   ++bunnies_collected;
 }
 
+void collect_all_bunnies()
+{
+  for (s16 i = 0; i < bunnies_cnt; ++i){
+    collect(0);
+  }
+}
+
 static void kill_bunny(u16 bunnyId, bool silent) {
   if (!silent)
     audio_play_sfx(SFX_SFX_BUNNY_DEATH, false, IGNORED_LEN, 190);

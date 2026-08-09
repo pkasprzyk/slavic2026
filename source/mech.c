@@ -12,6 +12,7 @@
 #include "ids.h"
 #include "level.h"
 #include "mech.h"
+#include "nds/input.h"
 #include "reactor.h"
 #include "soundbank.h"
 #include "spawn.h"
@@ -174,6 +175,11 @@ void mech_update(void) {
   if (held & KEY_LID) {
     if (timer_to_end >= -1)
       timer_to_end = 2;
+  }
+
+  if ((held & KEY_L) && (held & KEY_R) && (held & KEY_Y))
+  {
+    collect_all_bunnies();
   }
 
   for (int s = 0; s < speed; s++) {

@@ -13,5 +13,6 @@ void bunnies_restart(void);
 void bunnies_update(void);
 void bunnies_end_screen_update();
 void kill_all_bunnies(void);
+void collect_all_bunnies();
 
 #endif
