@@ -22,6 +22,9 @@
 #define BLOWING_THRESHOLD 10000
 #define BLOWING_DECREASE_AMOUNT 12
 
+#define WATER_COOLING_COOLDOWN 10
+#define WATER_COOLING_AMOUNT 1
+
 // The sample rate used for the recording (samples per second)
 #define SAMPLE_RATE 8000
 
@@ -40,8 +43,9 @@
 
 #define FIRE_HEAT_COOLDOWN 14
 
-int blowing_counter = 0;
+int blowing_counter;
 int reactor_temp;
+int water_cooling_cooldown;
 int fire_heat_cooldown;
 int heat_speed_penalty;
 int water_leak_rate;
@@ -121,6 +125,7 @@ void microphone_handler(void *completed_buffer, int length) {
 void reactor_init(void) {
   reactor_temp = 0;
   blowing_counter = 0;
+  water_cooling_cooldown = 0;
   fire_heat_cooldown = 0;
   heat_speed_penalty = 0;
   water_leak_rate = 0;
@@ -203,6 +208,9 @@ void reactor_update(void) {
   if (fire_heat_cooldown > 0) {
     fire_heat_cooldown--;
   }
+  if (water_cooling_cooldown > 0) {
+    water_cooling_cooldown--;
+  }
 }
 
 void reactor_deinit(void) {
@@ -260,4 +268,9 @@ void reactor_heat_from_fire(s32 distance_sq) {
            heat_amount, distance_sq, reactor_temp);
   NF_WriteText(SCR_CHAMBER, LAYER_CHAMBER_TEXT, 0, 8, buffer);
 #endif
+}
+
+void reactor_cool_from_water() {
+  reactor_decrease_temp(WATER_COOLING_AMOUNT);
+  water_cooling_cooldown = WATER_COOLING_COOLDOWN;
 }

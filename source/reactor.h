@@ -4,6 +4,7 @@
 #include <nds.h>
 
 extern int fire_heat_cooldown;
+extern int water_cooling_cooldown;
 extern int heat_speed_penalty;
 extern int water_leak_rate;
 
@@ -16,5 +17,6 @@ void reactor_increase_temp(int amount);
 void reactor_decrease_temp(int amount);
 
 void reactor_heat_from_fire(s32 distance_sq);
+void reactor_cool_from_water();
 
 #endif

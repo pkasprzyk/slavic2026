@@ -210,6 +210,9 @@ void mech_update(void) {
   }
 
   if (is_in_water(mech_precise_x, mech_precise_y)) {
+    if (water_cooling_cooldown <= 0) {
+      reactor_cool_from_water();
+    }
     water_show_pump();
     if (!was_in_water) {
       audio_set_looped_volume(SFX_SFX_FIRE_LOOP, 80);
