@@ -147,7 +147,6 @@ static void kill_bunny(u16 bunnyId, bool silent) {
   // NF_ShowSprite(SCR_WORLD, bunnies[bunnyId].indicator_oam_id, false);
   // NF_DeleteSprite(SCR_WORLD, bunnies[bunnyId].oam_id);
   NF_SpriteFrame(SCR_WORLD, bunnies[bunnyId].oam_id, 4);
-  NF_VflipSprite(SCR_WORLD, bunnies[bunnyId].oam_id, false);
 
   dead_bunnies[bunnies_died] = bunnies[bunnyId];
   bunnies[bunnyId] = bunnies[bunnies_cnt - 1];
@@ -283,8 +282,10 @@ static void updateBunny(int i) {
 
   NF_ShowSprite(SCR_WORLD, bunnies[i].oam_id, true);
   NF_MoveSprite(SCR_WORLD, bunnies[i].oam_id, x, y);
-  NF_SpriteFrame(SCR_WORLD, bunnies[i].oam_id, frame_cnt / 30);
-  NF_VflipSprite(SCR_WORLD, bunnies[i].oam_id, isHurt);
+  if (isHurt)
+    NF_SpriteFrame(SCR_WORLD, bunnies[i].oam_id, 5 + ((frame_cnt / 15) % 2));
+  else
+    NF_SpriteFrame(SCR_WORLD, bunnies[i].oam_id, frame_cnt / 30);
 }
 
 void updateChamberBunnies() {
