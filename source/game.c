@@ -20,6 +20,7 @@
 #include "sprites.h"
 #include "title.h"
 #include "water.h"
+#include "social.h"
 
 int game_state;
 bool left_handed_mode = false;
@@ -61,6 +62,7 @@ void game_init(void) {
   NF_InitSpriteSys(1);
 
   InitSprites();
+  social_init();
   level_init();
   chamber_init();
 
@@ -142,16 +144,19 @@ void game_update(void) {
   audio_update_loops();
 
   if (game_state == GAME_TITLE) {
+    social_hide_info();
     title_update();
     return;
   }
 
   if (game_state == GAME_OVER) {
+    social_hide_info();
     game_over_update();
     return;
   }
 
   if (game_state == GAME_PLAYING) {
+    social_update();
     mech_update();
     fire_update();
     water_update();
@@ -161,6 +166,7 @@ void game_update(void) {
   NF_UpdateTextLayers();
 
   if (bunnies_cnt == 0) {
+    social_hide_info();
     if (frames_in_end_state == 0) {
       startFadeOut();
     }

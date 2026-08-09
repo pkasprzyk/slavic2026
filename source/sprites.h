@@ -28,6 +28,7 @@ enum {
   INDICATOR_ARROW = 4,
   PUMP = 5,
   PUMP_HANDLE = 6,
+  GUARDIAN_ICON = 7,
   SPRITE_CNT
 };
 
@@ -47,6 +48,8 @@ static const SpriteInfo SPRITE_INFOS[SPRITE_CNT] = {
     [PUMP] = {"spr/pump_body", 64, 64, PUMP, DEFAULT_SPRITE_PALETTE, BOTTOM},
     [PUMP_HANDLE] = {"spr/pump_handle", 64, 32, PUMP_HANDLE,
                      DEFAULT_SPRITE_PALETTE, BOTTOM},
+    [GUARDIAN_ICON] = {"spr/Game_icon", 32, 32, GUARDIAN_ICON,
+                       DEFAULT_SPRITE_PALETTE, BOTTOM},
 };
 
 void InitSprites(void);
@@ -58,6 +61,8 @@ void InitSprites(void);
 
 #define WATER_DROP_OAM_BASE 11
 #define WATER_DROP_MAX 5
+
+#define GUARDIAN_ICON_OAM_ID 123
 
 #define PUMP_UP_OAM_ID 101
 #define PUMP_DOWN_OAM_ID 102

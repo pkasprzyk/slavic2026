@@ -11,7 +11,7 @@ python3 generate_from_tmx.py
 
 # =========== SPRITES
 
-$GRIT sprite_water_drops.png sprite_robot_all.png sprite_hare_idle.png sprite_fire_small.png indicator_arrow.png pump_body.png pump_handle.png -ftB -fh! -gTFF00FF -gt -gB8 -pS -Odefault_sprite.pal
+$GRIT Game_icon.png sprite_water_drops.png sprite_robot_all.png sprite_hare_idle.png sprite_fire_small.png indicator_arrow.png pump_body.png pump_handle.png -ftB -fh! -gTFF00FF -gt -gB8 -pS -Odefault_sprite.pal
 
 mv *.pal *.img ../nitrofiles/spr
 
