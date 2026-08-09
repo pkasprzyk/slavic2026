@@ -20,7 +20,7 @@
 #define REACTOR_MAX_TEMP 200
 
 #define BLOWING_THRESHOLD 10000
-#define BLOWING_DECREASE_AMOUNT 16
+#define BLOWING_DECREASE_AMOUNT 20
 
 // The sample rate used for the recording (samples per second)
 #define SAMPLE_RATE 8000
@@ -38,7 +38,7 @@
 #define FIRE_HEAT_DISTANCE 36
 #define FIRE_HEAT_MULTIPLIER 200
 
-#define FIRE_HEAT_COOLDOWN 10
+#define FIRE_HEAT_COOLDOWN 14
 
 int blowing_counter = 0;
 int reactor_temp;
