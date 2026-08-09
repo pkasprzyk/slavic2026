@@ -122,6 +122,7 @@ void draw_ending() {
   audio_close_wav();
   ending_drawn = true;
 
+  NF_InitSpriteSys(SCR_WORLD);
   NF_InitTiledBgSys(SCR_CHAMBER);
   NF_InitTiledBgSys(SCR_WORLD);
   NF_LoadTextFont(PATH_FONT, FONT_NORMAL, 256, 256, 0);
