@@ -48,8 +48,8 @@ static void draw_bad_ending(void) {
   snprintf(buf, sizeof(buf), "You failed to save\n\n    any of the %d bunnies...",  bunnies_died);
   NF_ClearTextLayer(SCR_CHAMBER, LAYER_CHAMBER_TEXT);
 
-  NF_WriteText(SCR_CHAMBER, LAYER_CHAMBER_TEXT, 16-5, 5, "SAD ROBOT");
-  NF_WriteText(SCR_CHAMBER, LAYER_CHAMBER_TEXT, 16-9, 10, buf);
+  NF_WriteText(SCR_CHAMBER, LAYER_CHAMBER_TEXT, 16-5, 8, "SAD ROBOT");
+  NF_WriteText(SCR_CHAMBER, LAYER_CHAMBER_TEXT, 16-9, 12, buf);
   // NF_WriteText(SCR_WORLD, LAYER_WORLD_TEXT, 11, 17, "[  EXIT  ]");
   NF_UpdateTextLayers();
 
@@ -74,9 +74,9 @@ static void draw_mid_ending(void) {
   }
   NF_ClearTextLayer(SCR_CHAMBER, LAYER_CHAMBER_TEXT);
 
-  NF_WriteText(SCR_CHAMBER, LAYER_CHAMBER_TEXT, 16-4, 5, "THE END");
-  NF_WriteText(SCR_CHAMBER, LAYER_CHAMBER_TEXT, 16-12, 10, buf);
-  NF_WriteText(SCR_CHAMBER, LAYER_CHAMBER_TEXT, 16-15, 12, buf2);
+  NF_WriteText(SCR_CHAMBER, LAYER_CHAMBER_TEXT, 16-4, 2, "THE END");
+  NF_WriteText(SCR_CHAMBER, LAYER_CHAMBER_TEXT, 16-12, 4, buf);
+  NF_WriteText(SCR_CHAMBER, LAYER_CHAMBER_TEXT, 16-15, 6, buf2);
   // NF_WriteText(SCR_WORLD, LAYER_WORLD_TEXT, 11, 17, "[  EXIT  ]");
   NF_UpdateTextLayers();
 
@@ -91,8 +91,8 @@ static void draw_good_ending(void) {
   snprintf(buf, sizeof(buf), "All %d bunnies rescued!", bunnies_collected);
   NF_ClearTextLayer(SCR_CHAMBER, LAYER_CHAMBER_TEXT);
 
-  NF_WriteText(SCR_CHAMBER, LAYER_CHAMBER_TEXT, 16-8, 5, "CONGRATULATIONS !");
-  NF_WriteText(SCR_CHAMBER, LAYER_CHAMBER_TEXT, 16-12, 10, buf);
+  NF_WriteText(SCR_CHAMBER, LAYER_CHAMBER_TEXT, 16-8, 3, "CONGRATULATIONS !!!");
+  NF_WriteText(SCR_CHAMBER, LAYER_CHAMBER_TEXT, 16-12, 7, buf);
   // NF_WriteText(SCR_WORLD, LAYER_WORLD_TEXT, 11, 17, "[  EXIT  ]");
   NF_UpdateTextLayers();
 

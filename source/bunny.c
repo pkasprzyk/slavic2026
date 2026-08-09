@@ -139,12 +139,6 @@ static void collect(u16 bunnyId) {
   ++bunnies_collected;
 }
 
-void collect_all_bunnies()
-{
-  for (s16 i = 0; i < bunnies_cnt; ++i){
-    collect(0);
-  }
-}
 
 static void kill_bunny(u16 bunnyId, bool silent) {
   if (!silent)
@@ -160,8 +154,15 @@ static void kill_bunny(u16 bunnyId, bool silent) {
 }
 
 void kill_all_bunnies(void) {
-  for (s16 i = bunnies_cnt - 1; i >= 0; i--) {
-    kill_bunny(i, true);
+  while ( bunnies_cnt > 0 ){
+    kill_bunny(0, true);
+  }
+}
+
+void collect_all_bunnies()
+{
+  while ( bunnies_cnt > 0 ){
+    collect(0);
   }
 }
 
