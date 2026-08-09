@@ -12,7 +12,7 @@ You are an ancient guardian mech, overgrown with vines and wildflowers — the l
 
 **Rescue animals. Quench flames with river water. Keep your reactor cool — by blowing on it.**
 
-![Inner chamber](assets/UI_background.png)
+![Inner chamber](assets/bg_mid_ending.png)
 
 ---
 
@@ -31,28 +31,17 @@ You are an ancient guardian mech, overgrown with vines and wildflowers — the l
 
 ## Controls
 
-| Input             | Action                                   |
-|-------------------|------------------------------------------|
-| D-Pad             | Move the mech                            |
-| A                 | Scoop / carry an animal                  |
-| B                 | Pick up water at a river or pond         |
-| Touch (stylus)    | Tap / drag to aim the water spray        |
-| **DS microphone** | **Blow to cool the overheating reactor** |
+| Input             | Action                                           |
+|-------------------|--------------------------------------------------|
+| D-Pad             | Move the mech                                    |
+| Touch (stylus)    | Tap / drag to aim the water spray, pumping water |
+| **DS microphone** | **Blow to cool the overheating reactor**         |
 
 ---
 
 ## Screenshots
 
 > Screenshots coming soon — for now, here is the art that makes up the game.
-
-| Mech                                  | Animals                              | Reactor                            |
-|---------------------------------------|--------------------------------------|------------------------------------|
-| ![Robot](assets/sprite_robot_all.png) | ![Hare](assets/sprite_hare_idle.png) | ![Reactor](assets/UI_reactor1.png) |
-
-| Forest map                   | Chamber                              | Water tank                          |
-|------------------------------|--------------------------------------|-------------------------------------|
-| ![Forest](assets/forest.png) | ![Chamber](assets/UI_background.png) | ![Water](assets/UI_water_level.png) |
-
 ---
 
 ## Build
@@ -83,11 +72,11 @@ Asset pipeline: PNGs in `assets/` → GRIT → `nitrofiles/` → NitroFS. Graphi
 
 Made for **Slavic Game Jam 2026**.
 
-| Role   | People                                                  |
-|--------|---------------------------------------------------------|
-| Code   | NamespaceV, Grafiszti, Szymon Rzosiński, Piotr Kasprzyk |
-| Art    | yreron                                                  |
-| Design | all                                                     |
-| Audio  | Justyna Kryścio-Rzosińska                               |
+| Role   | People                                                         |
+|--------|----------------------------------------------------------------|
+| Code   | NamespaceV, Mateusz Choiński, Szymon Rzosiński, Piotr Kasprzyk |
+| Art    | yreron                                                         |
+| Design | all                                                            |
+| Audio  | Justyna Kryścio-Rzosińska                                      |
 
 ---
