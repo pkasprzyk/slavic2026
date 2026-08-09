@@ -47,7 +47,7 @@ static void draw_bad_ending(void) {
   snprintf(buf, sizeof(buf), "You failed to save\n\n    any of the %d bunnies...",  bunnies_died);
   NF_ClearTextLayer(SCR_CHAMBER, LAYER_CHAMBER_TEXT);
 
-  NF_WriteText(SCR_CHAMBER, LAYER_CHAMBER_TEXT, 16-5, 5, "BAD ENDING");
+  NF_WriteText(SCR_CHAMBER, LAYER_CHAMBER_TEXT, 16-5, 5, "SO SAD");
   NF_WriteText(SCR_CHAMBER, LAYER_CHAMBER_TEXT, 16-9, 10, buf);
   // NF_WriteText(SCR_WORLD, LAYER_WORLD_TEXT, 11, 17, "[  EXIT  ]");
   NF_UpdateTextLayers();
@@ -61,7 +61,7 @@ static void draw_mid_ending(void) {
 
   char buf[50];
   if (bunnies_collected == 1){
-    snprintf(buf, sizeof(buf), "  You rescued 1 bunny...", bunnies_collected);
+    snprintf(buf, sizeof(buf), "  You rescued 1 bunny...");
   } else {
     snprintf(buf, sizeof(buf), "You rescued %d bunnies...", bunnies_collected);
   }
@@ -69,7 +69,7 @@ static void draw_mid_ending(void) {
   if (bunnies_died == 1){
     snprintf(buf2, sizeof(buf2), "But %d bunnies didnt make it :(", bunnies_died);
   } else {
-    snprintf(buf2, sizeof(buf2), "  But 1 bunny didnt make it :(", bunnies_died);
+    snprintf(buf2, sizeof(buf2), "  But 1 bunny didnt make it :(");
   }
   NF_ClearTextLayer(SCR_CHAMBER, LAYER_CHAMBER_TEXT);
 
