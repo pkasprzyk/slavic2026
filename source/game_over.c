@@ -5,6 +5,7 @@
 #include "bunny.h"
 #include "audio.h"
 #include "game.h"
+#include "game_over.h"
 
 static bool ending_drawn;
 
@@ -16,6 +17,13 @@ enum Ending {
 static u16 ending;
 
 static s16 frames_on_end_screen = 0;
+
+
+void write_press_to_reset(){
+  NF_WriteText(SCR_CHAMBER, LAYER_CHAMBER_TEXT, 16-7, 22, "TOUCH TO RESET");
+  NF_UpdateTextLayers();
+}
+
 
 void game_over_on_enter()
 {
@@ -29,9 +37,6 @@ void game_over_on_enter()
     ending = MID_ENDING;
   }
 }
-
-void draw_ending(); // fwd
-void write_press_to_reset(); // fwd
 
 void game_over_update(){
   ++frames_on_end_screen;
@@ -82,9 +87,9 @@ static void draw_mid_ending(void) {
   }
   char buf2[50];
   if (bunnies_died == 1){
-    snprintf(buf2, sizeof(buf2), "  But 1 bunny didnt make it :(");
+    snprintf(buf2, sizeof(buf2), "  But 1 bunny didn't make it :(");
   } else {
-    snprintf(buf2, sizeof(buf2), "But %d bunnies didnt make it :(", bunnies_died);
+    snprintf(buf2, sizeof(buf2), "But %d bunnies didn't make it :(", bunnies_died);
   }
   NF_ClearTextLayer(SCR_CHAMBER, LAYER_CHAMBER_TEXT);
 
@@ -111,11 +116,6 @@ static void draw_good_ending(void) {
   NF_UpdateTextLayers();
 
   ending_drawn = 1;
-}
-
-void write_press_to_reset(){
-  NF_WriteText(SCR_CHAMBER, LAYER_CHAMBER_TEXT, 16-7, 22, "TOUCH TO RESET");
-  NF_UpdateTextLayers();
 }
 
 void draw_ending() {
