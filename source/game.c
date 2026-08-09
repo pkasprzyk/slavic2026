@@ -77,16 +77,18 @@ void game_init(void) {
   title_init();
 }
 
-void game_return_to_title(void) {
-  game_state = GAME_TITLE;
-  title_init();
-}
-
 void restart_game() {
   level_restart();
   chamber_restart();
+  bunnies_restart();
+  mech_restart();
+  water_restart();
 
-  game_return_to_title();
+  NF_ResetSpriteBuffers();
+  NF_InitSpriteSys(0);
+  NF_InitSpriteSys(1);
+  
+  game_init(); // TODO: fix reset pump sprite
 }
 
 void game_update(void) {

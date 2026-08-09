@@ -4,6 +4,7 @@
 #include "ids.h"
 #include "bunny.h"
 #include "audio.h"
+#include "game.h"
 
 static bool ending_drawn;
 
@@ -14,9 +15,11 @@ enum Ending {
 };
 static u16 ending;
 
+static s16 frames_on_end_screen = 0;
 
 void game_over_on_enter()
 {
+  frames_on_end_screen = 0;
   ending_drawn = false;
   if (bunnies_collected == 0) {
     ending =  BAD_ENDING;
@@ -28,12 +31,23 @@ void game_over_on_enter()
 }
 
 void draw_ending(); // fwd
+void write_press_to_reset(); // fwd
 
 void game_over_update(){
+  ++frames_on_end_screen;
   if (!ending_drawn){
     draw_ending();
   }
   bunnies_end_screen_update();
+
+  if (frames_on_end_screen == 90)
+  {
+    write_press_to_reset();
+  }
+  if (frames_on_end_screen > 90 && keysDown() & KEY_TOUCH) {
+    restart_game();
+  }
+
 }
 
 void game_over_cleanup(){
@@ -99,6 +113,11 @@ static void draw_good_ending(void) {
   ending_drawn = 1;
 }
 
+void write_press_to_reset(){
+  NF_WriteText(SCR_CHAMBER, LAYER_CHAMBER_TEXT, 16-7, 22, "TOUCH TO RESET");
+  NF_UpdateTextLayers();
+}
+
 void draw_ending() {
   audio_close_wav();
   ending_drawn = true;
@@ -120,24 +139,5 @@ void draw_ending() {
   } else {
     draw_mid_ending();
     audio_stop_looped_sfx(SFX_SFX_FIRE_LOOP);
-  }
-}
-
-static bool touch_in_rect(int x, int y, int rx, int ry, int rw, int rh) {
-  return x >= rx && x <= rx + rw && y >= ry && y <= ry + rh;
-}
-
-void end_state_update() {
-  if (!ending_drawn) {
-    draw_ending();
-  }
-  bunnies_end_screen_update();
-  if (keysDown() & KEY_TOUCH) {
-    touchPosition touch;
-    touchRead(&touch);
-    if (touch_in_rect(touch.px, touch.py, 88, 134, 80, 16)){
-      // TODO: uncomment when restart is fixed
-      //restart_game();
-    }
   }
 }
