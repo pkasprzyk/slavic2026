@@ -35,7 +35,7 @@ FILE *wavFile = NULL;
 
 char stream_buffer[BUFFER_LENGTH];
 int stream_buffer_in;
-int stream_buffer_out;
+volatile int stream_buffer_out;
 
 bool wav_started = false;
 
@@ -61,6 +61,7 @@ mm_word streamingCallback(mm_word length, mm_addr dest,
 
     memcpy(dest, src_, size);
     stream_buffer_out += size;
+    DC_FlushRange(dest, size);
   } else {
     char *src_ = &stream_buffer[stream_buffer_out];
     char *dst_ = dest;
@@ -72,6 +73,7 @@ mm_word streamingCallback(mm_word length, mm_addr dest,
     src_ = &stream_buffer[0];
     memcpy(dst_, src_, size);
     stream_buffer_out = size;
+    DC_FlushRange(dest, bytes_until_end + size);
   }
 
   return length;
@@ -217,9 +219,11 @@ void audio_close_wav(void) {
 }
 
 void audio_init_SB(void) {
-  mmInitDefault("nitro:/soundbank.bin");
+  if (!mmInitDefault("nitro:/soundbank.bin")) {
+    printf("mmInitDefault failed\n");
+    waitForever();
+  }
   mmSelectMode(MM_MODE_B);
-  soundEnable();
 }
 void audio_play_sfx(mm_word sample_name, bool loop, u16 length, u8 volume) {
   mmLoadEffect(sample_name);
@@ -297,7 +301,7 @@ void audio_stop_all_sfx(void) {
 
 void audio_unload_all_sfx(void) {
   audio_stop_all_sfx();
-  for (u8 i = 0; i < MSL_BANKSIZE; ++i) {
+  for (u8 i = 0; i < MSL_NSAMPS; ++i) {
     mmUnloadEffect(i);
   }
 }

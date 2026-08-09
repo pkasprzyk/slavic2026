@@ -15,7 +15,6 @@
 #include "mech.h"
 #include "nds/input.h"
 #include "reactor.h"
-#include "soundbank.h"
 #include "spawn.h"
 #include "sprites.h"
 #include "water.h"
