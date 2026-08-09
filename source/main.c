@@ -11,6 +11,7 @@
 
 int main(void) {
   game_init();
+  social_init();
   while (1) {
     scanKeys();
     game_update();

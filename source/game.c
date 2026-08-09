@@ -62,7 +62,6 @@ void game_init(void) {
   NF_InitSpriteSys(1);
 
   InitSprites();
-  social_init();
   level_init();
   chamber_init();
 
@@ -150,7 +149,6 @@ void game_update(void) {
   }
 
   if (game_state == GAME_OVER) {
-    social_hide_info();
     game_over_update();
     return;
   }
@@ -166,7 +164,6 @@ void game_update(void) {
   NF_UpdateTextLayers();
 
   if (bunnies_cnt == 0) {
-    social_hide_info();
     if (frames_in_end_state == 0) {
       startFadeOut();
     }
