@@ -124,7 +124,7 @@ void fire_update(void) {
       int nx = cells[i].tx + dirs[d][0];
       int ny = cells[i].ty + dirs[d][1];
       if (nx >= 0 && nx < MAX_GRID_X && ny >= 0 && ny < MAX_GRID_Y &&
-          grid_state[ny][nx] == 0) {
+          grid_state[ny][nx] == 0 && !mech_occupies_tile(nx, ny)) {
         int t = NF_GetTile(COLMAP_SLOT, nx * 8, ny * 8);
         if (t == TILE_TREE || t == TILE_BUSH) {
           int ci = alloc_cell();

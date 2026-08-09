@@ -9,6 +9,7 @@
 
 #include "audio.h"
 #include "bunny.h"
+#include "fire.h"
 #include "ids.h"
 #include "level.h"
 #include "mech.h"
@@ -74,6 +75,8 @@ static int mech_blocked(s32 x, s32 y) {
 
   for (s32 ty = y0; ty <= y1; ty++)
     for (s32 tx = x0; tx <= x1; tx++) {
+      if (fire_is_burning(tx, ty))
+        return 1;
       int t = NF_GetTile(COLMAP_SLOT, tx << 3, ty << 3);
       if (t == TILE_WALL || t == TILE_TREE || t == TILE_DEEP_WATER)
         return 1;
@@ -95,6 +98,13 @@ static bool is_in_water(s32 x, s32 y) {
         return true;
     }
   return false;
+}
+
+bool mech_occupies_tile(int tx, int ty) {
+  int tile_x = tx * 8;
+  int tile_y = ty * 8;
+  return mech_x < tile_x + 8 && mech_x + MECH_W > tile_x &&
+         mech_y < tile_y + 8 && mech_y + MECH_H > tile_y;
 }
 
 s32 mech_fire_distance_sq(s16 fire_tx, s16 fire_ty) {
