@@ -24,7 +24,7 @@ void LoadGraphicImage(SpriteInfo info) {
 }
 
 void InitSprites(void) {
-  LoadPalette("spr/default_sprite", DEFAULT_SPRITE_PALETTE);
+  LoadPalette(DEFAULT_PALETTE_PATH, DEFAULT_SPRITE_PALETTE);
   NF_VramSpritePal(SCR_CHAMBER, DEFAULT_SPRITE_PALETTE, DEFAULT_SPRITE_PALETTE);
 
   // LoadPalette(SPRITE_INFOS[MECH].path, SPRITE_INFOS[MECH].pal_id);

@@ -31,7 +31,9 @@ enum {
   SPRITE_CNT
 };
 
+#define DEFAULT_PALETTE_PATH "spr/default_sprite"
 #define DEFAULT_SPRITE_PALETTE 0
+#define PLAYER_PALETTE_CPY SPRITE_CNT
 
 static const SpriteInfo SPRITE_INFOS[SPRITE_CNT] = {
     [MECH] = {"spr/sprite_robot_all", 32, 32, MECH, DEFAULT_SPRITE_PALETTE,

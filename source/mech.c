@@ -54,15 +54,51 @@ static u8 footstep_sfx = 0;
 static s16 footstep_timer = 0;
 static s16 timer_to_end = -1;
 
+
+#define PALETTE_COLORS 256
+static u8 palSnapshot[PALETTE_COLORS][3];
+
 void mech_init(void) {
   mech_x = spawn_player_x();
   mech_y = spawn_player_y();
   mech_precise_x = mech_x << PRECISION_BITS;
   mech_precise_y = mech_y << PRECISION_BITS;
 
-  NF_CreateSprite(SCR_WORLD, SPRITE_ID, MECH, DEFAULT_SPRITE_PALETTE, mech_x,
-                  mech_y);
+   NF_LoadSpritePal(DEFAULT_PALETTE_PATH, PLAYER_PALETTE_CPY);
+   NF_VramSpritePal(SCR_WORLD, PLAYER_PALETTE_CPY, PLAYER_PALETTE_CPY);
+  
+  // NF_LoadSpriteGfx(SPRITE_INFOS[MECH].path, 0, SPRITE_INFOS[MECH].width, SPRITE_INFOS[MECH].height);
+  // NF_VramSpriteGfx(SCR_WORLD, 0, 0, false);
+
+  NF_CreateSprite(SCR_WORLD, SPRITE_ID, MECH, PLAYER_PALETTE_CPY, mech_x,
+                mech_y);
   NF_SpriteLayer(SCR_WORLD, SPRITE_ID, LAYER_WORLD_FIRE);
+
+  for (int i = 0; i < PALETTE_COLORS; i++) {
+    NF_SpriteGetPalColor(SCR_CHAMBER, DEFAULT_SPRITE_PALETTE, i, 
+      &palSnapshot[i][0], &palSnapshot[i][1], &palSnapshot[i][2]);
+  }
+
+}
+
+#define STEPS 16
+
+void lerp_palette_to(s16 step, u8 tr, u8 tg, u8 tb){
+  if (step > STEPS) step = STEPS;
+  if (step < 0) step = 0;
+  for (int i = 0; i < PALETTE_COLORS; i++) {
+    u8 pr = palSnapshot[i][0];
+    u8 pg = palSnapshot[i][1];
+    u8 pb = palSnapshot[i][2];
+    s16 r = (pr * (STEPS-step)) + ((s16)tr)*step;
+    s16 g = (pg * (STEPS-step)) + ((s16)tg)*step;
+    s16 b = (pb * (STEPS-step)) + ((s16)tb)*step;
+    r/=STEPS;
+    g/=STEPS;
+    b/=STEPS;
+    NF_SpriteEditPalColor(SCR_WORLD, PLAYER_PALETTE_CPY, i, r, g, b);
+  }
+  NF_SpriteUpdatePalette(SCR_WORLD, PLAYER_PALETTE_CPY);
 }
 
 void mech_restart(void) {}
@@ -144,6 +180,8 @@ void mech_spray_water(void) {
   }
 }
 
+int step = 0;
+
 void mech_update(void) {
   if (timer_to_end > 0) {
     timer_to_end--;
@@ -158,6 +196,8 @@ void mech_update(void) {
 
   ++frame_cnt;
   frame_cnt %= 60;
+
+  lerp_palette_to(step, 0,31,0);
 
   if (footstep_timer > 0) {
     footstep_timer--;
